@@ -1,4 +1,5 @@
 /target
+/bin
 /src/main/webapp/WEB-INF/classes
 /src/main/webapp/WEB-INF/lib
 /.settings

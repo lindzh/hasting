@@ -39,7 +39,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 				channel.configureBlocking(false);
 				while(!channel.isConnected());
 				logger.info("connect to host "+host+" port "+port+" success");
-				selection.register(this,SelectionKey.OP_READ|SelectionKey.OP_WRITE,ByteBuffer.allocate(1024*512));
+				selection.register(this);
 				selection.startService();
 			}
 			InetSocketAddress remoteAddress = (InetSocketAddress)channel.getRemoteAddress();
@@ -79,7 +79,6 @@ public class RpcNioConnector extends AbstractRpcConnector{
 				throw new RpcException("request time out");
 			}
 		}
-		logger.info("add send message queue");
 		return true;
 	}
 	

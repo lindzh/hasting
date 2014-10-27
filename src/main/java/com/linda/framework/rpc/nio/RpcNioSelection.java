@@ -24,6 +24,7 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 	private boolean stop = false;
 	private boolean started = false;
 	private ConcurrentHashMap<SocketChannel,RpcNioConnector> connectorCache;
+	private static int READ_WRITE_SELECTION_MODE = SelectionKey.OP_READ|SelectionKey.OP_WRITE;
 	
 	private Logger logger = Logger.getLogger(RpcNioSelection.class);
 	
@@ -53,13 +54,8 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 		this.initNewSocketChannel(channel,connector);
 	}
 	
-	public void register(RpcNioConnector connector,int ops) throws ClosedChannelException{
-		connector.getChannel().register(selector, ops);
-		this.initNewSocketChannel(connector.getChannel(),connector);
-	}
-
-	public void register(RpcNioConnector connector,int ops,Object att) throws ClosedChannelException{
-		connector.getChannel().register(selector, ops, att);
+	public void register(RpcNioConnector connector) throws ClosedChannelException{
+		connector.getChannel().register(selector,READ_WRITE_SELECTION_MODE,ByteBuffer.allocate(RpcUtils.MEM_2M));
 		this.initNewSocketChannel(connector.getChannel(),connector);
 	}
 	
@@ -91,7 +87,7 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 		SocketChannel client = server.accept();
 		if(client!=null){
 			client.configureBlocking(false);
-			this.register(client, SelectionKey.OP_READ|SelectionKey.OP_WRITE,ByteBuffer.allocate(1024*512));
+			this.register(client, SelectionKey.OP_READ|SelectionKey.OP_WRITE,ByteBuffer.allocate(RpcUtils.MEM_2M));
 		}
 	}
 	
@@ -102,13 +98,14 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 			ByteBuffer buffer = (ByteBuffer)selectionKey.attachment();
 			int read = client.read(buffer);
 			if(read>0){
+				buffer.flip();
 				RpcObject rpc = RpcUtils.readBuffer(buffer);
 				rpc.setHost(connector.getRemoteHost());
 				rpc.setPort(connector.getRemotePort());
 				rpc.setRpcContext(connector.getRpcContext());
 				this.fireCallListeners(rpc, connector);
-				buffer.clear();
 			}
+			buffer.clear();
 		}
 	}
 	
