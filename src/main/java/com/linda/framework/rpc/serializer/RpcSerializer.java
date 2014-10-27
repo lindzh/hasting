@@ -1,4 +1,4 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.serializer;
 
 public interface RpcSerializer {
 

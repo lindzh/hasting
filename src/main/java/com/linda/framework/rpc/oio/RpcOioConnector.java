@@ -1,40 +1,32 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.oio;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-public class RpcConnector extends RpcNetBase implements Service,RpcSend{
-	
-	private String host = "127.0.0.1";
-	private int port = 6521;
+import com.linda.framework.rpc.RpcObject;
+import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.net.AbstractRpcConnector;
+import com.linda.framework.rpc.utils.RpcUtils;
+
+public class RpcOioConnector extends AbstractRpcConnector{
 	
 	private Socket socket;
 	private DataInputStream dis;
 	private DataOutputStream dos;
-	private boolean stop = false;
 	private RpcOutputPipeline pipeline;
-	private ExecutorService executor = Executors.newFixedThreadPool(3);
-	private Logger logger = Logger.getLogger(RpcConnector.class);
-	private String remoteHost;
-	private int remotePort;
-	private ConcurrentHashMap<String,Object> rpcContext;
+	private Logger logger = Logger.getLogger(RpcOioConnector.class);
 	
-	public RpcConnector(){
+	public RpcOioConnector(){
 		super();
-		rpcContext = new ConcurrentHashMap<String,Object>();
 	}
 	
-	public RpcConnector(Socket socket){
+	public RpcOioConnector(Socket socket){
 		super();
 		this.socket = socket;
-		rpcContext = new ConcurrentHashMap<String,Object>();
 	}
 	
 	public void startService(){
@@ -56,36 +48,6 @@ public class RpcConnector extends RpcNetBase implements Service,RpcSend{
 		}
 	}
 
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-	
-	private void fireCall(final RpcObject rpc){
-		executor.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					fireCallListeners(rpc, RpcConnector.this);
-				} catch (Exception e) {
-					e.printStackTrace();
-					logger.error("fire call err:" + e.getMessage());
-				}
-			}
-		});
-	}
-	
 	private class ClientThread extends Thread{
 		@Override
 		public void run() {

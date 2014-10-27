@@ -1,23 +1,37 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.client;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
-import com.linda.framework.rpc.RpcUtils.RpcType;
+import com.linda.framework.rpc.RemoteCall;
+import com.linda.framework.rpc.RemoteExecutor;
+import com.linda.framework.rpc.RpcCallSync;
+import com.linda.framework.rpc.RpcObject;
+import com.linda.framework.rpc.Service;
+import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.net.AbstractRpcConnector;
+import com.linda.framework.rpc.net.RpcCallListener;
+import com.linda.framework.rpc.net.RpcSender;
+import com.linda.framework.rpc.oio.RpcOioConnector;
+import com.linda.framework.rpc.serializer.JdkSerializer;
+import com.linda.framework.rpc.serializer.RpcSerializer;
+import com.linda.framework.rpc.sync.RpcSync;
+import com.linda.framework.rpc.sync.SimpleFutureRpcSync;
+import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 
 public class SimpleClientRemoteExecutor implements RemoteExecutor,RpcCallListener,Service{
 	
 	private int timeout = 10000;
-	private RpcConnector connector;
+	private AbstractRpcConnector connector;
 	private AtomicInteger index = new AtomicInteger(10000);
 	private RpcSync clientRpcSync;
 	private RpcSerializer serializer;
 	
 	private Logger logger = Logger.getLogger(SimpleClientRemoteExecutor.class);
 	
-	public SimpleClientRemoteExecutor(RpcConnector connector){
+	public SimpleClientRemoteExecutor(AbstractRpcConnector connector){
 		connector.addRpcCallListener(this);
 		this.connector = connector;
 		clientRpcSync = new SimpleFutureRpcSync();
@@ -66,7 +80,7 @@ public class SimpleClientRemoteExecutor implements RemoteExecutor,RpcCallListene
 	}
 	
 	@Override
-	public void onRpcMessage(RpcObject rpc,RpcSend sender) {
+	public void onRpcMessage(RpcObject rpc,RpcSender sender) {
 		RpcCallSync sync = rpcCache.get(this.genRpcCallCacheKey(rpc.getThreadId(), rpc.getIndex()));
 		if(sync!=null&&sync.getRequest().getThreadId()==rpc.getThreadId()){
 			clientRpcSync.notifyResult(sync, rpc);
@@ -77,11 +91,11 @@ public class SimpleClientRemoteExecutor implements RemoteExecutor,RpcCallListene
 		return index.getAndIncrement();
 	}
 
-	public RpcConnector getConnector() {
+	public AbstractRpcConnector getConnector() {
 		return connector;
 	}
 
-	public void setConnector(RpcConnector connector) {
+	public void setConnector(RpcOioConnector connector) {
 		this.connector = connector;
 	}
 

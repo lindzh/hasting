@@ -1,8 +1,12 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.client;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+
+import com.linda.framework.rpc.RemoteCall;
+import com.linda.framework.rpc.RemoteExecutor;
+import com.linda.framework.rpc.Service;
 
 public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 

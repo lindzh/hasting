@@ -1,6 +1,6 @@
 package com.linda.framework.rpc;
 
-import com.linda.framework.rpc.RpcUtils.RpcType;
+import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 
 public interface RemoteExecutor extends Service{
 	

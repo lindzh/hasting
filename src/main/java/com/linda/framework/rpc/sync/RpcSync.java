@@ -1,4 +1,7 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.sync;
+
+import com.linda.framework.rpc.RpcCallSync;
+import com.linda.framework.rpc.RpcObject;
 
 public interface RpcSync {
 	

@@ -1,4 +1,4 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.exception;
 
 public class RpcException extends RuntimeException{
 	

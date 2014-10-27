@@ -1,4 +1,4 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.utils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -7,11 +7,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
+import com.linda.framework.rpc.RemoteCall;
+import com.linda.framework.rpc.RpcObject;
+import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.exception.RpcExceptionHandler;
 
 public class RpcUtils {
 
@@ -114,6 +120,37 @@ public class RpcUtils {
 		} catch (IOException e) {
 			throw new RpcException(e);
 		}
+	}
+	
+	/**
+	 * type|threadId|index|length|data
+	 * @return
+	 */
+	public static boolean writeBuffer(ByteBuffer buffer,RpcObject object){
+		if (object.getLength() > MEM_2M) {
+			throw new RpcException("rpc data too long "+ object.getLength());
+		}
+		buffer.putInt(object.getType().getType());
+		buffer.putLong(object.getThreadId());
+		buffer.putInt(object.getIndex());
+		buffer.putInt(object.getLength());
+		buffer.put(object.getData());
+		return true;
+	}
+	
+	public static RpcObject readBuffer(ByteBuffer buffer){
+		RpcObject object = new RpcObject();
+		object.setType(RpcType.getByType(buffer.getInt()));
+		object.setThreadId(buffer.getLong());
+		object.setIndex(buffer.getInt());
+		object.setLength(buffer.getInt());
+		if (object.getLength() > MEM_2M) {
+			throw new RpcException("rpc data too long "+ object.getLength());
+		}
+		byte[] buf = new byte[object.getLength()];
+		buffer.get(buf, 0, buf.length);
+		object.setData(buf);
+		return object;
 	}
 
 	public static Object invokeMethod(Object obj, String methodName,Object[] args,RpcExceptionHandler exceptionHandler) {

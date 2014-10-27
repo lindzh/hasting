@@ -6,9 +6,15 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
-public class RpcTestClient {
+import com.linda.framework.rpc.client.SimpleClientRemoteExecutor;
+import com.linda.framework.rpc.client.SimpleClientRemoteProxy;
+import com.linda.framework.rpc.net.AbstractRpcConnector;
+import com.linda.framework.rpc.oio.RpcOioConnector;
+import com.linda.framework.rpc.utils.RpcUtils;
+
+public class RpcTestOioClient {
 	
-	private static Logger logger = 	Logger.getLogger(RpcTestClient.class);
+	private static Logger logger = 	Logger.getLogger(RpcTestOioClient.class);
 	
 	public static class CallThread extends Thread{
 		
@@ -66,7 +72,7 @@ public class RpcTestClient {
 		
 		String host = "127.0.0.1";
 		int port = 4332;
-		RpcConnector connector = new RpcConnector();
+		AbstractRpcConnector connector = new RpcOioConnector();
 		connector.setHost(host);
 		connector.setPort(port);
 		

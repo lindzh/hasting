@@ -1,9 +1,11 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.serializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import com.linda.framework.rpc.exception.RpcException;
 
 public class JdkSerializer implements RpcSerializer {
 

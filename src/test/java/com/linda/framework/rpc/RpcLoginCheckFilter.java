@@ -1,22 +1,20 @@
 package com.linda.framework.rpc;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.linda.framework.rpc.RemoteCall;
-import com.linda.framework.rpc.RpcException;
-import com.linda.framework.rpc.RpcFilter;
-import com.linda.framework.rpc.RpcFilterChain;
-import com.linda.framework.rpc.RpcObject;
-import com.linda.framework.rpc.RpcSend;
+import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.filter.RpcFilter;
+import com.linda.framework.rpc.filter.RpcFilterChain;
+import com.linda.framework.rpc.net.RpcSender;
 
 public class RpcLoginCheckFilter implements RpcFilter{
 	
 	private Logger logger = Logger.getLogger(RpcLoginCheckFilter.class);
 	
 	@Override
-	public void doFilter(RpcObject rpc, RemoteCall call, RpcSend sender,RpcFilterChain chain) {
+	public void doFilter(RpcObject rpc, RemoteCall call, RpcSender sender,RpcFilterChain chain) {
 		String service = call.getService();
 		if(service.equals(LoginRpcService.class.getName())){
 			logger.info("----------user login---------------");
@@ -29,7 +27,7 @@ public class RpcLoginCheckFilter implements RpcFilter{
 			}
 			return;
 		}else{
-			ConcurrentHashMap<String,Object> context = rpc.getRpcContext();
+			Map<String,Object> context = rpc.getRpcContext();
 			if(context.get("logined")==null){
 				throw new RpcException("user not login");
 			}else{

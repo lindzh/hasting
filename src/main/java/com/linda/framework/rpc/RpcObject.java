@@ -1,8 +1,10 @@
 package com.linda.framework.rpc;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.linda.framework.rpc.RpcUtils.RpcType;
+import com.linda.framework.rpc.utils.RpcUtils;
+import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 
 public class RpcObject {
 	
@@ -84,7 +86,7 @@ public class RpcObject {
 		this.port = port;
 	}
 
-	public ConcurrentHashMap<String, Object> getRpcContext() {
+	public Map<String, Object> getRpcContext() {
 		return rpcContext;
 	}
 

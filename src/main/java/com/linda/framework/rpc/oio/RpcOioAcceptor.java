@@ -1,4 +1,4 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.oio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -7,17 +7,19 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RpcAcceptor extends RpcNetBase implements Service{
+import com.linda.framework.rpc.Service;
+import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.net.AbstractRpcAcceptor;
+import com.linda.framework.rpc.net.RpcCallListener;
+
+public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	
-	private String host;
-	private int port;
 	private ServerSocket server;
-	private boolean stop = false;
-	private List<RpcConnector> connectors;
+	private List<RpcOioConnector> connectors;
 	
-	public RpcAcceptor(){
+	public RpcOioAcceptor(){
 		super();
-		connectors = new ArrayList<RpcConnector>();
+		connectors = new ArrayList<RpcOioConnector>();
 	}
 	
 	public void startService(){
@@ -31,28 +33,10 @@ public class RpcAcceptor extends RpcNetBase implements Service{
 		}
 	}
 	
-	private void startListeners(){
-		for(RpcCallListener listener:callListeners){
-			if(listener instanceof Service){
-				Service service = (Service)listener;
-				service.startService();
-			}
-		}
-	}
-	
-	private void stopListeners(){
-		for(RpcCallListener listener:callListeners){
-			if(listener instanceof Service){
-				Service service = (Service)listener;
-				service.stopService();
-			}
-		}
-	}
-
 	@Override
 	public void stopService() {
 		stop = true;
-		for(RpcConnector connector:connectors){
+		for(RpcOioConnector connector:connectors){
 			connector.stopService();
 		}
 		this.stopListeners();
@@ -64,10 +48,8 @@ public class RpcAcceptor extends RpcNetBase implements Service{
 			while(!stop){
 				try {
 					Socket socket = server.accept();
-					RpcConnector connector = new RpcConnector(socket);
-					for(RpcCallListener listener:callListeners){
-						connector.addRpcCallListener(listener);
-					}
+					RpcOioConnector connector = new RpcOioConnector(socket);
+					RpcOioAcceptor.this.addConnectorListeners(connector);
 					connector.startService();
 				} catch (IOException e) {
 					throw new RpcException(e);

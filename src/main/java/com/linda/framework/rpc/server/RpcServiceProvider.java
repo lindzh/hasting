@@ -1,8 +1,22 @@
-package com.linda.framework.rpc;
+package com.linda.framework.rpc.server;
 
 import org.apache.log4j.Logger;
 
-import com.linda.framework.rpc.RpcUtils.RpcType;
+import com.linda.framework.rpc.RemoteCall;
+import com.linda.framework.rpc.RemoteExecutor;
+import com.linda.framework.rpc.RpcObject;
+import com.linda.framework.rpc.Service;
+import com.linda.framework.rpc.exception.RpcExceptionHandler;
+import com.linda.framework.rpc.exception.SimpleRpcExceptionHandler;
+import com.linda.framework.rpc.filter.RpcFilter;
+import com.linda.framework.rpc.filter.RpcFilterChain;
+import com.linda.framework.rpc.filter.SimpleRpcFilterChain;
+import com.linda.framework.rpc.net.RpcCallListener;
+import com.linda.framework.rpc.net.RpcSender;
+import com.linda.framework.rpc.serializer.JdkSerializer;
+import com.linda.framework.rpc.serializer.RpcSerializer;
+import com.linda.framework.rpc.utils.RpcUtils;
+import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 
 public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 	
@@ -25,7 +39,7 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 	}
 	
 	@Override
-	public void onRpcMessage(RpcObject rpc, RpcSend sender) {
+	public void onRpcMessage(RpcObject rpc, RpcSender sender) {
 		RemoteCall call = this.deserializeCall(rpc, sender);
 		try{
 			if(call!=null){
@@ -37,7 +51,7 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 		
 	}
 	
-	private RemoteCall deserializeCall(RpcObject rpc, RpcSend sender){
+	private RemoteCall deserializeCall(RpcObject rpc, RpcSender sender){
 		try{
 			return (RemoteCall)serializer.deserialize(rpc.getData());
 		}catch(Exception e){
@@ -46,7 +60,7 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 		}
 	}
 	
-	private void execute(RemoteCall call,long threadId,int index,RpcSend sender){
+	private void execute(RemoteCall call,long threadId,int index,RpcSender sender){
 		RpcObject rpc = this.createRpcObject(index);
 		rpc.setThreadId(threadId);
 		Object result = executor.invoke(call);
@@ -87,8 +101,8 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 		this.serializer = serializer;
 	}
 
-	public RpcFilterChain getFilterChain() {
-		return filterChain;
+	public void addRpcFilter(RpcFilter filter){
+		filterChain.addRpcFilter(filter);
 	}
 
 	public void setFilterChain(RpcFilterChain filterChain) {
@@ -105,7 +119,7 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 		
 	}
 
-	private void handleException(RpcObject rpc, RemoteCall call, RpcSend sender,Exception e){
+	private void handleException(RpcObject rpc, RemoteCall call, RpcSender sender,Exception e){
 		RpcUtils.handleException(exceptionHandler,rpc,call,e);
 		if(rpc.getType()==RpcType.INVOKE){
 			RpcObject respRpc = this.createRpcObject(rpc.getIndex());
@@ -124,7 +138,7 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 	}
 	
 	@Override
-	public void doFilter(RpcObject rpc, RemoteCall call, RpcSend sender,
+	public void doFilter(RpcObject rpc, RemoteCall call, RpcSender sender,
 			RpcFilterChain chain) {
 		int index = rpc.getIndex();
 		if (rpc.getType() == RpcType.ONEWAY) {

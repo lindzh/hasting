@@ -2,19 +2,20 @@ package com.linda.framework.rpc;
 
 import org.apache.log4j.Logger;
 
-import com.linda.framework.rpc.RpcAcceptor;
-import com.linda.framework.rpc.RpcServiceProvider;
-import com.linda.framework.rpc.SimpleServerRemoteExecutor;
+import com.linda.framework.rpc.net.AbstractRpcAcceptor;
+import com.linda.framework.rpc.nio.RpcNioAcceptor;
+import com.linda.framework.rpc.server.RpcServiceProvider;
+import com.linda.framework.rpc.server.SimpleServerRemoteExecutor;
 
-public class RpcTestServer {
+public class RpcTestNioServer {
 	
-	private static Logger logger = 	Logger.getLogger(RpcTestServer.class);
+	private static Logger logger = 	Logger.getLogger(RpcTestNioServer.class);
 	
 	public static void main(String[] args) throws InterruptedException {
 		String host = "127.0.0.1";
 		int port = 4332;
 		
-		RpcAcceptor acceptor = new RpcAcceptor();
+		AbstractRpcAcceptor acceptor = new RpcNioAcceptor();
 		acceptor.setHost(host);
 		acceptor.setPort(port);
 		RpcServiceProvider provider = new RpcServiceProvider();
@@ -35,9 +36,9 @@ public class RpcTestServer {
 		
 		provider.setExecutor(proxy);
 		
-		provider.getFilterChain().addRpcFilter(new MyTestRpcFilter());
+		provider.addRpcFilter(new MyTestRpcFilter());
 		
-		provider.getFilterChain().addRpcFilter(new RpcLoginCheckFilter());
+		provider.addRpcFilter(new RpcLoginCheckFilter());
 		
 		acceptor.addRpcCallListener(provider);
 		
