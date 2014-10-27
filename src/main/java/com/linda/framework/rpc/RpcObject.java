@@ -93,4 +93,12 @@ public class RpcObject {
 	public void setRpcContext(ConcurrentHashMap<String, Object> rpcContext) {
 		this.rpcContext = rpcContext;
 	}
+
+	@Override
+	public String toString() {
+		return "RpcObject [type=" + type + ", threadId=" + threadId
+				+ ", index=" + index + ", length=" + length + ", host=" + host
+				+ ", port=" + port + "]";
+	}
+	
 }

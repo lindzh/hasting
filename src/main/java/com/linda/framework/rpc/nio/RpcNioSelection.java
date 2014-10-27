@@ -90,7 +90,6 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 		ServerSocketChannel server = (ServerSocketChannel)selectionKey.channel();
 		SocketChannel client = server.accept();
 		if(client!=null){
-			logger.info("accept client");
 			client.configureBlocking(false);
 			this.register(client, SelectionKey.OP_READ|SelectionKey.OP_WRITE,ByteBuffer.allocate(1024*512));
 		}
@@ -104,12 +103,10 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 			int read = client.read(buffer);
 			if(read>0){
 				RpcObject rpc = RpcUtils.readBuffer(buffer);
-				logger.info("read message");
 				rpc.setHost(connector.getRemoteHost());
 				rpc.setPort(connector.getRemotePort());
 				rpc.setRpcContext(connector.getRpcContext());
 				this.fireCallListeners(rpc, connector);
-				buffer.flip();
 				buffer.clear();
 			}
 		}
@@ -119,9 +116,9 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
 		while(connector.needSend()){
-			logger.info("write message");
 			ByteBuffer buffer = (ByteBuffer)selectionKey.attachment();
 			RpcUtils.writeBuffer(buffer, connector.pop());
+			buffer.flip();
 			client.write(buffer);
 			buffer.clear();
 		}

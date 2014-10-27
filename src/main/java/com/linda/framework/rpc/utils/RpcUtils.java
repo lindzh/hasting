@@ -34,8 +34,7 @@ public class RpcUtils {
 			dos.write(RpcUtils.intToBytes(rpc.getLength()));
 			if (rpc.getLength() > 0) {
 				if (rpc.getLength() > MEM_2M) {
-					throw new RpcException("rpc data too long "
-							+ rpc.getLength());
+					throw new RpcException("rpc data too long "+ rpc.getLength());
 				}
 				dos.write(rpc.getData());
 			}
@@ -79,8 +78,7 @@ public class RpcUtils {
 			rpc.setLength(RpcUtils.bytesToInt(lenBytes));
 			if (rpc.getLength() > 0) {
 				if (rpc.getLength() > MEM_2M) {
-					throw new RpcException("rpc data too long "
-							+ rpc.getLength());
+					throw new RpcException("rpc data too long "	+ rpc.getLength());
 				}
 				byte[] buf = new byte[rpc.getLength()];
 				dis.read(buf);
