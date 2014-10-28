@@ -99,6 +99,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 				throw new RpcException("request time out");
 			}
 		}
+		logger.info("send-->");
 		selection.sendNotify(selectionKey);
 		return true;
 	}

@@ -14,43 +14,48 @@ public class NioUtils {
 	private static Logger logger = Logger.getLogger(NioUtils.class);
 
 	public static void clearNioWriteOp(SelectionKey key){
-		if (!key.isValid()) {
-			return;
-		}
-		final int interestOps = key.interestOps();
-		if ((interestOps & SelectionKey.OP_WRITE) != 0) {
-			key.interestOps(interestOps & ~SelectionKey.OP_WRITE);
+		if(checkKey(key)){
+			final int interestOps = key.interestOps();
+			if ((interestOps & SelectionKey.OP_WRITE) != 0) {
+				key.interestOps(interestOps & ~SelectionKey.OP_WRITE);
+			}
 		}
 	}
 	
 	public static void setNioWriteOp(SelectionKey key){
-        if (!key.isValid()) {
-            return;
-        }
-        final int interestOps = key.interestOps();
-        if ((interestOps & SelectionKey.OP_WRITE) == 0) {
-            key.interestOps(interestOps | SelectionKey.OP_WRITE);
-        }
+		if(checkKey(key)){
+	        final int interestOps = key.interestOps();
+	        if ((interestOps & SelectionKey.OP_WRITE) == 0) {
+	            key.interestOps(interestOps | SelectionKey.OP_WRITE);
+	        }
+		}
 	}
 	
 	public static void clearNioReadOp(SelectionKey key){
-		if (!key.isValid()) {
-			return;
-		}
-		int interestOps = key.interestOps();
-		if ((interestOps & SelectionKey.OP_READ) != 0) {
-			key.interestOps(interestOps & ~SelectionKey.OP_READ);
+		if (checkKey(key)) {
+			int interestOps = key.interestOps();
+			if ((interestOps & SelectionKey.OP_READ) != 0) {
+				key.interestOps(interestOps & ~SelectionKey.OP_READ);
+			}
 		}
 	}
 	
 	public static void setNioReadOp(SelectionKey key){
+		if(checkKey(key)){
+	        final int interestOps = key.interestOps();
+	        if ((interestOps & SelectionKey.OP_READ) == 0) {
+	        	key.interestOps(interestOps | SelectionKey.OP_READ);
+	        }
+		}
+	}
+	
+	private static boolean checkKey(SelectionKey key){
         if (!key.isValid()) {
-            return;
+        	logger.info("valid selection key");
+            return false;
         }
-        final int interestOps = key.interestOps();
-        if ((interestOps & SelectionKey.OP_READ) == 0) {
-        	key.interestOps(interestOps | SelectionKey.OP_READ);
-        }
+        logger.info("selection key ok");
+        return true;
 	}
 	
 	/**
