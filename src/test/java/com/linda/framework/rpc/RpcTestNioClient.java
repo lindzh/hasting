@@ -35,9 +35,9 @@ public class RpcTestNioClient {
 		
 		logger.info("start client");
 		
-		//helloRpcService.sayHello("this is HelloRpcService",564);
-		
 		loginService.login("linda", "123456");
+		
+		helloRpcService.sayHello("this is HelloRpcService",564);
 		
 		testService.index(43, "index client test");
 		

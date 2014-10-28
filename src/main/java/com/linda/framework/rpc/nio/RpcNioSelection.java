@@ -7,7 +7,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,26 +15,27 @@ import org.apache.log4j.Logger;
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.exception.RpcException;
-import com.linda.framework.rpc.net.RpcCallListener;
-import com.linda.framework.rpc.net.RpcNetBase;
+import com.linda.framework.rpc.utils.NioUtils;
 import com.linda.framework.rpc.utils.RpcUtils;
 
-public class RpcNioSelection implements Service{
+public class RpcNioSelection implements Service,RpcNotify{
 	
 	private Selector selector;
 	private boolean stop = false;
 	private boolean started = false;
 	private ConcurrentHashMap<SocketChannel,RpcNioConnector> connectorCache;
-	private static int READ_WRITE_SELECTION_MODE = SelectionKey.OP_READ|SelectionKey.OP_WRITE;
 	private RpcNioAcceptor acceptor;
+	//private RpcWriteSelection writeSelection;
+	
 	
 	private Logger logger = Logger.getLogger(RpcNioSelection.class);
 	
 	public RpcNioSelection(RpcNioAcceptor acceptor){
+		this.acceptor = acceptor;
 		try {
 			selector = Selector.open();
 			connectorCache = new ConcurrentHashMap<SocketChannel,RpcNioConnector>();
-			this.acceptor = acceptor;
+			//writeSelection = new RpcWriteSelection();
 		} catch (IOException e) {
 			throw new RpcException(e);
 		}
@@ -45,40 +45,25 @@ public class RpcNioSelection implements Service{
 	public void register(ServerSocketChannel channel,int ops) throws ClosedChannelException{
 		channel.register(selector, ops);
 	}
-
-	public void register(SocketChannel channel,int ops) throws ClosedChannelException{
-		channel.register(selector, ops);
-		RpcNioConnector connector = this.genConnector(channel);
-		this.initNewSocketChannel(channel,connector);
-	}
-
-	public void register(SocketChannel channel,int ops,Object att) throws ClosedChannelException{
-		channel.register(selector, ops, att);
-		RpcNioConnector connector = this.genConnector(channel);
-		this.initNewSocketChannel(channel,connector);
-	}
 	
 	public void register(RpcNioConnector connector) throws ClosedChannelException{
-		connector.getChannel().register(selector,READ_WRITE_SELECTION_MODE,ByteBuffer.allocate(RpcUtils.MEM_2M));
-		this.initNewSocketChannel(connector.getChannel(),connector);
+		SelectionKey selectionKey = connector.getChannel().register(selector,SelectionKey.OP_READ);
+		this.initNewSocketChannel(connector.getChannel(),connector,selectionKey);
 	}
 	
-	private RpcNioConnector genConnector(SocketChannel channel){
-		RpcNioConnector connector = new RpcNioConnector(channel,this);
-		connector.startService();
-		return connector;
-	}
-	
-	private void initNewSocketChannel(SocketChannel channel,RpcNioConnector connector){
+	private void initNewSocketChannel(SocketChannel channel,RpcNioConnector connector,SelectionKey selectionKey){
 		if(acceptor!=null){
 			acceptor.addConnectorListeners(connector);
 		}
+		connector.setSelectionKey(selectionKey);
 		connectorCache.put(channel, connector);
+		//writeSelection.registerWrite(connector);
 	}
 
 	@Override
 	public synchronized void startService() {
 		if(!started){
+			//writeSelection.startService();
 			new SelectionThread().start();
 			started = true;
 		}
@@ -87,14 +72,17 @@ public class RpcNioSelection implements Service{
 	@Override
 	public void stopService() {
 		this.stop = true;
+		//writeSelection.stopService();
 	}
 	
 	private boolean doAccept(SelectionKey selectionKey) throws IOException{
 		ServerSocketChannel server = (ServerSocketChannel)selectionKey.channel();
 		SocketChannel client = server.accept();
 		if(client!=null){
+			logger.info("accept");
 			client.configureBlocking(false);
-			this.register(client, SelectionKey.OP_READ|SelectionKey.OP_WRITE,ByteBuffer.allocate(RpcUtils.MEM_2M));
+			RpcNioConnector connector = new RpcNioConnector(client,this);
+			this.register(connector);
 			return true;
 		}
 		return false;
@@ -102,17 +90,19 @@ public class RpcNioSelection implements Service{
 	
 	private boolean doRead(SelectionKey selectionKey) throws IOException{
 		boolean result = false;
+		logger.info("receive");
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
 		if(connector!=null){
-			ByteBuffer buffer = (ByteBuffer)selectionKey.attachment();
+			ByteBuffer buffer = connector.getReadBuf();
 			int read = client.read(buffer);
 			if(read>0){
 				buffer.flip();
-				RpcObject rpc = RpcUtils.readBuffer(buffer);
+				RpcObject rpc = NioUtils.readBuffer(buffer);
 				rpc.setHost(connector.getRemoteHost());
 				rpc.setPort(connector.getRemotePort());
 				rpc.setRpcContext(connector.getRpcContext());
+				logger.info("receive:"+rpc);
 				connector.fireCall(rpc);
 				result = true;
 			}
@@ -123,16 +113,20 @@ public class RpcNioSelection implements Service{
 	
 	private boolean doWrite(SelectionKey selectionKey) throws IOException{
 		boolean result = false;
+		logger.info("send:");
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
-		ByteBuffer buffer = (ByteBuffer)selectionKey.attachment();
+		ByteBuffer buffer = connector.getWriteBuf();
 		while(connector.needSend()){
-			RpcUtils.writeBuffer(buffer, connector.pop());
+			RpcObject rpc = connector.pop();
+			NioUtils.writeBuffer(buffer,rpc);
 			buffer.flip();
 			client.write(buffer);
 			result=true;
+			logger.info("send:"+rpc);
+			buffer.clear();
 		}
-		buffer.clear();
+		this.clearWriteOp(selectionKey);
 		return result;
 	}
 	
@@ -166,16 +160,28 @@ public class RpcNioSelection implements Service{
 					for (SelectionKey selectionKey : selectionKeys) {
 						hasTodo |= doDispatchSelectionKey(selectionKey);
 					}
-					if(!hasTodo){
-						Thread.currentThread().sleep(5L);
-					}
+//					if(!hasTodo){
+//						Thread.currentThread().sleep(50L);
+//					}
 				} catch (IOException e) {
 					throw new RpcException(e);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
+//				catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
 			}
 		}
+	}
+	
+	public void clearWriteOp(SelectionKey key){
+		NioUtils.clearNioWriteOp(key);
+		NioUtils.setNioReadOp(key);
+	}
+
+	@Override
+	public void sendNotify(SelectionKey key) {
+		NioUtils.clearNioReadOp(key);
+		NioUtils.setNioWriteOp(key);
 	}
 
 }

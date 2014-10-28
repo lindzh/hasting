@@ -41,11 +41,13 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 	@Override
 	public void onRpcMessage(RpcObject rpc, RpcSender sender) {
 		RemoteCall call = this.deserializeCall(rpc, sender);
+		logger.info("start--> "+call+"  rpc:"+rpc);
 		try{
 			if(call!=null){
 				filterChain.startFilter(rpc, call, sender);
 			}
 		}catch(Exception e){
+			logger.info("end exception:-->"+call+" rpc:"+rpc);
 			this.handleException(rpc, call, sender, e);
 		}
 		

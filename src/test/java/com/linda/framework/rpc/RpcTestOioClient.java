@@ -108,8 +108,8 @@ public class RpcTestOioClient {
 	
 		logger.info("exResult:"+ex);
 		
-		int tcount = 1;
-		int count = 4;
+		int tcount = 3;
+		int count = 100;
 		List<CallThread> ths = new ArrayList<CallThread>(tcount);
 		CountDownLatch latch = new CountDownLatch(tcount);
 		for(int i=0;i<tcount;i++){

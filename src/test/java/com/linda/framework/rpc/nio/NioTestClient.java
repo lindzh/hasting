@@ -8,12 +8,12 @@ import com.linda.framework.rpc.net.RpcCallListener;
 import com.linda.framework.rpc.net.RpcSender;
 import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 
-public class RpcNioTestClient implements RpcCallListener{
+public class NioTestClient implements RpcCallListener{
 	
-	public static Logger logger = Logger.getLogger(RpcNioTestClient.class);
+	public static Logger logger = Logger.getLogger(NioTestClient.class);
 	
 	public static void main(String[] args) {
-		RpcNioTestClient client = new RpcNioTestClient();
+		NioTestClient client = new NioTestClient();
 		String host = "127.0.0.1";
 		int port = 4332;
 		AbstractRpcConnector connector = new RpcNioConnector();

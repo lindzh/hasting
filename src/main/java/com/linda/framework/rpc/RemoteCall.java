@@ -1,6 +1,7 @@
 package com.linda.framework.rpc;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class RemoteCall implements Serializable{
 
@@ -39,4 +40,9 @@ public class RemoteCall implements Serializable{
 		this.args = args;
 	}
 
+	@Override
+	public String toString() {
+		return "RemoteCall [service=" + service + ", method=" + method
+				+ ", args=" + Arrays.toString(args) + "]";
+	}
 }

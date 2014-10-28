@@ -7,12 +7,12 @@ import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 import com.linda.framework.rpc.net.RpcCallListener;
 import com.linda.framework.rpc.net.RpcSender;
 
-public class RpcNioTestServer implements RpcCallListener{
+public class NioTestServer implements RpcCallListener{
 	
-	private Logger logger = Logger.getLogger(RpcNioTestServer.class);
+	private Logger logger = Logger.getLogger(NioTestServer.class);
 	
 	public static void main(String[] args) {
-		RpcNioTestServer server = new RpcNioTestServer();
+		NioTestServer server = new NioTestServer();
 		
 		String host = "127.0.0.1";
 		int port = 4332;

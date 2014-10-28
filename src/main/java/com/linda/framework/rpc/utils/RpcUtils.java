@@ -119,41 +119,6 @@ public class RpcUtils {
 			throw new RpcException(e);
 		}
 	}
-	
-	/**
-	 * type|threadId|index|length|data
-	 * @return
-	 */
-	public static boolean writeBuffer(ByteBuffer buffer,RpcObject object){
-		if (object.getLength() > MEM_2M) {
-			throw new RpcException("rpc data too long "+ object.getLength());
-		}
-		buffer.putInt(object.getType().getType());
-		buffer.putLong(object.getThreadId());
-		buffer.putInt(object.getIndex());
-		buffer.putInt(object.getLength());
-		buffer.put(object.getData());
-		return true;
-	}
-	
-	public static void logBuffer(String clazz,String key,ByteBuffer buffer){
-		logger.info(clazz+" "+key+" buff position:"+buffer.position()+" limit:"+buffer.limit()+" capacity:"+buffer.capacity());
-	}
-	
-	public static RpcObject readBuffer(ByteBuffer buffer){
-		RpcObject object = new RpcObject();
-		object.setType(RpcType.getByType(buffer.getInt()));
-		object.setThreadId(buffer.getLong());
-		object.setIndex(buffer.getInt());
-		object.setLength(buffer.getInt());
-		if (object.getLength() > MEM_2M) {
-			throw new RpcException("rpc data too long "+ object.getLength());
-		}
-		byte[] buf = new byte[object.getLength()];
-		buffer.get(buf, 0, buf.length);
-		object.setData(buf);
-		return object;
-	}
 
 	public static Object invokeMethod(Object obj, String methodName,Object[] args,RpcExceptionHandler exceptionHandler) {
 		Class<? extends Object> clazz = obj.getClass();
