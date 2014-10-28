@@ -65,7 +65,7 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 		this.remotePort = remotePort;
 	}
 
-	protected void fireCall(final RpcObject rpc){
+	public void fireCall(final RpcObject rpc){
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {

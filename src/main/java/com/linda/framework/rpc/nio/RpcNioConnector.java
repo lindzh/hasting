@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +28,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	}
 	
 	public RpcNioConnector(){
-		selection = new RpcNioSelection();
+		selection = new RpcNioSelection(null);
 	}
 	
 	@Override
@@ -80,10 +81,6 @@ public class RpcNioConnector extends AbstractRpcConnector{
 			}
 		}
 		return true;
-	}
-	
-	public void addRpcCallListener(RpcCallListener listener) {
-		selection.addRpcCallListener(listener);
 	}
 
 	public SocketChannel getChannel() {

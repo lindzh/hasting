@@ -18,7 +18,7 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 		try {
 			serverSocketChannel = ServerSocketChannel.open();
 			serverSocketChannel.configureBlocking(false);
-			selection = new RpcNioSelection();
+			selection = new RpcNioSelection(this);
 		} catch (IOException e) {
 			throw new RpcException(e);
 		}
@@ -48,10 +48,6 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 	public void stopService() {
 		selection.stopService();
 		this.stopListeners();
-	}
-
-	public void addRpcCallListener(RpcCallListener listener) {
-		selection.addRpcCallListener(listener);
 	}
 	
 }

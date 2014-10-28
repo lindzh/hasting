@@ -18,13 +18,17 @@ public abstract class RpcNetBase {
 		callListeners.add(listener);
 	}
 	
+	public List<RpcCallListener> getCallListeners() {
+		return callListeners;
+	}
+
 	public void fireCallListeners(RpcObject rpc,RpcSender sender){
 		for(RpcCallListener listener:callListeners){
 			listener.onRpcMessage(rpc,sender);
 		}
 	}
 	
-	protected void startListeners(){
+	public void startListeners(){
 		for(RpcCallListener listener:callListeners){
 			if(listener instanceof Service){
 				Service service = (Service)listener;
@@ -33,7 +37,7 @@ public abstract class RpcNetBase {
 		}
 	}
 	
-	protected void stopListeners(){
+	public void stopListeners(){
 		for(RpcCallListener listener:callListeners){
 			if(listener instanceof Service){
 				Service service = (Service)listener;
@@ -42,7 +46,7 @@ public abstract class RpcNetBase {
 		}
 	}
 	
-	protected void addConnectorListeners(AbstractRpcConnector connector){
+	public void addConnectorListeners(AbstractRpcConnector connector){
 		for(RpcCallListener listener:callListeners){
 			connector.addRpcCallListener(listener);
 		}

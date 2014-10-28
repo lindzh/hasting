@@ -136,6 +136,10 @@ public class RpcUtils {
 		return true;
 	}
 	
+	public static void logBuffer(String clazz,String key,ByteBuffer buffer){
+		logger.info(clazz+" "+key+" buff position:"+buffer.position()+" limit:"+buffer.limit()+" capacity:"+buffer.capacity());
+	}
+	
 	public static RpcObject readBuffer(ByteBuffer buffer){
 		RpcObject object = new RpcObject();
 		object.setType(RpcType.getByType(buffer.getInt()));

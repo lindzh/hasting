@@ -57,7 +57,7 @@ public class RpcNioTestClient implements RpcCallListener{
 				connector.sendRpcObject(rpc, 10000);
 				index++;
 				try {
-					Thread.currentThread().sleep(3000L);
+					Thread.currentThread().sleep(10000L);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

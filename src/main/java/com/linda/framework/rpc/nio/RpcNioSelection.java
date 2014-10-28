@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,23 +16,26 @@ import org.apache.log4j.Logger;
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.net.RpcCallListener;
 import com.linda.framework.rpc.net.RpcNetBase;
 import com.linda.framework.rpc.utils.RpcUtils;
 
-public class RpcNioSelection extends RpcNetBase implements Service{
+public class RpcNioSelection implements Service{
 	
 	private Selector selector;
 	private boolean stop = false;
 	private boolean started = false;
 	private ConcurrentHashMap<SocketChannel,RpcNioConnector> connectorCache;
 	private static int READ_WRITE_SELECTION_MODE = SelectionKey.OP_READ|SelectionKey.OP_WRITE;
+	private RpcNioAcceptor acceptor;
 	
 	private Logger logger = Logger.getLogger(RpcNioSelection.class);
 	
-	public RpcNioSelection(){
+	public RpcNioSelection(RpcNioAcceptor acceptor){
 		try {
 			selector = Selector.open();
 			connectorCache = new ConcurrentHashMap<SocketChannel,RpcNioConnector>();
+			this.acceptor = acceptor;
 		} catch (IOException e) {
 			throw new RpcException(e);
 		}
@@ -66,6 +70,9 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 	}
 	
 	private void initNewSocketChannel(SocketChannel channel,RpcNioConnector connector){
+		if(acceptor!=null){
+			acceptor.addConnectorListeners(connector);
+		}
 		connectorCache.put(channel, connector);
 	}
 
@@ -82,16 +89,19 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 		this.stop = true;
 	}
 	
-	private void doAccept(SelectionKey selectionKey) throws IOException{
+	private boolean doAccept(SelectionKey selectionKey) throws IOException{
 		ServerSocketChannel server = (ServerSocketChannel)selectionKey.channel();
 		SocketChannel client = server.accept();
 		if(client!=null){
 			client.configureBlocking(false);
 			this.register(client, SelectionKey.OP_READ|SelectionKey.OP_WRITE,ByteBuffer.allocate(RpcUtils.MEM_2M));
+			return true;
 		}
+		return false;
 	}
 	
-	private void doRead(SelectionKey selectionKey) throws IOException{
+	private boolean doRead(SelectionKey selectionKey) throws IOException{
+		boolean result = false;
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
 		if(connector!=null){
@@ -103,53 +113,66 @@ public class RpcNioSelection extends RpcNetBase implements Service{
 				rpc.setHost(connector.getRemoteHost());
 				rpc.setPort(connector.getRemotePort());
 				rpc.setRpcContext(connector.getRpcContext());
-				this.fireCallListeners(rpc, connector);
+				connector.fireCall(rpc);
+				result = true;
 			}
 			buffer.clear();
 		}
+		return result;
 	}
 	
-	private void doWrite(SelectionKey selectionKey) throws IOException{
+	private boolean doWrite(SelectionKey selectionKey) throws IOException{
+		boolean result = false;
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
+		ByteBuffer buffer = (ByteBuffer)selectionKey.attachment();
 		while(connector.needSend()){
-			ByteBuffer buffer = (ByteBuffer)selectionKey.attachment();
 			RpcUtils.writeBuffer(buffer, connector.pop());
 			buffer.flip();
 			client.write(buffer);
-			buffer.clear();
+			result=true;
 		}
+		buffer.clear();
+		return result;
 	}
 	
-	private void doDispatchSelectionKey(SelectionKey selectionKey){
+	private boolean doDispatchSelectionKey(SelectionKey selectionKey){
+		boolean result = false;
 		try{
 			if (selectionKey.isAcceptable()) {
-				doAccept(selectionKey);
+				result = doAccept(selectionKey);
 			}
 			if (selectionKey.isWritable()) {
-				doWrite(selectionKey);
+				result = doWrite(selectionKey);
 			}
 			if (selectionKey.isReadable()) {
-				doRead(selectionKey);
+				result = doRead(selectionKey);
 			}
 		}catch(IOException e){
 			
 		}
+		return result;
 	}
 	
 	private class SelectionThread extends Thread {
 		@Override
 		public void run() {
 			logger.info("select thread has started");
+			boolean hasTodo = false;
 			while (!stop) {
 				try {
 					selector.select();
 					Set<SelectionKey> selectionKeys = selector.selectedKeys();
 					for (SelectionKey selectionKey : selectionKeys) {
-						doDispatchSelectionKey(selectionKey);
+						hasTodo |= doDispatchSelectionKey(selectionKey);
+					}
+					if(!hasTodo){
+						Thread.currentThread().sleep(5L);
 					}
 				} catch (IOException e) {
 					throw new RpcException(e);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		}
