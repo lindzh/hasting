@@ -46,8 +46,8 @@ proxy.registerRemote(LoginRpcService.class, loginService);
 添加ip端口 log和安全检查过滤器
 
 ```java
-provider.getFilterChain().addRpcFilter(new MyTestRpcFilter());
-provider.getFilterChain().addRpcFilter(new RpcLoginCheckFilter());
+provider.addRpcFilter(new MyTestRpcFilter());
+provider.addRpcFilter(new RpcLoginCheckFilter());
 ```
 
 ###客户端
