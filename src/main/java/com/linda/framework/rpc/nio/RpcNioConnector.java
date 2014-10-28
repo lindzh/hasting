@@ -100,7 +100,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 			}
 		}
 		logger.info("send-->");
-		selection.sendNotify(selectionKey);
+		//selection.sendNotify(selectionKey);
 		return true;
 	}
 

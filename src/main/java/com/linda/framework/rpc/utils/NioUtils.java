@@ -92,7 +92,5 @@ public class NioUtils {
 		object.setData(buf);
 		return object;
 	}
-	
-	
 
 }

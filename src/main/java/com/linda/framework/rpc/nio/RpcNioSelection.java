@@ -47,7 +47,7 @@ public class RpcNioSelection implements Service,RpcNotify{
 	}
 	
 	public void register(RpcNioConnector connector) throws ClosedChannelException{
-		SelectionKey selectionKey = connector.getChannel().register(selector,SelectionKey.OP_READ);
+		SelectionKey selectionKey = connector.getChannel().register(selector,SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 		this.initNewSocketChannel(connector.getChannel(),connector,selectionKey);
 	}
 	
@@ -90,7 +90,7 @@ public class RpcNioSelection implements Service,RpcNotify{
 	
 	private boolean doRead(SelectionKey selectionKey) throws IOException{
 		boolean result = false;
-		logger.info("receive");
+		//logger.info("receive");
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
 		if(connector!=null){
@@ -113,7 +113,7 @@ public class RpcNioSelection implements Service,RpcNotify{
 	
 	private boolean doWrite(SelectionKey selectionKey) throws IOException{
 		boolean result = false;
-		logger.info("send:");
+		//logger.info("send:");
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
 		ByteBuffer buffer = connector.getWriteBuf();
@@ -126,7 +126,7 @@ public class RpcNioSelection implements Service,RpcNotify{
 			logger.info("send:"+rpc);
 			buffer.clear();
 		}
-		this.clearWriteOp(selectionKey);
+		//this.clearWriteOp(selectionKey);
 		return result;
 	}
 	
