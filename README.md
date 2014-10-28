@@ -9,20 +9,21 @@ rpc远程调用通用框架，提供一个端口多个服务同时高并发部�
 ```java
 String host = "127.0.0.1";
 int port = 4332;
-
-RpcAcceptor acceptor = new RpcAcceptor();
+//添加一个网络接口监听器
+AbstractRpcAcceptor acceptor = new RpcOioAcceptor();
+//nio AbstractRpcAcceptor acceptor = new RpcNioAcceptor();
+//设置监听端口
 acceptor.setHost(host);
 acceptor.setPort(port);
+//添加服务提供者
 RpcServiceProvider provider = new RpcServiceProvider();
-
 SimpleServerRemoteExecutor proxy = new SimpleServerRemoteExecutor();
-
+//设置反射服务执行器
 provider.setExecutor(proxy);
-
+//添加网络通知监听器
 acceptor.addRpcCallListener(provider);
-
+//启动服务
 acceptor.startService();
-
 logger.info("service started");
 ```
 
@@ -57,16 +58,18 @@ provider.getFilterChain().addRpcFilter(new RpcLoginCheckFilter());
 ```java
 String host = "127.0.0.1";
 int port = 4332;
-RpcConnector connector = new RpcConnector();
+//添加连接器
+AbstractRpcConnector connector = new RpcOioConnector();
+//nio AbstractRpcConnector connector = new RpcNioConnector();
+//设置远程服务
 connector.setHost(host);
 connector.setPort(port);
-
+//添加执行器
 SimpleClientRemoteExecutor executor = new SimpleClientRemoteExecutor(connector);
-
+//添加反射代理
 SimpleClientRemoteProxy proxy = new SimpleClientRemoteProxy();
-
 proxy.setRemoteExecutor(executor);
-
+//启动服务
 proxy.startService();
 
 logger.info("start client");
