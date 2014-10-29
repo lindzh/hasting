@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 
@@ -29,6 +30,9 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 	private ConcurrentHashMap<SocketChannel,RpcNioConnector> connectorCache;
 	private List<RpcNioConnector> connectors;
 	private RpcNioAcceptor acceptor;
+	private AtomicBoolean inSelect = new AtomicBoolean(false);
+	private static final int READ_OP = SelectionKey.OP_READ;
+	private static final int READ_WRITE_OP = SelectionKey.OP_READ|SelectionKey.OP_WRITE;
 	
 	private Logger logger = Logger.getLogger(RpcNioSelection.class);
 	
@@ -49,7 +53,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 	}
 	
 	public void register(RpcNioConnector connector) throws ClosedChannelException{
-		SelectionKey selectionKey = connector.getChannel().register(selector,SelectionKey.OP_READ);
+		SelectionKey selectionKey = connector.getChannel().register(selector,READ_OP);
 		this.initNewSocketChannel(connector.getChannel(),connector,selectionKey);
 	}
 	
@@ -91,7 +95,6 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 		boolean result = false;
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
-		logger.info("doRead:"+connector.getRemoteHost()+" "+connector.getRemotePort());
 		if(connector!=null){
 			ByteBuffer buffer = connector.getReadBuf();
 			while(!stop){
@@ -102,12 +105,10 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 					rpc.setHost(connector.getRemoteHost());
 					rpc.setPort(connector.getRemotePort());
 					rpc.setRpcContext(connector.getRpcContext());
-					logger.info("nioRead:" + rpc);
 					connector.fireCall(rpc);
 					result = true;
 				}else{
 					buffer.clear();
-					logger.info("nioRead len 0");
 					break;
 				}
 			}
@@ -123,7 +124,6 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 			while (connector.isNeedToSend()) {
 				ByteBuffer buffer = connector.getWriteBuf();
 				RpcObject rpc = connector.getToSend();
-				logger.info("nioSend:" + rpc);
 				NioUtils.writeBuffer(buffer, rpc);
 				buffer.flip();
 				try {
@@ -134,7 +134,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 				buffer.clear();
 				result = true;
 			}
-			selectionKey.interestOps(SelectionKey.OP_READ);
+			selectionKey.interestOps(READ_OP);
 		}
 		return result;
 	}
@@ -164,7 +164,9 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 			while (!stop) {
 				checkSend();
 				try {
+					inSelect.set(true);
 					selector.select();
+					inSelect.set(false);
 					Set<SelectionKey> selectionKeys = selector.selectedKeys();
 					for (SelectionKey selectionKey : selectionKeys) {
 						doDispatchSelectionKey(selectionKey);
@@ -180,14 +182,16 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 		for(RpcNioConnector connector:connectors){
 			if(connector.isNeedToSend()){
 				SelectionKey selectionKey = connector.getChannel().keyFor(selector);
-				selectionKey.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+				selectionKey.interestOps(READ_WRITE_OP);
 			}
 		}
 	}
 
 	@Override
 	public void notifySend(AbstractRpcConnector connector) {
-		selector.wakeup();
+		if(inSelect.get()){
+			selector.wakeup();
+		}
 	}
 
 }
