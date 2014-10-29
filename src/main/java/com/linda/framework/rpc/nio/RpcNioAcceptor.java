@@ -12,14 +12,12 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 	
 	private ServerSocketChannel serverSocketChannel;
 	private RpcNioSelection selection;
-	private RpcNioWriter writer;
 	
 	public RpcNioAcceptor(){
 		try {
 			serverSocketChannel = ServerSocketChannel.open();
 			serverSocketChannel.configureBlocking(false);
-			writer = new RpcNioWriter();
-			selection = new RpcNioSelection(this,writer);
+			selection = new RpcNioSelection(this);
 		} catch (IOException e) {
 			throw new RpcException(e);
 		}

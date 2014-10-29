@@ -29,12 +29,10 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	public RpcNioConnector(RpcNioSelection selection){
 		super(null);
 		if(selection==null){
-			RpcNioWriter writer = new RpcNioWriter();
-			this.selection = new RpcNioSelection(null,writer);
+			this.selection = new RpcNioSelection(null);
 		}else{
 			this.selection = selection;
 		}
-		this.setRpcWriter(this.selection.getWriter());
 		this.initBuf();
 	}
 	
@@ -89,4 +87,8 @@ public class RpcNioConnector extends AbstractRpcConnector{
 		this.selectionKey = selectionKey;
 	}
 
+	@Override
+	public void notifySend() {
+		selection.notifySend(this);
+	}
 }

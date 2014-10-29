@@ -95,10 +95,14 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 				throw new RpcException("request time out");
 			}
 		}
+		this.notifySend();
+		return true;
+	}
+	
+	public void notifySend(){
 		if(rpcWriter!=null){
 			rpcWriter.notifySend(this);
 		}
-		return true;
 	}
 	
 	public AbstractRpcWriter getRpcWriter() {

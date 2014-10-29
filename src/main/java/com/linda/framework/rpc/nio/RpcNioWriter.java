@@ -16,18 +16,22 @@ public class RpcNioWriter extends AbstractRpcWriter{
 		boolean result = false;
 		RpcNioConnector connector = (RpcNioConnector)con;
 		SocketChannel channel = connector.getChannel();
-		while(connector.isNeedToSend()){
-			ByteBuffer buffer = connector.getWriteBuf();
-			RpcObject rpc = connector.getToSend();
-			NioUtils.writeBuffer(buffer,rpc);
-			buffer.flip();
-			try {
-				channel.write(buffer);
-			} catch (IOException e) {
-				e.printStackTrace();
+		if(connector.isNeedToSend()){
+			synchronized (connector) {
+				while(connector.isNeedToSend()){
+					ByteBuffer buffer = connector.getWriteBuf();
+					RpcObject rpc = connector.getToSend();
+					NioUtils.writeBuffer(buffer,rpc);
+					buffer.flip();
+					try {
+						channel.write(buffer);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					buffer.clear();
+					result=true;
+				}
 			}
-			buffer.clear();
-			result=true;
 		}
 		return result;
 	}
