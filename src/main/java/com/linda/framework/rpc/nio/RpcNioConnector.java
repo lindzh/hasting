@@ -5,21 +5,16 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
-import com.linda.framework.rpc.net.RpcCallListener;
 import com.linda.framework.rpc.utils.RpcUtils;
 
 public class RpcNioConnector extends AbstractRpcConnector{
 	
 	private SocketChannel channel;
-	private LinkedList<RpcObject> sendQueue = new LinkedList<RpcObject>();
 	private RpcNioSelection selection;
 	private Logger logger = Logger.getLogger(RpcNioConnector.class);
 	private ByteBuffer writeBuf;
@@ -27,13 +22,19 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	private SelectionKey selectionKey;
 
 	public RpcNioConnector(SocketChannel socketChanel,RpcNioSelection selection){
+		this(selection);
 		this.channel = socketChanel;
-		this.selection = selection;
-		this.initBuf();
 	}
 	
-	public RpcNioConnector(){
-		selection = new RpcNioSelection(null);
+	public RpcNioConnector(RpcNioSelection selection){
+		super(null);
+		if(selection==null){
+			RpcNioWriter writer = new RpcNioWriter();
+			this.selection = new RpcNioSelection(null,writer);
+		}else{
+			this.selection = selection;
+		}
+		this.setRpcWriter(this.selection.getWriter());
 		this.initBuf();
 	}
 	
@@ -74,34 +75,6 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	@Override
 	public void stopService() {
 		this.stop = true;
-	}
-
-	public boolean needSend(){
-		RpcObject peek = sendQueue.peek();
-		return peek!=null;
-	}
-	
-	public RpcObject pop(){
-		return sendQueue.pop();
-	}
-	
-	@Override
-	public boolean sendRpcObject(RpcObject rpc, int timeout) {
-		int cost = 0;
-		while(!sendQueue.offer(rpc)){
-			cost +=3;
-			try {
-				Thread.currentThread().sleep(3);
-			} catch (InterruptedException e) {
-				throw new RpcException(e);
-			}
-			if(timeout>0&&cost>timeout){
-				throw new RpcException("request time out");
-			}
-		}
-		logger.info("send-->");
-		//selection.sendNotify(selectionKey);
-		return true;
 	}
 
 	public SocketChannel getChannel() {

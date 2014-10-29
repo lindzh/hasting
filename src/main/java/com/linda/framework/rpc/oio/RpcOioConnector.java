@@ -17,15 +17,22 @@ public class RpcOioConnector extends AbstractRpcConnector{
 	private Socket socket;
 	private DataInputStream dis;
 	private DataOutputStream dos;
-	private RpcOutputPipeline pipeline;
+	//private RpcOutputPipeline pipeline;
 	private Logger logger = Logger.getLogger(RpcOioConnector.class);
 	
-	public RpcOioConnector(){
-		super();
+	public RpcOioConnector(RpcOioWriter writer){
+		super(writer);
+		this.init();
 	}
 	
-	public RpcOioConnector(Socket socket){
-		super();
+	private void init(){
+		if(this.getRpcWriter()==null){
+			this.setRpcWriter(new RpcOioWriter());
+		}
+	}
+	
+	public RpcOioConnector(Socket socket,RpcOioWriter writer){
+		this(writer);
 		this.socket = socket;
 	}
 	
@@ -40,8 +47,8 @@ public class RpcOioConnector extends AbstractRpcConnector{
 			remoteHost = remoteAddress.getAddress().getHostAddress();
 			dis = new DataInputStream(socket.getInputStream());
 			dos = new DataOutputStream(socket.getOutputStream());
-			pipeline = new RpcOutputPipeline(dos);
-			pipeline.startService();
+			this.getRpcWriter().registerWrite(this);
+			this.getRpcWriter().startService();
 			new ClientThread().start();
 		} catch (Exception e) {
 			throw new RpcException(e);
@@ -69,11 +76,10 @@ public class RpcOioConnector extends AbstractRpcConnector{
 		RpcUtils.close(dis, dos);
 		rpcContext.clear();
 		executor.shutdown();
-		pipeline.stopService();
+		this.getRpcWriter().stopService();
 	}
 
-	@Override
-	public boolean sendRpcObject(RpcObject rpc, int timeout) {
-		return pipeline.addRpcObject(rpc, timeout);
+	public DataOutputStream getOutputStream() {
+		return dos;
 	}
 }

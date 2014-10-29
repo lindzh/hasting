@@ -72,7 +72,7 @@ public class RpcTestOioClient {
 		
 		String host = "127.0.0.1";
 		int port = 4332;
-		AbstractRpcConnector connector = new RpcOioConnector();
+		AbstractRpcConnector connector = new RpcOioConnector(null);
 		connector.setHost(host);
 		connector.setPort(port);
 		

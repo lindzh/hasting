@@ -16,26 +16,25 @@ import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.utils.NioUtils;
-import com.linda.framework.rpc.utils.RpcUtils;
 
-public class RpcNioSelection implements Service,RpcNotify{
+public class RpcNioSelection implements Service{
 	
 	private Selector selector;
 	private boolean stop = false;
 	private boolean started = false;
 	private ConcurrentHashMap<SocketChannel,RpcNioConnector> connectorCache;
 	private RpcNioAcceptor acceptor;
-	//private RpcWriteSelection writeSelection;
+	private RpcNioWriter writer;
 	
 	
 	private Logger logger = Logger.getLogger(RpcNioSelection.class);
 	
-	public RpcNioSelection(RpcNioAcceptor acceptor){
+	public RpcNioSelection(RpcNioAcceptor acceptor,RpcNioWriter writer){
 		this.acceptor = acceptor;
 		try {
 			selector = Selector.open();
 			connectorCache = new ConcurrentHashMap<SocketChannel,RpcNioConnector>();
-			//writeSelection = new RpcWriteSelection();
+			this.writer = writer;
 		} catch (IOException e) {
 			throw new RpcException(e);
 		}
@@ -47,7 +46,7 @@ public class RpcNioSelection implements Service,RpcNotify{
 	}
 	
 	public void register(RpcNioConnector connector) throws ClosedChannelException{
-		SelectionKey selectionKey = connector.getChannel().register(selector,SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+		SelectionKey selectionKey = connector.getChannel().register(selector,SelectionKey.OP_READ);
 		this.initNewSocketChannel(connector.getChannel(),connector,selectionKey);
 	}
 	
@@ -57,13 +56,13 @@ public class RpcNioSelection implements Service,RpcNotify{
 		}
 		connector.setSelectionKey(selectionKey);
 		connectorCache.put(channel, connector);
-		//writeSelection.registerWrite(connector);
+		writer.registerWrite(connector);
 	}
 
 	@Override
 	public synchronized void startService() {
 		if(!started){
-			//writeSelection.startService();
+			writer.startService();
 			new SelectionThread().start();
 			started = true;
 		}
@@ -72,14 +71,13 @@ public class RpcNioSelection implements Service,RpcNotify{
 	@Override
 	public void stopService() {
 		this.stop = true;
-		//writeSelection.stopService();
+		writer.stopService();
 	}
 	
 	private boolean doAccept(SelectionKey selectionKey) throws IOException{
 		ServerSocketChannel server = (ServerSocketChannel)selectionKey.channel();
 		SocketChannel client = server.accept();
 		if(client!=null){
-			logger.info("accept");
 			client.configureBlocking(false);
 			RpcNioConnector connector = new RpcNioConnector(client,this);
 			this.register(connector);
@@ -90,7 +88,6 @@ public class RpcNioSelection implements Service,RpcNotify{
 	
 	private boolean doRead(SelectionKey selectionKey) throws IOException{
 		boolean result = false;
-		//logger.info("receive");
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
 		if(connector!=null){
@@ -102,7 +99,6 @@ public class RpcNioSelection implements Service,RpcNotify{
 				rpc.setHost(connector.getRemoteHost());
 				rpc.setPort(connector.getRemotePort());
 				rpc.setRpcContext(connector.getRpcContext());
-				logger.info("receive:"+rpc);
 				connector.fireCall(rpc);
 				result = true;
 			}
@@ -111,33 +107,11 @@ public class RpcNioSelection implements Service,RpcNotify{
 		return result;
 	}
 	
-	private boolean doWrite(SelectionKey selectionKey) throws IOException{
-		boolean result = false;
-		//logger.info("send:");
-		SocketChannel client = (SocketChannel)selectionKey.channel();
-		RpcNioConnector connector = connectorCache.get(client);
-		ByteBuffer buffer = connector.getWriteBuf();
-		while(connector.needSend()){
-			RpcObject rpc = connector.pop();
-			NioUtils.writeBuffer(buffer,rpc);
-			buffer.flip();
-			client.write(buffer);
-			result=true;
-			logger.info("send:"+rpc);
-			buffer.clear();
-		}
-		//this.clearWriteOp(selectionKey);
-		return result;
-	}
-	
 	private boolean doDispatchSelectionKey(SelectionKey selectionKey){
 		boolean result = false;
 		try{
 			if (selectionKey.isAcceptable()) {
 				result = doAccept(selectionKey);
-			}
-			if (selectionKey.isWritable()) {
-				result = doWrite(selectionKey);
 			}
 			if (selectionKey.isReadable()) {
 				result = doRead(selectionKey);
@@ -148,40 +122,30 @@ public class RpcNioSelection implements Service,RpcNotify{
 		return result;
 	}
 	
+	public RpcNioWriter getWriter() {
+		return writer;
+	}
+
+	public void setWriter(RpcNioWriter writer) {
+		this.writer = writer;
+	}
+
 	private class SelectionThread extends Thread {
 		@Override
 		public void run() {
 			logger.info("select thread has started");
-			boolean hasTodo = false;
 			while (!stop) {
 				try {
 					selector.select();
 					Set<SelectionKey> selectionKeys = selector.selectedKeys();
 					for (SelectionKey selectionKey : selectionKeys) {
-						hasTodo |= doDispatchSelectionKey(selectionKey);
+						doDispatchSelectionKey(selectionKey);
 					}
-//					if(!hasTodo){
-//						Thread.currentThread().sleep(50L);
-//					}
 				} catch (IOException e) {
 					throw new RpcException(e);
 				}
-//				catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
 			}
 		}
-	}
-	
-	public void clearWriteOp(SelectionKey key){
-		NioUtils.clearNioWriteOp(key);
-		NioUtils.setNioReadOp(key);
-	}
-
-	@Override
-	public void sendNotify(SelectionKey key) {
-		NioUtils.clearNioReadOp(key);
-		NioUtils.setNioWriteOp(key);
 	}
 
 }

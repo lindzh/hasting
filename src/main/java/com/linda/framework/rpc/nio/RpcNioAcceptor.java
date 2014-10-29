@@ -7,18 +7,19 @@ import java.nio.channels.ServerSocketChannel;
 
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.net.AbstractRpcAcceptor;
-import com.linda.framework.rpc.net.RpcCallListener;
 
 public class RpcNioAcceptor extends AbstractRpcAcceptor{
 	
 	private ServerSocketChannel serverSocketChannel;
 	private RpcNioSelection selection;
+	private RpcNioWriter writer;
 	
 	public RpcNioAcceptor(){
 		try {
 			serverSocketChannel = ServerSocketChannel.open();
 			serverSocketChannel.configureBlocking(false);
-			selection = new RpcNioSelection(this);
+			writer = new RpcNioWriter();
+			selection = new RpcNioSelection(this,writer);
 		} catch (IOException e) {
 			throw new RpcException(e);
 		}

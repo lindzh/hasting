@@ -1,5 +1,6 @@
 package com.linda.framework.rpc.net;
 
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
+import com.linda.framework.rpc.exception.RpcException;
 
 public abstract class AbstractRpcConnector extends RpcNetBase implements Service,RpcSender{
 	
@@ -19,9 +21,14 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 	protected String remoteHost;
 	protected int remotePort;
 	protected ConcurrentHashMap<String,Object> rpcContext;
+	private RpcOutputNofity outputNotify;
 	
-	public AbstractRpcConnector(){
+	private LinkedList<RpcObject> sendQueueCache = new LinkedList<RpcObject>();
+	private AbstractRpcWriter rpcWriter;
+	
+	public AbstractRpcConnector(AbstractRpcWriter rpcWriter){
 		super();
+		this.rpcWriter = rpcWriter;
 		rpcContext = new ConcurrentHashMap<String,Object>();
 	}
 	
@@ -63,6 +70,51 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 
 	public void setRemotePort(int remotePort) {
 		this.remotePort = remotePort;
+	}
+	
+	public boolean isNeedToSend(){
+		RpcObject peek = sendQueueCache.peek();
+		return peek!=null;
+	}
+	
+	public RpcObject getToSend(){
+		return sendQueueCache.pop();
+	}
+	
+	@Override
+	public boolean sendRpcObject(RpcObject rpc, int timeout) {
+		int cost = 0;
+		while(!sendQueueCache.offer(rpc)){
+			cost +=3;
+			try {
+				Thread.currentThread().sleep(3);
+			} catch (InterruptedException e) {
+				throw new RpcException(e);
+			}
+			if(timeout>0&&cost>timeout){
+				throw new RpcException("request time out");
+			}
+		}
+		if(rpcWriter!=null){
+			rpcWriter.notifySend(this);
+		}
+		return true;
+	}
+	
+	public AbstractRpcWriter getRpcWriter() {
+		return rpcWriter;
+	}
+
+	public void setRpcWriter(AbstractRpcWriter rpcWriter) {
+		this.rpcWriter = rpcWriter;
+	}
+
+	public RpcOutputNofity getOutputNotify() {
+		return outputNotify;
+	}
+
+	public void setOutputNotify(RpcOutputNofity outputNotify) {
+		this.outputNotify = outputNotify;
 	}
 
 	public void fireCall(final RpcObject rpc){

@@ -15,7 +15,7 @@ public class RpcTestNioClient {
 		
 		String host = "127.0.0.1";
 		int port = 4332;
-		AbstractRpcConnector connector = new RpcNioConnector();
+		AbstractRpcConnector connector = new RpcNioConnector(null);
 		connector.setHost(host);
 		connector.setPort(port);
 		
