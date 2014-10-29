@@ -17,7 +17,6 @@ public class RpcOioConnector extends AbstractRpcConnector{
 	private Socket socket;
 	private DataInputStream dis;
 	private DataOutputStream dos;
-	//private RpcOutputPipeline pipeline;
 	private Logger logger = Logger.getLogger(RpcOioConnector.class);
 	
 	public RpcOioConnector(RpcOioWriter writer){
