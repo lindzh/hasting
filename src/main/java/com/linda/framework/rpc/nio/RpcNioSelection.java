@@ -30,7 +30,6 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 	private List<RpcNioConnector> connectors;
 	private RpcNioAcceptor acceptor;
 	
-	
 	private Logger logger = Logger.getLogger(RpcNioSelection.class);
 	
 	public RpcNioSelection(RpcNioAcceptor acceptor){
@@ -92,20 +91,25 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 		boolean result = false;
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
+		logger.info("doRead:"+connector.getRemoteHost()+" "+connector.getRemotePort());
 		if(connector!=null){
-			synchronized(connector){
-				ByteBuffer buffer = connector.getReadBuf();
+			ByteBuffer buffer = connector.getReadBuf();
+			while(!stop){
 				int read = client.read(buffer);
-				if(read>0){
+				if (read > 0) {
 					buffer.flip();
 					RpcObject rpc = NioUtils.readBuffer(buffer);
 					rpc.setHost(connector.getRemoteHost());
 					rpc.setPort(connector.getRemotePort());
 					rpc.setRpcContext(connector.getRpcContext());
+					logger.info("nioRead:" + rpc);
 					connector.fireCall(rpc);
 					result = true;
+				}else{
+					buffer.clear();
+					logger.info("nioRead len 0");
+					break;
 				}
-				buffer.clear();
 			}
 		}
 		return result;
@@ -116,20 +120,19 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 		SocketChannel channel = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(channel);
 		if(connector.isNeedToSend()){
-			synchronized (connector) {
-				while(connector.isNeedToSend()){
-					ByteBuffer buffer = connector.getWriteBuf();
-					RpcObject rpc = connector.getToSend();
-					NioUtils.writeBuffer(buffer,rpc);
-					buffer.flip();
-					try {
-						channel.write(buffer);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					buffer.clear();
-					result=true;
+			while (connector.isNeedToSend()) {
+				ByteBuffer buffer = connector.getWriteBuf();
+				RpcObject rpc = connector.getToSend();
+				logger.info("nioSend:" + rpc);
+				NioUtils.writeBuffer(buffer, rpc);
+				buffer.flip();
+				try {
+					channel.write(buffer);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
+				buffer.clear();
+				result = true;
 			}
 			selectionKey.interestOps(SelectionKey.OP_READ);
 		}
@@ -149,7 +152,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 				result = doWrite(selectionKey);
 			}
 		}catch(IOException e){
-			
+			e.printStackTrace();
 		}
 		return result;
 	}

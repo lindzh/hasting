@@ -35,11 +35,15 @@ public class RpcTestNioClient {
 		
 		logger.info("start client");
 		
-		loginService.login("linda", "123456");
+		boolean login = loginService.login("linda", "123456");
+		
+		logger.info("login result:"+login);
 		
 		helloRpcService.sayHello("this is HelloRpcService",564);
 		
-		testService.index(43, "index client test");
+		String index = testService.index(43, "index client test");
+		
+		logger.info("index result:"+index);
 		
 		String hello = helloRpcService.getHello();
 		

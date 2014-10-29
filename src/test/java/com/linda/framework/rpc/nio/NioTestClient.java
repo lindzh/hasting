@@ -22,6 +22,7 @@ public class NioTestClient implements RpcCallListener{
 		connector.addRpcCallListener(client);
 		connector.startService();
 		new SendThread(connector).start();
+		new SendThread(connector).start();
 	}
 
 	@Override
