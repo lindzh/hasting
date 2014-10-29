@@ -86,6 +86,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity{
 			client.configureBlocking(false);
 			RpcNioConnector connector = new RpcNioConnector(client,this);
 			this.register(connector);
+			connector.startService();
 			return true;
 		}
 		return false;

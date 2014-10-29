@@ -2,6 +2,7 @@ package com.linda.framework.rpc.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -54,6 +55,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 				selection.startService();
 			}
 			InetSocketAddress remoteAddress = (InetSocketAddress)channel.getRemoteAddress();
+			logger.info("remote address> "+remoteAddress.getAddress().getHostAddress()+":"+remoteAddress.getPort());
 			remotePort = remoteAddress.getPort();
 			remoteHost = remoteAddress.getAddress().getHostAddress();
 		}catch(IOException e){
