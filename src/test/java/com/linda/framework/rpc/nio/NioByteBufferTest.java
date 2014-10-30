@@ -26,14 +26,16 @@ public class NioByteBufferTest {
 		buffer.put(bytes);
 		infoBuffer(buffer);
 		buffer.flip();
-		writeChannel.write(buffer);
+		buffer.position(4);
+		int write = writeChannel.write(buffer);
 		infoBuffer(buffer);
 		byte[] dest = bos.toByteArray();
 		logger.info("dest len:"+dest.length);
 		ByteArrayInputStream bis = new ByteArrayInputStream(dest);
 		ReadableByteChannel readChannel = Channels.newChannel(bis);
 		infoBuffer(buffer);
-		readChannel.read(buffer);
+		buffer.clear();
+		int read = readChannel.read(buffer);
 		infoBuffer(buffer);
 		buffer.flip();
 		infoBuffer(buffer);

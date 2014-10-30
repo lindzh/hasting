@@ -12,6 +12,8 @@ import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 public class NioUtils {
 	
 	private static Logger logger = Logger.getLogger(NioUtils.class);
+	
+	public static final int RPC_PROTOCOL_HEAD_LEN = 20;
 
 	public static void clearNioWriteOp(SelectionKey key){
 		if(checkKey(key)){
@@ -87,9 +89,11 @@ public class NioUtils {
 		if (object.getLength() > RpcUtils.MEM_2M) {
 			throw new RpcException("rpc data too long "+ object.getLength());
 		}
-		byte[] buf = new byte[object.getLength()];
-		buffer.get(buf, 0, buf.length);
-		object.setData(buf);
+		if(object.getLength()>0){
+			byte[] buf = new byte[object.getLength()];
+			buffer.get(buf, 0, buf.length);
+			object.setData(buf);
+		}
 		return object;
 	}
 

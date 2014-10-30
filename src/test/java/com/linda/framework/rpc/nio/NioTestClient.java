@@ -3,6 +3,7 @@ package com.linda.framework.rpc.nio;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -16,6 +17,10 @@ public class NioTestClient implements RpcCallListener{
 	
 	public static Logger logger = Logger.getLogger(NioTestClient.class);
 	
+	private static AtomicInteger send = new AtomicInteger(0);
+	
+	private static AtomicInteger receive = new AtomicInteger(0);
+	
 	public static void main(String[] args) {
 		NioTestClient client = new NioTestClient();
 		String host = "127.0.0.1";
@@ -25,15 +30,19 @@ public class NioTestClient implements RpcCallListener{
 		connector.setPort(port);
 		connector.addRpcCallListener(client);
 		connector.startService();
-		List<Thread> list = startThread(connector,1);
+		List<Thread> list = startThread(connector,2);
 		try {
-			Thread.currentThread().sleep(100000L);
+			Thread.currentThread().sleep(30000L);
 		} catch (InterruptedException e) {
 		}
 		for(Thread th:list){
 			th.interrupt();
 		}
-		logger.info("stop------------------");
+		try {
+			Thread.currentThread().sleep(5000L);
+		} catch (InterruptedException e) {
+		}
+		logger.info("stop------------------send:"+send.get()+" receive:"+receive.get());
 	}
 	
 	private static List<Thread> startThread(AbstractRpcConnector connector,int count){
@@ -56,6 +65,7 @@ public class NioTestClient implements RpcCallListener{
 	@Override
 	public void onRpcMessage(RpcObject rpc, RpcSender sender) {
 		logger.info("client receive:"+rpc);
+		receive.incrementAndGet();
 	}
 	
 	public static RpcObject createRpc(String str,long id,int index){
@@ -89,9 +99,10 @@ public class NioTestClient implements RpcCallListener{
 				RpcObject rpc = createRpc(prefix+index,threadId,index);
 				logger.info("send:"+rpc);
 				connector.sendRpcObject(rpc, 10000);
+				send.incrementAndGet();
 				index++;
 				try {
-					Thread.currentThread().sleep(interval);
+					Thread.currentThread().sleep(20);
 				} catch (InterruptedException e) {
 					break;
 				}
