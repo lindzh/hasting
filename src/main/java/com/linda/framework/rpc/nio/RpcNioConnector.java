@@ -2,7 +2,6 @@ package com.linda.framework.rpc.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -18,9 +17,12 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	private SocketChannel channel;
 	private RpcNioSelection selection;
 	private Logger logger = Logger.getLogger(RpcNioConnector.class);
-	private ByteBuffer writeBuf;
-	private ByteBuffer readBuf;
+	private ByteBuffer channelWriteBuffer;
+	private ByteBuffer channelReadBuffer;
 	private SelectionKey selectionKey;
+	
+	private RpcNioBuffer rpcNioReadBuffer;
+	private RpcNioBuffer rpcNioWriteBuffer;
 
 	public RpcNioConnector(SocketChannel socketChanel,RpcNioSelection selection){
 		this(selection);
@@ -38,8 +40,10 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	}
 	
 	private void initBuf(){
-		writeBuf = ByteBuffer.allocate(RpcUtils.MEM_2M);
-		readBuf = ByteBuffer.allocate(RpcUtils.MEM_2M);
+		channelWriteBuffer = ByteBuffer.allocate(RpcUtils.MEM_2M);
+		channelReadBuffer = ByteBuffer.allocate(RpcUtils.MEM_2M);
+		rpcNioReadBuffer = new RpcNioBuffer(RpcUtils.MEM_2M);
+		rpcNioWriteBuffer = new RpcNioBuffer(RpcUtils.MEM_2M);
 	}
 	
 	@Override
@@ -64,12 +68,12 @@ public class RpcNioConnector extends AbstractRpcConnector{
 		}
 	}
 	
-	public ByteBuffer getWriteBuf() {
-		return writeBuf;
+	public ByteBuffer getChannelWriteBuffer() {
+		return channelWriteBuffer;
 	}
 
-	public ByteBuffer getReadBuf() {
-		return readBuf;
+	public ByteBuffer getChannelReadBuffer() {
+		return channelReadBuffer;
 	}
 
 	@Override
@@ -93,4 +97,13 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	public void notifySend() {
 		selection.notifySend(this);
 	}
+
+	public RpcNioBuffer getRpcNioReadBuffer() {
+		return rpcNioReadBuffer;
+	}
+	
+	public RpcNioBuffer getRpcNioWriteBuffer() {
+		return rpcNioWriteBuffer;
+	}
+
 }

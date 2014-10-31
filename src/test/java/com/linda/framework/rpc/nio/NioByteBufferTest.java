@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -14,7 +16,7 @@ public class NioByteBufferTest {
 	
 	static Logger logger = Logger.getLogger(NioByteBufferTest.class);
 	
-	public static void main(String[] args) throws IOException {
+	public static void testBuf() throws IOException{
 		String str = "this is a test";
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		WritableByteChannel writeChannel = Channels.newChannel(bos);
@@ -46,6 +48,15 @@ public class NioByteBufferTest {
 		buffer.get(sss, 0, len);
 		logger.info("int1:"+int1+" int2:"+int2+" len:"+len);
 		logger.info("str:"+new String(sss));
+	}
+	
+	public static void main(String[] args) throws IOException {
+		LinkedList<String> list = new LinkedList<String>();
+		list.offer("123");
+		list.offer("234");
+		String peek = list.peek();
+		String peek2 = list.peek();
+		logger.info("peak:"+peek+" "+peek2);
 	}
 	
 	public static void infoBuffer(ByteBuffer buffer){

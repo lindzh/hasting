@@ -30,7 +30,7 @@ public class NioTestClient implements RpcCallListener{
 		connector.setPort(port);
 		connector.addRpcCallListener(client);
 		connector.startService();
-		List<Thread> list = startThread(connector,2);
+		List<Thread> list = startThread(connector,5);
 		try {
 			Thread.currentThread().sleep(30000L);
 		} catch (InterruptedException e) {
@@ -102,7 +102,7 @@ public class NioTestClient implements RpcCallListener{
 				send.incrementAndGet();
 				index++;
 				try {
-					Thread.currentThread().sleep(20);
+					Thread.currentThread().sleep(50);
 				} catch (InterruptedException e) {
 					break;
 				}

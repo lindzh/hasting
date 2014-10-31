@@ -1,7 +1,7 @@
 package com.linda.framework.rpc.net;
 
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,7 +23,7 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 	protected ConcurrentHashMap<String,Object> rpcContext;
 	private RpcOutputNofity outputNotify;
 	
-	private LinkedList<RpcObject> sendQueueCache = new LinkedList<RpcObject>();
+	private ConcurrentLinkedQueue<RpcObject> sendQueueCache = new ConcurrentLinkedQueue<RpcObject>();
 	private AbstractRpcWriter rpcWriter;
 	
 	public AbstractRpcConnector(AbstractRpcWriter rpcWriter){
@@ -78,7 +78,7 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 	}
 	
 	public RpcObject getToSend(){
-		return sendQueueCache.pop();
+		return sendQueueCache.poll();
 	}
 	
 	@Override
