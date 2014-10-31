@@ -23,7 +23,7 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 	protected ConcurrentHashMap<String,Object> rpcContext;
 	private RpcOutputNofity outputNotify;
 	
-	private ConcurrentLinkedQueue<RpcObject> sendQueueCache = new ConcurrentLinkedQueue<RpcObject>();
+	protected ConcurrentLinkedQueue<RpcObject> sendQueueCache = new ConcurrentLinkedQueue<RpcObject>();
 	private AbstractRpcWriter rpcWriter;
 	
 	public AbstractRpcConnector(AbstractRpcWriter rpcWriter){

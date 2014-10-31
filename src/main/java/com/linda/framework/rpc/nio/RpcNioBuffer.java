@@ -139,6 +139,11 @@ public class RpcNioBuffer{
 		return byteBuf;
     }
     
+    public void clear(){
+    	readIndex = 0;
+    	writeIndex = 0;
+    }
+    
     public void writeRpcObject(RpcObject rpc){
     	this.writeInt(rpc.getType().getType());
     	this.writeLong(rpc.getThreadId());

@@ -16,7 +16,7 @@ public class RpcOioWriter extends AbstractRpcWriter{
 		DataOutputStream dos = connector.getOutputStream();
 		while(connector.isNeedToSend()){
 			RpcObject rpc = connector.getToSend();
-			RpcUtils.writeDataRpc(rpc, dos);
+			RpcUtils.writeDataRpc(rpc, dos,connector);
 			hasSend = true;
 		}
 		return hasSend;

@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
+import java.net.InetSocketAddress;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +18,7 @@ import com.linda.framework.rpc.RemoteCall;
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.exception.RpcExceptionHandler;
+import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 
 public class RpcUtils {
 
@@ -26,7 +27,7 @@ public class RpcUtils {
 
 	public static int MEM_2M = 1024 * 1024 * 2;
 
-	public static void writeRpc(RpcObject rpc, OutputStream dos) {
+	public static void writeRpc(RpcObject rpc, OutputStream dos,RpcNetExceptionHandler handler) {
 		try {
 			dos.write(rpc.getType().getType());
 			dos.write(RpcUtils.longToBytes(rpc.getThreadId()));
@@ -40,11 +41,28 @@ public class RpcUtils {
 			}
 			dos.flush();
 		} catch (IOException e) {
+			handleNetException(e,handler);
+		}
+	}
+	
+	private static void handleNetException(Exception e,RpcNetExceptionHandler handler){
+		if(handler!=null){
+			handler.handleNetException(e);
+		}else{
 			throw new RpcException(e);
 		}
 	}
 	
-	public static void writeDataRpc(RpcObject rpc, DataOutputStream dos) {
+	public static String genAddressString(String prefix,InetSocketAddress address){
+		StringBuilder sb = new StringBuilder();
+		sb.append(prefix);
+		sb.append(address.getAddress().getHostAddress());
+		sb.append(":");
+		sb.append(address.getPort());
+		return sb.toString();
+	}
+	
+	public static void writeDataRpc(RpcObject rpc, DataOutputStream dos,RpcNetExceptionHandler handler) {
 		try {
 			dos.writeInt(rpc.getType().getType());
 			dos.writeLong(rpc.getThreadId());
@@ -58,11 +76,11 @@ public class RpcUtils {
 			}
 			dos.flush();
 		} catch (IOException e) {
-			throw new RpcException(e);
+			handleNetException(e,handler);
 		}
 	}
 
-	public static RpcObject readRpc(InputStream dis, byte[] buffer) {
+	public static RpcObject readRpc(InputStream dis, byte[] buffer,RpcNetExceptionHandler handler) {
 		try {
 			RpcObject rpc = new RpcObject();
 			int type = dis.read();
@@ -86,11 +104,12 @@ public class RpcUtils {
 			}
 			return rpc;
 		} catch (IOException e) {
-			throw new RpcException(e);
+			handleNetException(e,handler);
+			return null;
 		}
 	}
 	
-	public static RpcObject readDataRpc(DataInputStream dis) {
+	public static RpcObject readDataRpc(DataInputStream dis,RpcNetExceptionHandler handler) {
 		try {
 			RpcObject rpc = new RpcObject();
 			rpc.setType(RpcType.getByType(dis.readInt()));
@@ -107,7 +126,8 @@ public class RpcUtils {
 			}
 			return rpc;
 		} catch (IOException e) {
-			throw new RpcException(e);
+			handleNetException(e,handler);
+			return null;
 		}
 	}
 
@@ -116,7 +136,7 @@ public class RpcUtils {
 			dis.close();
 			dos.close();
 		} catch (IOException e) {
-			throw new RpcException(e);
+			// close all
 		}
 	}
 

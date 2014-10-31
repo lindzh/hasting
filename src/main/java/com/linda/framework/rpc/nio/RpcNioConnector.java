@@ -23,7 +23,9 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	
 	private RpcNioBuffer rpcNioReadBuffer;
 	private RpcNioBuffer rpcNioWriteBuffer;
-
+	
+	private RpcNioAcceptor acceptor;
+	
 	public RpcNioConnector(SocketChannel socketChanel,RpcNioSelection selection){
 		this(selection);
 		this.channel = socketChanel;
@@ -32,11 +34,15 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	public RpcNioConnector(RpcNioSelection selection){
 		super(null);
 		if(selection==null){
-			this.selection = new RpcNioSelection(null);
+			this.selection = new RpcNioSelection();
 		}else{
 			this.selection = selection;
 		}
 		this.initBuf();
+	}
+	
+	public RpcNioConnector(){
+		this(null);
 	}
 	
 	private void initBuf(){
@@ -54,12 +60,15 @@ public class RpcNioConnector extends AbstractRpcConnector{
 				channel.connect(new InetSocketAddress(host,port));
 				channel.configureBlocking(false);
 				while(!channel.isConnected());
-				logger.info("connect to host "+host+" port "+port+" success");
+				logger.info("connect to "+host+":"+port+" success");
 				selection.register(this);
 				selection.startService();
 			}
 			InetSocketAddress remoteAddress = (InetSocketAddress)channel.getRemoteAddress();
-			logger.info("remote address> "+remoteAddress.getAddress().getHostAddress()+":"+remoteAddress.getPort());
+			InetSocketAddress localAddress = (InetSocketAddress)channel.getLocalAddress();
+			String remote = RpcUtils.genAddressString("remoteAddress-> ", remoteAddress);
+			String local = RpcUtils.genAddressString("localAddress-> ", localAddress);
+			logger.info(local+"  "+remote);
 			remotePort = remoteAddress.getPort();
 			remoteHost = remoteAddress.getAddress().getHostAddress();
 		}catch(IOException e){
@@ -78,7 +87,24 @@ public class RpcNioConnector extends AbstractRpcConnector{
 
 	@Override
 	public void stopService() {
+		this.selection.unRegister(this);
+		this.sendQueueCache.clear();
+		this.rpcContext.clear();
+		executor.shutdown();
+		try {
+			channel.close();
+			channelWriteBuffer.clear();
+			channelReadBuffer.clear();
+			rpcNioReadBuffer.clear();
+			rpcNioWriteBuffer.clear();
+		} catch (IOException e) {
+			
+		}
 		this.stop = true;
+	}
+	
+	public boolean isValid(){
+		return !stop;
 	}
 
 	public SocketChannel getChannel() {
@@ -106,4 +132,17 @@ public class RpcNioConnector extends AbstractRpcConnector{
 		return rpcNioWriteBuffer;
 	}
 
+	@Override
+	public void handleNetException(Exception e) {
+		logger.error("connector "+this.host+":"+this.port+" io exception start to shutdown");
+		this.stopService();
+	}
+
+	public RpcNioAcceptor getAcceptor() {
+		return acceptor;
+	}
+
+	public void setAcceptor(RpcNioAcceptor acceptor) {
+		this.acceptor = acceptor;
+	}
 }

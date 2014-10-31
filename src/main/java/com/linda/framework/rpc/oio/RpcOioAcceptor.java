@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 
@@ -15,11 +17,20 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	private ServerSocket server;
 	private List<RpcOioConnector> connectors;
 	private RpcOioWriter writer;
+	private Logger logger = Logger.getLogger(RpcOioAcceptor.class);
 	
 	public RpcOioAcceptor(){
+		this(null);
+	}
+	
+	public RpcOioAcceptor(RpcOioWriter writer){
 		super();
+		if(writer==null){
+			writer = new RpcOioWriter();
+		}else{
+			this.writer = writer;
+		}
 		connectors = new ArrayList<RpcOioConnector>();
-		writer = new RpcOioWriter();
 	}
 	
 	public void startService(){
@@ -39,7 +50,13 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 		for(RpcOioConnector connector:connectors){
 			connector.stopService();
 		}
+		connectors.clear();
 		this.stopListeners();
+		try {
+			server.close();
+		} catch (IOException e) {
+			//do nothing
+		}
 	}
 
 	private class AcceptThread extends Thread{
@@ -52,7 +69,7 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 					RpcOioAcceptor.this.addConnectorListeners(connector);
 					connector.startService();
 				} catch (IOException e) {
-					throw new RpcException(e);
+					RpcOioAcceptor.this.handleNetException(e);
 				}
 			}
 		}
@@ -72,6 +89,12 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	@Override
+	public void handleNetException(Exception e) {
+		logger.error("acceptor io exception,service start to shutdown");
+		this.stopService();
 	}
 	
 }

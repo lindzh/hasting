@@ -3,55 +3,106 @@ package com.linda.framework.rpc.nio;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.RpcObject;
+import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
 import com.linda.framework.rpc.net.RpcCallListener;
 import com.linda.framework.rpc.net.RpcSender;
-import com.linda.framework.rpc.oio.RpcOioConnector;
 import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 
 public class NioTestClient implements RpcCallListener{
 	
 	public static Logger logger = Logger.getLogger(NioTestClient.class);
+	private RpcNioSelection selection;
+	private RpcNioConnector connector;
+	private String host = "127.0.0.1";
+	private int port = 4332;
+	private int threadCount;
+	private AtomicInteger send = new AtomicInteger(0);
+	private AtomicInteger receive = new AtomicInteger(0);
+	private List<Thread> threads;
+	private AtomicBoolean started = new AtomicBoolean(false);
+	private AtomicInteger cccc = new AtomicInteger(0);
 	
-	private static AtomicInteger send = new AtomicInteger(0);
-	
-	private static AtomicInteger receive = new AtomicInteger(0);
-	
-	public static void main(String[] args) {
-		NioTestClient client = new NioTestClient();
-		String host = "127.0.0.1";
-		int port = 4332;
-		AbstractRpcConnector connector = new RpcOioConnector(null);
-		connector.setHost(host);
-		connector.setPort(port);
-		connector.addRpcCallListener(client);
-		connector.startService();
-		List<Thread> list = startThread(connector,5);
-		try {
-			Thread.currentThread().sleep(30000L);
-		} catch (InterruptedException e) {
-		}
-		for(Thread th:list){
-			th.interrupt();
-		}
-		try {
-			Thread.currentThread().sleep(5000L);
-		} catch (InterruptedException e) {
-		}
-		logger.info("stop------------------send:"+send.get()+" receive:"+receive.get());
+	public NioTestClient(RpcNioSelection selection){
+		this.selection = selection;
 	}
 	
-	private static List<Thread> startThread(AbstractRpcConnector connector,int count){
+	public static void main(String[] args) throws InterruptedException {
+		RpcNioSelection selector = new RpcNioSelection();
+		String ip = "127.0.0.1";
+		int basePort = 3333;
+		int clientCount = 5;
+		int connectors = 2;
+		int threadCount = 2;
+		List<NioTestClient> clients = createClients(selector,ip,basePort,clientCount,connectors,threadCount);
+		startService(clients);
+		Thread.currentThread().sleep(60000);
+		stopService(clients);
+		Thread.currentThread().sleep(10000);
+		printResult(clients);
+	}
+	
+	public NioTestClient clone(){
+		NioTestClient client = new NioTestClient(selection);
+		client.host = host;
+		client.port = port;
+		client.threadCount = threadCount;
+		return client;
+	}
+	
+	public static void startService(List<NioTestClient> clients){
+		int i = 0;
+		for(NioTestClient client:clients){
+			client.startService();
+			i++;
+		}
+		logger.info("start client count:"+i);
+	}
+	
+	public static void stopService(List<NioTestClient> clients){
+		for(NioTestClient client:clients){
+			client.stopService();
+		}
+	}
+	
+	public static void printResult(List<NioTestClient> clients){
+		for(NioTestClient client:clients){
+			client.printResult();
+		}
+	}
+	
+	public static List<NioTestClient> createClients(RpcNioSelection selection,String ip,int port,int clients,int connectors,int threadCount){
+		List<NioTestClient> list = new LinkedList<NioTestClient>();
+		int i=0;
+		while(i<clients){
+			NioTestClient client = new NioTestClient(selection);
+			client.host = ip;
+			client.port = port+i;
+			client.threadCount = threadCount;
+			
+			list.add(client);
+			int con = 0;
+			while(con<connectors){
+				list.add(client.clone());
+				con++;
+			}
+			i++;
+		}
+		return list;
+	}
+	
+	private List<Thread> startThread(AbstractRpcConnector connector,int count){
 		LinkedList<Thread> list = new LinkedList<Thread>();
 		int c = 0;
 		Random random = new Random();
 		while(c<count){
-			int interval = random.nextInt(1000);
+			int interval = random.nextInt(200);
 			int index = random.nextInt(20000);
 			SendThread thread = new SendThread(connector,interval,index);
 			list.add(thread);
@@ -60,12 +111,9 @@ public class NioTestClient implements RpcCallListener{
 		}
 		return list;
 	}
-	
-	
 
 	@Override
 	public void onRpcMessage(RpcObject rpc, RpcSender sender) {
-		logger.info("client receive:"+rpc);
 		receive.incrementAndGet();
 	}
 	
@@ -79,7 +127,7 @@ public class NioTestClient implements RpcCallListener{
 		return rpc;
 	}
 
-	public static class SendThread extends Thread{
+	public class SendThread extends Thread{
 
 		private AbstractRpcConnector connector;
 		private int interval;
@@ -95,12 +143,11 @@ public class NioTestClient implements RpcCallListener{
 		public void run() {
 			String prefix = "rpc test index ";
 			long threadId = Thread.currentThread().getId();
-			logger.info("senf thread:"+threadId+" start");
+			logger.info("send thread:"+threadId+" start "+host+":"+port);
 			while(true){
 				RpcObject rpc = createRpc(prefix+index,threadId,index);
-				logger.info("send:"+rpc);
 				connector.sendRpcObject(rpc, 10000);
-				send.incrementAndGet();
+				NioTestClient.this.send.incrementAndGet();
 				index++;
 				try {
 					Thread.currentThread().sleep(interval);
@@ -109,6 +156,32 @@ public class NioTestClient implements RpcCallListener{
 				}
 			}
 		}
+	}
+
+	public void printResult(){
+		logger.info(this.host+":"+this.port+"  send:"+send.get()+" receive:"+receive.get());
+	}
+	
+	public void startService() {
+		if(!started.get()){
+			started.set(true);
+			connector = new RpcNioConnector(selection);
+			connector.setHost(host);
+			connector.setPort(port);
+			connector.addRpcCallListener(this);
+			connector.startService();
+			threads = startThread(connector,threadCount);
+			cccc.incrementAndGet();
+			logger.info("start time:"+cccc.get());
+		}
+
+	}
+
+	public void stopService() {
+		for (Thread thread : threads) {
+			thread.interrupt();
+		}
+		//connector.stopService();
 	}
 	
 }

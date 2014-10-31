@@ -5,8 +5,9 @@ import java.util.List;
 
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
+import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 
-public abstract class RpcNetBase {
+public abstract class RpcNetBase implements RpcNetExceptionHandler{
 	
 	public RpcNetBase(){
 		callListeners = new LinkedList<RpcCallListener>();

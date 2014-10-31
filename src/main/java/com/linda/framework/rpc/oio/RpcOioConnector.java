@@ -2,6 +2,7 @@ package com.linda.framework.rpc.oio;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -9,10 +10,11 @@ import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
 import com.linda.framework.rpc.utils.RpcUtils;
 
-public class RpcOioConnector extends AbstractRpcConnector{
+public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExceptionHandler{
 	
 	private Socket socket;
 	private DataInputStream dis;
@@ -22,6 +24,10 @@ public class RpcOioConnector extends AbstractRpcConnector{
 	public RpcOioConnector(RpcOioWriter writer){
 		super(writer);
 		this.init();
+	}
+	
+	public RpcOioConnector(){
+		this(null);
 	}
 	
 	private void init(){
@@ -50,7 +56,7 @@ public class RpcOioConnector extends AbstractRpcConnector{
 			this.getRpcWriter().startService();
 			new ClientThread().start();
 		} catch (Exception e) {
-			throw new RpcException(e);
+			this.handleNetException(e);
 		}
 	}
 
@@ -58,7 +64,7 @@ public class RpcOioConnector extends AbstractRpcConnector{
 		@Override
 		public void run() {
 			while(!stop){
-				RpcObject rpc = RpcUtils.readDataRpc(dis);
+				RpcObject rpc = RpcUtils.readDataRpc(dis,RpcOioConnector.this);
 				if(rpc!=null){
 					rpc.setHost(remoteHost);
 					rpc.setPort(remotePort);
@@ -73,12 +79,25 @@ public class RpcOioConnector extends AbstractRpcConnector{
 	public void stopService() {
 		stop = true;
 		RpcUtils.close(dis, dos);
+		try {
+			socket.close();
+		} catch (IOException e) {
+			//do nothing
+		}
 		rpcContext.clear();
+		sendQueueCache.clear();
 		executor.shutdown();
-		this.getRpcWriter().stopService();
 	}
 
 	public DataOutputStream getOutputStream() {
 		return dos;
+	}
+
+	@Override
+	public void handleNetException(Exception e){
+		this.getRpcWriter().unRegWrite(this);
+		this.stopService();
+		logger.error("connection caught io exception close");
+		throw new RpcException(e);
 	}
 }
