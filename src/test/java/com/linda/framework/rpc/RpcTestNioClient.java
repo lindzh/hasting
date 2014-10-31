@@ -37,6 +37,8 @@ public class RpcTestNioClient {
 		
 		helloRpcService.sayHello("this is HelloRpcService",564);
 		
+		helloRpcService.sayHello("this is HelloRpcService tttttttt",3333);
+		
 		boolean login = loginService.login("linda", "123456");
 		
 		logger.info("login result:"+login);

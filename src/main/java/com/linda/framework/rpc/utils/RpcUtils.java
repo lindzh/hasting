@@ -165,8 +165,8 @@ public class RpcUtils {
 
 	public static byte[] intToBytes(int iSource) {
 		byte[] bLocalArr = new byte[4];
-		for (int i = 0; (i < 4); i++) {
-			bLocalArr[i] = (byte) (iSource >> 8 * i & 0xFF);
+		for (int i=0;i<bLocalArr.length; i++) {
+			bLocalArr[i] = (byte) (iSource >> 8*(3-i) & 0xFF);
 		}
 		return bLocalArr;
 	}
@@ -174,9 +174,9 @@ public class RpcUtils {
 	public static int bytesToInt(byte[] bRefArr) {
 		int iOutcome = 0;
 		byte bLoop;
-		for (int i = 0; i < bRefArr.length; i++) {
+		for (int i=0; i<bRefArr.length; i++) {
 			bLoop = bRefArr[i];
-			iOutcome += (bLoop & 0xFF) << (8 * i);
+			iOutcome += (bLoop & 0xFF) << (8 * (3-i));
 		}
 		return iOutcome;
 	}
@@ -184,7 +184,7 @@ public class RpcUtils {
 	public static byte[] longToBytes(long number) {
 		long temp = number;
 		byte[] b = new byte[8];
-		for (int i = 0; i < b.length; i++) {
+		for (int i = 7; i>-1; i--) {
 			b[i] = new Long(temp & 0xff).byteValue();
 			temp = temp >> 8;
 		}
@@ -201,13 +201,13 @@ public class RpcUtils {
 		long s5 = b[5] & 0xff;
 		long s6 = b[6] & 0xff;
 		long s7 = b[7] & 0xff;
-		s1 <<= 8;
-		s2 <<= 16;
-		s3 <<= 24;
-		s4 <<= 8 * 4;
-		s5 <<= 8 * 5;
-		s6 <<= 8 * 6;
-		s7 <<= 8 * 7;
+		s6 <<= 8;
+		s5 <<= 16;
+		s4 <<= 24;
+		s3 <<= 8 * 4;
+		s2 <<= 8 * 5;
+		s1 <<= 8 * 6;
+		s0 <<= 8 * 7;
 		s = s0 | s1 | s2 | s3 | s4 | s5 | s6 | s7;
 		return s;
 	}

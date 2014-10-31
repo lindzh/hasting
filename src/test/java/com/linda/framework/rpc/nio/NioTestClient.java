@@ -11,6 +11,7 @@ import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
 import com.linda.framework.rpc.net.RpcCallListener;
 import com.linda.framework.rpc.net.RpcSender;
+import com.linda.framework.rpc.oio.RpcOioConnector;
 import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 
 public class NioTestClient implements RpcCallListener{
@@ -25,7 +26,7 @@ public class NioTestClient implements RpcCallListener{
 		NioTestClient client = new NioTestClient();
 		String host = "127.0.0.1";
 		int port = 4332;
-		AbstractRpcConnector connector = new RpcNioConnector(null);
+		AbstractRpcConnector connector = new RpcOioConnector(null);
 		connector.setHost(host);
 		connector.setPort(port);
 		connector.addRpcCallListener(client);
@@ -102,7 +103,7 @@ public class NioTestClient implements RpcCallListener{
 				send.incrementAndGet();
 				index++;
 				try {
-					Thread.currentThread().sleep(50);
+					Thread.currentThread().sleep(interval);
 				} catch (InterruptedException e) {
 					break;
 				}
