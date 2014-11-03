@@ -2,6 +2,7 @@ package com.linda.framework.rpc.nio;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -190,16 +191,44 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 		return result;
 	}
 	
+	private void logState(){
+		int acceptorLen = acceptors.size();
+		int connectorLen = connectors.size();
+		logger.info("acceptors:"+acceptorLen+" connectors:"+connectorLen);
+	}
+	
+	private void handSelectionKeyException(SelectionKey selectionKey,Exception e){
+		SelectableChannel channel = selectionKey.channel();
+		if(channel instanceof ServerSocketChannel){
+			RpcNioAcceptor acceptor = acceptorCache.get(channel);
+			if(acceptor!=null){
+				logger.error("acceptor "+acceptor.getHost()+":"+acceptor.getPort()+" selection error "+e.getClass()+" "+e.getMessage()+" start to shutdown");
+				acceptor.stopService();
+			}
+		}else{
+			RpcNioConnector connector = connectorCache.get(channel);
+			if(connector!=null){
+				logger.error("connector "+connector.getHost()+":"+connector.getPort()+" selection error "+e.getClass()+" "+e.getMessage()+" start to shutdown");
+				connector.stopService();
+			}
+		}
+		this.logState();
+	}
+	
 	private boolean doDispatchSelectionKey(SelectionKey selectionKey){
 		boolean result = false;
-		if (selectionKey.isAcceptable()) {
-			result = doAccept(selectionKey);
-		}
-		if (selectionKey.isReadable()) {
-			result = doRead(selectionKey);
-		}
-		if (selectionKey.isWritable()) {
-			result = doWrite(selectionKey);
+		try{
+			if (selectionKey.isAcceptable()) {
+				result = doAccept(selectionKey);
+			}
+			if (selectionKey.isReadable()) {
+				result = doRead(selectionKey);
+			}
+			if (selectionKey.isWritable()) {
+				result = doWrite(selectionKey);
+			}
+		}catch(Exception e){
+			this.handSelectionKeyException(selectionKey, e);
 		}
 		return result;
 	}
