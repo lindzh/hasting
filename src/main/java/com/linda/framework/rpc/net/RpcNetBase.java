@@ -7,7 +7,7 @@ import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 
-public abstract class RpcNetBase implements RpcNetExceptionHandler{
+public abstract class RpcNetBase extends AbstractRpcNetworkBase implements RpcNetExceptionHandler{
 	
 	public RpcNetBase(){
 		callListeners = new LinkedList<RpcCallListener>();

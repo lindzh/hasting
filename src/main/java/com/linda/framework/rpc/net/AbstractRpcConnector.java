@@ -13,8 +13,6 @@ import com.linda.framework.rpc.exception.RpcException;
 
 public abstract class AbstractRpcConnector extends RpcNetBase implements Service,RpcSender{
 	
-	protected String host = "127.0.0.1";
-	protected int port = 6521;
 	protected boolean stop = false;
 	protected ExecutorService executor = Executors.newFixedThreadPool(3);
 	private Logger logger = Logger.getLogger(AbstractRpcConnector.class);
@@ -38,22 +36,6 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 
 	public void setRpcContext(ConcurrentHashMap<String, Object> rpcContext) {
 		this.rpcContext = rpcContext;
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
 	}
 	
 	public String getRemoteHost() {
