@@ -19,8 +19,8 @@ public class RpcServer extends AbstractRpcNetworkBase{
 		provider.addRpcFilter(filter);
 	}
 	
-	public void register(Class<?> iface,Object obj){
-		proxy.registerRemote(iface, obj);
+	public <Iface> void register(Class<Iface> clazz,Iface ifaceImpl){
+		proxy.registerRemote(clazz, ifaceImpl);
 	}
 	
 	@Override

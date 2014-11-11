@@ -29,15 +29,15 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor{
 		return RpcUtils.invokeMethod(this.findService(call), call.getMethod(), call.getArgs(),exceptionHandler);
 	}
 	
-	public void registerRemote(Class clazz,Object object){
+	public <Iface> void registerRemote(Class<Iface> clazz,Iface ifaceImpl){
 		Object service = exeCache.get(clazz.getName());
-		if(service!=null&&service!=object){
+		if(service!=null&&service!=ifaceImpl){
 			throw new RpcException("can't register service "+clazz.getName()+" again");
 		}
-		if(object==service||object==null){
+		if(ifaceImpl==service||ifaceImpl==null){
 			return;
 		}
-		exeCache.put(clazz.getName(), object);
+		exeCache.put(clazz.getName(), ifaceImpl);
 	}
 	
 	private Object findService(RemoteCall call){

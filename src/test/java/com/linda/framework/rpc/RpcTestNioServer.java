@@ -22,7 +22,7 @@ public class RpcTestNioServer {
 		
 		SimpleServerRemoteExecutor proxy = new SimpleServerRemoteExecutor();
 		
-		Object obj = new HelloRpcServiceImpl();
+		HelloRpcServiceImpl obj = new HelloRpcServiceImpl();
 		
 		proxy.registerRemote(HelloRpcService.class, obj);
 		

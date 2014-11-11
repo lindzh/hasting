@@ -25,9 +25,9 @@ public class RpcServerTest {
 		server.setHost(host);
 		server.setPort(port);
 		
-		Object obj = new HelloRpcServiceImpl();
+		HelloRpcService helloRpcServiceImpl = new HelloRpcServiceImpl();
 		
-		server.register(HelloRpcService.class, obj);
+		server.register(HelloRpcService.class, helloRpcServiceImpl);
 		
 		HelloRpcTestServiceImpl obj2 = new HelloRpcTestServiceImpl();
 		
