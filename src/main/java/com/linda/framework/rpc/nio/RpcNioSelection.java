@@ -198,6 +198,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 	}
 	
 	private void handSelectionKeyException(SelectionKey selectionKey,Exception e){
+		selectionKey.interestOps(0);
 		SelectableChannel channel = selectionKey.channel();
 		if(channel instanceof ServerSocketChannel){
 			RpcNioAcceptor acceptor = acceptorCache.get(channel);
