@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,8 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 	private AtomicBoolean inSelect = new AtomicBoolean(false);
 	private static final int READ_OP = SelectionKey.OP_READ;
 	private static final int READ_WRITE_OP = SelectionKey.OP_READ|SelectionKey.OP_WRITE;
+	private static final int NONE_OP = 0;
+	private LinkedList<Runnable> selectTasks = new LinkedList<Runnable>();
 	
 	private Logger logger = Logger.getLogger(RpcNioSelection.class);
 	
@@ -116,7 +119,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 				return true;
 			}
 		}catch(Exception e){
-			acceptor.handleNetException(e);
+			this.handSelectionKeyException(selectionKey, e);
 		}
 		return false;
 	}
@@ -129,6 +132,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 	}
 	
 	private boolean doRead(SelectionKey selectionKey){
+		//logger.info("--------------read");
 		boolean result = false;
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
@@ -150,11 +154,15 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 						}
 					}
 					if(read<1){
+						if(read<0){
+							logger.info("read error--------------------------");
+							this.handSelectionKeyException(selectionKey, new RpcException());
+						}
 						break;
 					}
 				}
 			}catch(Exception e){
-				connector.handleNetException(e);
+				this.handSelectionKeyException(selectionKey, e);
 			}
 		}
 		return result;
@@ -185,7 +193,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 					selectionKey.interestOps(READ_OP);
 				}	
 			}catch(Exception e){
-				connector.handleNetException(e);
+				this.handSelectionKeyException(selectionKey, e);
 			}
 		}
 		return result;
@@ -197,8 +205,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 		logger.info("acceptors:"+acceptorLen+" connectors:"+connectorLen);
 	}
 	
-	private void handSelectionKeyException(SelectionKey selectionKey,Exception e){
-		selectionKey.interestOps(0);
+	private void handSelectionKeyException(final SelectionKey selectionKey,Exception e){
 		SelectableChannel channel = selectionKey.channel();
 		if(channel instanceof ServerSocketChannel){
 			RpcNioAcceptor acceptor = acceptorCache.get(channel);
@@ -239,6 +246,9 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 		public void run() {
 			logger.info("select thread has started");
 			while (!stop) {
+				if(RpcNioSelection.this.hasTask()){
+					RpcNioSelection.this.runSelectTasks();
+				}
 				boolean needSend = checkSend();
 				try {
 					inSelect.set(true);
@@ -277,10 +287,28 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 			selector.wakeup();
 		}
 	}
+	
+	private void addSelectTask(Runnable task){
+		selectTasks.offer(task);
+	}
 
+	private boolean hasTask(){
+		Runnable peek = selectTasks.peek();
+		return peek!=null;
+	}
+	
+	private void runSelectTasks(){
+		Runnable peek = selectTasks.peek();
+		while(peek!=null){
+			peek = selectTasks.pop();
+			peek.run();
+			peek = selectTasks.peek();
+		}
+	}
+	
 	@Override
 	public void handleNetException(Exception e) {
-		
+		logger.info("exception------------------------------->");
 	}
 
 }

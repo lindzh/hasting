@@ -132,7 +132,7 @@ public class RpcClientTest {
 		test.sleep = sleep;
 		test.threadCount = threadCount;
 		test.time = time;
-		long myTime = test.time+10000;
+		long myTime = test.time+3000;
 		test.start();
 		try {
 			Thread.currentThread().sleep(myTime);
