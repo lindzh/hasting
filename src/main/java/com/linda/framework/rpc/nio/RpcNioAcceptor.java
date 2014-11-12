@@ -13,14 +13,14 @@ import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 public class RpcNioAcceptor extends AbstractRpcAcceptor{
 	
 	private ServerSocketChannel serverSocketChannel;
-	private RpcNioSelection selection;
+	private AbstractRpcNioSelector selector;
 	private Logger logger = Logger.getLogger(RpcNioAcceptor.class);
 	
-	public RpcNioAcceptor(RpcNioSelection selection){
+	public RpcNioAcceptor(AbstractRpcNioSelector selector){
 		try {
 			serverSocketChannel = ServerSocketChannel.open();
 			serverSocketChannel.configureBlocking(false);
-			this.selection = selection;
+			this.selector = selector;
 		} catch (IOException e) {
 			this.handleNetException(e);
 		}
@@ -30,24 +30,24 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 		this(null);
 	}
 	
-	public RpcNioSelection getSelection() {
-		return selection;
+	public AbstractRpcNioSelector getSelector() {
+		return selector;
 	}
 
-	public void setSelection(RpcNioSelection selection) {
-		this.selection = selection;
+	public void setSelector(AbstractRpcNioSelector selector) {
+		this.selector = selector;
 	}
 
 	@Override
 	public void startService() {
 		try {
-			if(selection==null){
-				selection = new RpcNioSelection();
+			if(selector==null){
+				selector = new SimpleRpcNioSelector();
 			}
+			selector.startService();
 			serverSocketChannel.bind(new InetSocketAddress(host,port));
-			selection.register(this);
+			selector.register(this);
 			this.startListeners();
-			selection.startService();
 		} catch (IOException e) {
 			this.handleNetException(e);
 		}
@@ -58,8 +58,8 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 		if(serverSocketChannel!=null){
 			try {
 				serverSocketChannel.close();
-				if(selection!=null){
-					selection.stopService();
+				if(selector!=null){
+					selector.stopService();
 				}
 			} catch (IOException e) {
 				//do mothing

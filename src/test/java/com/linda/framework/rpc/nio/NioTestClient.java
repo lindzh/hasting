@@ -18,7 +18,7 @@ import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 public class NioTestClient implements RpcCallListener{
 	
 	public static Logger logger = Logger.getLogger(NioTestClient.class);
-	private RpcNioSelection selection;
+	private SimpleRpcNioSelector selection;
 	private RpcNioConnector connector;
 	private String host = "127.0.0.1";
 	private int port = 4332;
@@ -29,12 +29,12 @@ public class NioTestClient implements RpcCallListener{
 	private AtomicBoolean started = new AtomicBoolean(false);
 	private AtomicInteger cccc = new AtomicInteger(0);
 	
-	public NioTestClient(RpcNioSelection selection){
+	public NioTestClient(SimpleRpcNioSelector selection){
 		this.selection = selection;
 	}
 	
 	public static void main(String[] args) throws InterruptedException {
-		RpcNioSelection selector = new RpcNioSelection();
+		SimpleRpcNioSelector selector = new SimpleRpcNioSelector();
 		String ip = "127.0.0.1";
 		int basePort = 3333;
 		int clientCount = 5;
@@ -77,7 +77,7 @@ public class NioTestClient implements RpcCallListener{
 		}
 	}
 	
-	public static List<NioTestClient> createClients(RpcNioSelection selection,String ip,int port,int clients,int connectors,int threadCount){
+	public static List<NioTestClient> createClients(SimpleRpcNioSelector selection,String ip,int port,int clients,int connectors,int threadCount){
 		List<NioTestClient> list = new LinkedList<NioTestClient>();
 		int i=0;
 		while(i<clients){

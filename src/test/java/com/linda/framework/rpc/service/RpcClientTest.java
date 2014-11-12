@@ -107,8 +107,8 @@ public class RpcClientTest {
 	public static void main(String[] args) {
 		String host = "127.0.0.1";
 		int port = 4332;
-		long sleep = 10;
-		long time = 10000L;
+		long sleep = 5;
+		long time = 60000L;
 		int threadCount = 5;
 		if(args!=null){
 			for(String arg:args){

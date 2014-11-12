@@ -17,13 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.RpcObject;
-import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.exception.RpcException;
-import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
-import com.linda.framework.rpc.net.RpcOutputNofity;
 
-public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionHandler{
+public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 	
 	private Selector selector;
 	private boolean stop = false;
@@ -32,15 +29,16 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 	private List<RpcNioConnector> connectors;
 	private ConcurrentHashMap<ServerSocketChannel,RpcNioAcceptor> acceptorCache;
 	private List<RpcNioAcceptor> acceptors;
-	private AtomicBoolean inSelect = new AtomicBoolean(false);
 	private static final int READ_OP = SelectionKey.OP_READ;
 	private static final int READ_WRITE_OP = SelectionKey.OP_READ|SelectionKey.OP_WRITE;
-	private static final int NONE_OP = 0;
 	private LinkedList<Runnable> selectTasks = new LinkedList<Runnable>();
+	private AtomicBoolean inSelect = new AtomicBoolean(false);
 	
-	private Logger logger = Logger.getLogger(RpcNioSelection.class);
+	private AbstractRpcNioSelector delegageSelector;
 	
-	public RpcNioSelection(){
+	private Logger logger = Logger.getLogger(SimpleRpcNioSelector.class);
+	
+	public SimpleRpcNioSelector(){
 		try {
 			selector = Selector.open();
 			connectorCache = new ConcurrentHashMap<SocketChannel,RpcNioConnector>();
@@ -52,15 +50,20 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 		}
 	}
 	
-	public void register(RpcNioAcceptor acceptor){
-		ServerSocketChannel channel = acceptor.getServerSocketChannel();
-		try{
-			channel.register(selector, SelectionKey.OP_ACCEPT);	
+	public void register(final RpcNioAcceptor acceptor){
+		final ServerSocketChannel channel = acceptor.getServerSocketChannel();
+			this.addSelectTask(new Runnable() {
+				public void run() {
+					try {
+						channel.register(selector, SelectionKey.OP_ACCEPT);
+					} catch (Exception e) {
+						acceptor.handleNetException(e);
+					}
+				}
+			});
+			this.notifySend(null);
 			acceptorCache.put(acceptor.getServerSocketChannel(), acceptor);
 			acceptors.add(acceptor);
-		}catch(Exception e){
-			acceptor.handleNetException(e);
-		}
 	}
 	
 	public void unRegister(RpcNioAcceptor acceptor){
@@ -69,13 +72,18 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 		acceptors.remove(acceptor);
 	}
 	
-	public void register(RpcNioConnector connector){
-		try{
-			SelectionKey selectionKey = connector.getChannel().register(selector,READ_OP);
-			this.initNewSocketChannel(connector.getChannel(),connector,selectionKey);
-		}catch(Exception e){
-			connector.handleNetException(e);
-		}
+	public void register(final RpcNioConnector connector){
+		this.addSelectTask(new Runnable(){
+			public void run() {
+				try{
+					SelectionKey selectionKey = connector.getChannel().register(selector,READ_OP);
+					SimpleRpcNioSelector.this.initNewSocketChannel(connector.getChannel(),connector,selectionKey);
+				}catch(Exception e){
+					connector.handleNetException(e);
+				}
+			}
+		});
+		this.notifySend(null);
 	}
 	
 	public void unRegister(RpcNioConnector connector){
@@ -112,10 +120,17 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 			SocketChannel client = server.accept();
 			if(client!=null){
 				client.configureBlocking(false);
-				RpcNioConnector connector = new RpcNioConnector(client,this);
-				connector.setAcceptor(acceptor);
-				this.register(connector);
-				connector.startService();
+				if(delegageSelector!=null){
+					RpcNioConnector connector = new RpcNioConnector(client,delegageSelector);
+					connector.setAcceptor(acceptor);
+					delegageSelector.register(connector);
+					connector.startService();
+				}else{
+					RpcNioConnector connector = new RpcNioConnector(client,this);
+					connector.setAcceptor(acceptor);
+					this.register(connector);
+					connector.startService();
+				}
 				return true;
 			}
 		}catch(Exception e){
@@ -132,7 +147,6 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 	}
 	
 	private boolean doRead(SelectionKey selectionKey){
-		//logger.info("--------------read");
 		boolean result = false;
 		SocketChannel client = (SocketChannel)selectionKey.channel();
 		RpcNioConnector connector = connectorCache.get(client);
@@ -155,7 +169,6 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 					}
 					if(read<1){
 						if(read<0){
-							logger.info("read error--------------------------");
 							this.handSelectionKeyException(selectionKey, new RpcException());
 						}
 						break;
@@ -244,10 +257,10 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 	private class SelectionThread extends Thread {
 		@Override
 		public void run() {
-			logger.info("select thread has started");
+			logger.info("select thread has started :"+Thread.currentThread().getId());
 			while (!stop) {
-				if(RpcNioSelection.this.hasTask()){
-					RpcNioSelection.this.runSelectTasks();
+				if(SimpleRpcNioSelector.this.hasTask()){
+					SimpleRpcNioSelector.this.runSelectTasks();
 				}
 				boolean needSend = checkSend();
 				try {
@@ -258,7 +271,7 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 						selector.select();
 					}
 				} catch (IOException e) {
-					RpcNioSelection.this.handleNetException(e);
+					SimpleRpcNioSelector.this.handleNetException(e);
 				}
 				inSelect.set(false);
 				Set<SelectionKey> selectionKeys = selector.selectedKeys();
@@ -306,9 +319,19 @@ public class RpcNioSelection implements Service,RpcOutputNofity,RpcNetExceptionH
 		}
 	}
 	
+	public void setDelegageSelector(AbstractRpcNioSelector delegageSelector) {
+		this.delegageSelector = delegageSelector;
+	}
+
 	@Override
 	public void handleNetException(Exception e) {
-		logger.info("exception------------------------------->");
+		logger.error("selector exception:"+e.getMessage());
+	}
+	
+	public static void main(String[] args) {
+		SimpleRpcNioSelector s1 = new SimpleRpcNioSelector();
+		SimpleRpcNioSelector s2 = new SimpleRpcNioSelector();
+		System.out.println(s2==s1);
 	}
 
 }

@@ -15,7 +15,7 @@ import com.linda.framework.rpc.utils.RpcUtils;
 public class RpcNioConnector extends AbstractRpcConnector{
 	
 	private SocketChannel channel;
-	private RpcNioSelection selection;
+	private AbstractRpcNioSelector selector;
 	private Logger logger = Logger.getLogger(RpcNioConnector.class);
 	private ByteBuffer channelWriteBuffer;
 	private ByteBuffer channelReadBuffer;
@@ -26,17 +26,17 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	
 	private RpcNioAcceptor acceptor;
 	
-	public RpcNioConnector(SocketChannel socketChanel,RpcNioSelection selection){
+	public RpcNioConnector(SocketChannel socketChanel,AbstractRpcNioSelector selection){
 		this(selection);
 		this.channel = socketChanel;
 	}
 	
-	public RpcNioConnector(RpcNioSelection selection){
+	public RpcNioConnector(AbstractRpcNioSelector selector){
 		super(null);
-		if(selection==null){
-			this.selection = new RpcNioSelection();
+		if(selector==null){
+			this.selector = new SimpleRpcNioSelector();
 		}else{
-			this.selection = selection;
+			this.selector = selector;
 		}
 		this.initBuf();
 	}
@@ -61,8 +61,8 @@ public class RpcNioConnector extends AbstractRpcConnector{
 				channel.configureBlocking(false);
 				while(!channel.isConnected());
 				logger.info("connect to "+host+":"+port+" success");
-				selection.register(this);
-				selection.startService();
+				selector.startService();
+				selector.register(this);
 			}
 			InetSocketAddress remoteAddress = (InetSocketAddress)channel.getRemoteAddress();
 			InetSocketAddress localAddress = (InetSocketAddress)channel.getLocalAddress();
@@ -87,7 +87,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 
 	@Override
 	public void stopService() {
-		this.selection.unRegister(this);
+		this.selector.unRegister(this);
 		this.sendQueueCache.clear();
 		this.rpcContext.clear();
 		executor.shutdown();
@@ -121,7 +121,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 
 	@Override
 	public void notifySend() {
-		selection.notifySend(this);
+		selector.notifySend(this);
 	}
 
 	public RpcNioBuffer getRpcNioReadBuffer() {

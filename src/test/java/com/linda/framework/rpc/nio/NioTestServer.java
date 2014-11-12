@@ -17,14 +17,14 @@ public class NioTestServer implements RpcCallListener{
 	
 	private static Logger logger = Logger.getLogger(NioTestServer.class);
 	RpcNioAcceptor acceptor;
-	private RpcNioSelection selection;
+	private SimpleRpcNioSelector selection;
 	private String host;
 	private int port;
 	private AtomicInteger receive = new AtomicInteger(0);
 	private AtomicBoolean started = new AtomicBoolean(false);
 	private ConcurrentHashMap<String, AtomicInteger> count = new ConcurrentHashMap<String, AtomicInteger>();
 	
-	public NioTestServer(RpcNioSelection selection){
+	public NioTestServer(SimpleRpcNioSelector selection){
 		this.selection = selection;
 	}
 	
@@ -53,7 +53,7 @@ public class NioTestServer implements RpcCallListener{
 	}
 	
 	public static void main(String[] args) throws InterruptedException {
-		RpcNioSelection selection = new RpcNioSelection();
+		SimpleRpcNioSelector selection = new SimpleRpcNioSelector();
 		String ip = "127.0.0.1";
 		int port = 3333;
 		int c = 5;
@@ -63,9 +63,9 @@ public class NioTestServer implements RpcCallListener{
 		printResult(servers);
 	}
 	
-	public static List<NioTestServer> createServers(RpcNioSelection selection,int c,String ip,int basePort){
+	public static List<NioTestServer> createServers(SimpleRpcNioSelector selection,int c,String ip,int basePort){
 		if(selection==null){
-			selection = new RpcNioSelection();
+			selection = new SimpleRpcNioSelector();
 		}
 		List<NioTestServer> servers = new LinkedList<NioTestServer>();
 		int i = 0;

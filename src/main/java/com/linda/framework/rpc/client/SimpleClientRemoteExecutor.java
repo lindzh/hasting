@@ -45,7 +45,6 @@ public class SimpleClientRemoteExecutor implements RemoteExecutor,RpcCallListene
 		byte[] buffer = serializer.serialize(call);
 		int length = buffer.length;
 		RpcObject rpc = new RpcObject(ONEWAY,this.genIndex(),length,buffer);
-		logger.info("client oneway:"+call+" rpc:"+rpc);
 		connector.sendRpcObject(rpc, timeout);
 	}
 	
@@ -60,7 +59,6 @@ public class SimpleClientRemoteExecutor implements RemoteExecutor,RpcCallListene
 		RpcObject request = new RpcObject(INVOKE,this.genIndex(),length,buffer);
 		RpcCallSync sync = new RpcCallSync(request.getIndex(),request);
 		rpcCache.put(this.genRpcCallCacheKey(request.getThreadId(), request.getIndex()), sync);
-		logger.info("client invoke:"+call+" rpc:"+request);
 		connector.sendRpcObject(request, timeout);
 		clientRpcSync.waitForResult(timeout, sync);
 		rpcCache.remove(sync.getIndex());
