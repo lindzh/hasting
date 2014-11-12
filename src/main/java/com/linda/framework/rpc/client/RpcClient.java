@@ -42,6 +42,14 @@ public class RpcClient extends AbstractRpcNetworkBase{
 		proxy.stopService();
 	}
 	
+	public AbstractRpcConnector getConnector() {
+		return connector;
+	}
+
+	public void setConnector(AbstractRpcConnector connector) {
+		this.connector = connector;
+	}
+
 	private void checkConnector(){
 		if(connector==null){
 			SimpleRpcNioSelector selector = new SimpleRpcNioSelector();

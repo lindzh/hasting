@@ -7,10 +7,9 @@ import com.linda.framework.rpc.net.AbstractRpcConnector;
 import com.linda.framework.rpc.net.AbstractRpcWriter;
 import com.linda.framework.rpc.utils.RpcUtils;
 
-public class RpcOioWriter extends AbstractRpcWriter{
-
-	@Override
-	public boolean doSend(AbstractRpcConnector con) {
+public abstract class AbstractRpcOioWriter extends AbstractRpcWriter{
+	
+	public boolean exeSend(AbstractRpcConnector con){
 		boolean hasSend = false;
 		RpcOioConnector connector = (RpcOioConnector)con;
 		DataOutputStream dos = connector.getOutputStream();
@@ -21,5 +20,5 @@ public class RpcOioWriter extends AbstractRpcWriter{
 		}
 		return hasSend;
 	}
-
+	
 }

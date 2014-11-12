@@ -12,6 +12,7 @@ import com.linda.framework.rpc.HelloRpcTestService;
 import com.linda.framework.rpc.LoginRpcService;
 import com.linda.framework.rpc.client.RpcClient;
 import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.oio.RpcOioConnector;
 
 public class RpcClientTest {
 	
@@ -42,6 +43,7 @@ public class RpcClientTest {
 	
 	public void start(){
 		client = new RpcClient();
+		//client.setConnector(new RpcOioConnector());
 		client.setHost(host);
 		client.setPort(port);
 		client.startService();

@@ -21,7 +21,7 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 	private DataOutputStream dos;
 	private Logger logger = Logger.getLogger(RpcOioConnector.class);
 	
-	public RpcOioConnector(RpcOioWriter writer){
+	public RpcOioConnector(AbstractRpcOioWriter writer){
 		super(writer);
 		this.init();
 	}
@@ -32,11 +32,11 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 	
 	private void init(){
 		if(this.getRpcWriter()==null){
-			this.setRpcWriter(new RpcOioWriter());
+			this.setRpcWriter(new SimpleRpcOioWriter());
 		}
 	}
 	
-	public RpcOioConnector(Socket socket,RpcOioWriter writer){
+	public RpcOioConnector(Socket socket,AbstractRpcOioWriter writer){
 		this(writer);
 		this.socket = socket;
 	}

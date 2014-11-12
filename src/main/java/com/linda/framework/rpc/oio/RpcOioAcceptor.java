@@ -16,17 +16,17 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	
 	private ServerSocket server;
 	private List<RpcOioConnector> connectors;
-	private RpcOioWriter writer;
+	private AbstractRpcOioWriter writer;
 	private Logger logger = Logger.getLogger(RpcOioAcceptor.class);
 	
 	public RpcOioAcceptor(){
 		this(null);
 	}
 	
-	public RpcOioAcceptor(RpcOioWriter writer){
+	public RpcOioAcceptor(AbstractRpcOioWriter writer){
 		super();
 		if(writer==null){
-			writer = new RpcOioWriter();
+			writer = new PooledRpcOioWriter();
 		}else{
 			this.writer = writer;
 		}
