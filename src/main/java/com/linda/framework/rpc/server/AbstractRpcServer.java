@@ -3,11 +3,11 @@ package com.linda.framework.rpc.server;
 import com.linda.framework.rpc.filter.RpcFilter;
 import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 import com.linda.framework.rpc.net.AbstractRpcNetworkBase;
+import com.linda.framework.rpc.nio.AbstractRpcNioSelector;
 import com.linda.framework.rpc.nio.ConcurrentRpcNioSelector;
 import com.linda.framework.rpc.nio.RpcNioAcceptor;
-import com.linda.framework.rpc.nio.SimpleRpcNioSelector;
 
-public class RpcServer extends AbstractRpcNetworkBase{
+public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 
 	private AbstractRpcAcceptor acceptor;
 	private RpcServiceProvider provider = new RpcServiceProvider();
@@ -52,11 +52,12 @@ public class RpcServer extends AbstractRpcNetworkBase{
 		proxy.stopService();
 		provider.stopService();
 	}
+
+	public abstract AbstractRpcNioSelector getNioSelector();
 	
 	private void checkAcceptor(){
 		if(acceptor==null){
-			ConcurrentRpcNioSelector selector = new ConcurrentRpcNioSelector();
-			acceptor = new RpcNioAcceptor(selector);
+			acceptor = new RpcNioAcceptor(getNioSelector());
 		}
 	}
 

@@ -10,8 +10,8 @@ import com.linda.framework.rpc.LoginRpcService;
 import com.linda.framework.rpc.LoginRpcServiceImpl;
 import com.linda.framework.rpc.MyTestRpcFilter;
 import com.linda.framework.rpc.RpcLoginCheckFilter;
-import com.linda.framework.rpc.oio.RpcOioAcceptor;
-import com.linda.framework.rpc.server.RpcServer;
+import com.linda.framework.rpc.server.AbstractRpcServer;
+import com.linda.framework.rpc.server.ConcurrentRpcServer;
 
 public class RpcServerTest {
 	
@@ -21,7 +21,7 @@ public class RpcServerTest {
 		
 		String host = "127.0.0.1";
 		int port = 4332;
-		RpcServer server = new RpcServer();
+		AbstractRpcServer server = new ConcurrentRpcServer();
 		//server.setAcceptor(new RpcOioAcceptor());
 		server.setHost(host);
 		server.setPort(port);
