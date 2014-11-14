@@ -2,28 +2,21 @@ package com.linda.framework.rpc.client;
 
 import com.linda.framework.rpc.RemoteExecutor;
 import com.linda.framework.rpc.Service;
+import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
 import com.linda.framework.rpc.net.RpcCallListener;
-import com.linda.framework.rpc.oio.RpcOioConnector;
+import com.linda.framework.rpc.net.RpcMultiConnector;
 
-public class SimpleClientRemoteExecutor extends AbstractClientRemoteExecutor implements RemoteExecutor,RpcCallListener,Service{
+public class MultiClientRemoteExecutor extends AbstractClientRemoteExecutor implements RemoteExecutor,RpcCallListener,Service{
+
+	private RpcMultiConnector connector;
 	
-	private AbstractRpcConnector connector;
-	
-	public SimpleClientRemoteExecutor(AbstractRpcConnector connector){
+	public MultiClientRemoteExecutor(RpcMultiConnector connector){
 		super();
 		connector.addRpcCallListener(this);
 		this.connector = connector;
 	}
-
-	public AbstractRpcConnector getConnector() {
-		return connector;
-	}
-
-	public void setConnector(RpcOioConnector connector) {
-		this.connector = connector;
-	}
-
+	
 	@Override
 	public void startService() {
 		connector.startService();
@@ -36,6 +29,12 @@ public class SimpleClientRemoteExecutor extends AbstractClientRemoteExecutor imp
 
 	@Override
 	public AbstractRpcConnector getRpcConnector() {
-		return connector;
+		AbstractRpcConnector resource = connector.getResource();
+		if(resource==null){
+			throw new RpcException("connection lost");
+		}
+		return resource;
 	}
+
+
 }

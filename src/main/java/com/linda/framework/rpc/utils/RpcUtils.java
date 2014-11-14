@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
@@ -19,6 +20,11 @@ import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.exception.RpcExceptionHandler;
 import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
+import com.linda.framework.rpc.net.AbstractRpcConnector;
+import com.linda.framework.rpc.nio.AbstractRpcNioSelector;
+import com.linda.framework.rpc.nio.RpcNioConnector;
+import com.linda.framework.rpc.oio.AbstractRpcOioWriter;
+import com.linda.framework.rpc.oio.RpcOioConnector;
 
 public class RpcUtils {
 
@@ -230,6 +236,23 @@ public class RpcUtils {
 		s0 <<= 8 * 7;
 		s = s0 | s1 | s2 | s3 | s4 | s5 | s6 | s7;
 		return s;
+	}
+	
+	public static AbstractRpcConnector createRpcConnector(AbstractRpcNioSelector nioSelector,
+			AbstractRpcOioWriter writer,Class<? extends AbstractRpcConnector> connectorClass){
+		try{
+			if(connectorClass==RpcNioConnector.class){
+				Constructor<? extends AbstractRpcConnector> constructor = connectorClass.getConstructor(AbstractRpcNioSelector.class);
+				return constructor.newInstance(nioSelector);
+			}else if(connectorClass==RpcOioConnector.class){
+				Constructor<? extends AbstractRpcConnector> constructor = connectorClass.getConstructor(AbstractRpcOioWriter.class);
+				return constructor.newInstance(writer);
+			}else{
+				return connectorClass.newInstance();
+			}
+		}catch(Exception e){
+			throw new RpcException(e);
+		}
 	}
 	
 	public static String bytesToHexString(byte[] bytes){   

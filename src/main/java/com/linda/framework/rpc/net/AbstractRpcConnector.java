@@ -102,6 +102,10 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 	public void setOutputNotify(RpcOutputNofity outputNotify) {
 		this.outputNotify = outputNotify;
 	}
+	
+	public boolean isStop() {
+		return stop;
+	}
 
 	public void fireCall(final RpcObject rpc){
 		executor.execute(new Runnable() {

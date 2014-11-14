@@ -10,16 +10,16 @@ import org.apache.log4j.Logger;
 import com.linda.framework.rpc.HelloRpcService;
 import com.linda.framework.rpc.HelloRpcTestService;
 import com.linda.framework.rpc.LoginRpcService;
-import com.linda.framework.rpc.client.RpcClient;
+import com.linda.framework.rpc.client.AbstractRpcClient;
+import com.linda.framework.rpc.client.MultiRpcClient;
 import com.linda.framework.rpc.exception.RpcException;
-import com.linda.framework.rpc.oio.RpcOioConnector;
 
 public class RpcClientTest {
 	
 	private static Logger logger = 	Logger.getLogger(RpcClientTest.class);
 	private String host = "127.0.0.1";
 	private int port = 4332;
-	private RpcClient client;
+	private AbstractRpcClient client;
 	private LoginRpcService loginService;
 	private HelloRpcService helloRpcService;
 	private HelloRpcTestService testService;
@@ -42,7 +42,7 @@ public class RpcClientTest {
 	}
 	
 	public void start(){
-		client = new RpcClient();
+		client = new MultiRpcClient();
 		//client.setConnector(new RpcOioConnector());
 		client.setHost(host);
 		client.setPort(port);
@@ -109,9 +109,9 @@ public class RpcClientTest {
 	public static void main(String[] args) {
 		String host = "127.0.0.1";
 		int port = 4332;
-		long sleep = 5;
+		long sleep = 100;
 		long time = 60000L;
-		int threadCount = 5;
+		int threadCount = 3;
 		if(args!=null){
 			for(String arg:args){
 				if(arg.startsWith("-h")){
