@@ -21,7 +21,7 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 		provider.addRpcFilter(filter);
 	}
 	
-	public <Iface> void register(Class<Iface> clazz,Iface ifaceImpl){
+	public void register(Class<?> clazz,Object ifaceImpl){
 		proxy.registerRemote(clazz, ifaceImpl);
 	}
 	
