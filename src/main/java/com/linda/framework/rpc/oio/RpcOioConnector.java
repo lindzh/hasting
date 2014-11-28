@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
 import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.RpcObject;
@@ -13,6 +16,7 @@ import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
 import com.linda.framework.rpc.utils.RpcUtils;
+import com.linda.framework.rpc.utils.SSLUtils;
 
 public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExceptionHandler{
 	
@@ -40,11 +44,11 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 		this(writer);
 		this.socket = socket;
 	}
-	
+
 	public void startService(){
 		try {
 			if(socket==null){
-				socket = new Socket();
+				socket = SSLUtils.getSocketInstance(sslContext, sslMode);
 				socket.connect(new InetSocketAddress(host,port));
 			}
 			InetSocketAddress remoteAddress = (InetSocketAddress)socket.getRemoteSocketAddress();

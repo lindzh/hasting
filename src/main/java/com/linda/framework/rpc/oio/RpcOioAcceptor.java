@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.net.AbstractRpcAcceptor;
+import com.linda.framework.rpc.utils.SSLUtils;
 
 public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	
@@ -35,7 +36,7 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	
 	public void startService(){
 		try {
-			server = new ServerSocket();
+			server = SSLUtils.getServerSocketInstance(sslContext, sslMode);
 			server.bind(new InetSocketAddress(host,port));
 			this.startListeners();
 			new AcceptThread().start();
