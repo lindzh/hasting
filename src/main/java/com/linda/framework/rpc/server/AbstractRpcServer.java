@@ -27,20 +27,19 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	
 	@Override
 	public void setHost(String host) {
-		checkAcceptor();
 		super.setHost(host);
-		acceptor.setHost(host);
 	}
 
 	@Override
 	public void setPort(int port) {
-		checkAcceptor();
 		super.setPort(port);
-		acceptor.setPort(port);
 	}
 
 	@Override
 	public void startService() {
+		checkAcceptor();
+		acceptor.setHost(host);
+		acceptor.setPort(port);
 		provider.setExecutor(proxy);
 		acceptor.addRpcCallListener(provider);
 		acceptor.startService();
