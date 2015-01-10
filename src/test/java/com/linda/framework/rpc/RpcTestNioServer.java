@@ -36,9 +36,9 @@ public class RpcTestNioServer {
 		
 		provider.setExecutor(proxy);
 		
-		provider.addRpcFilter(new MyTestRpcFilter());
-		
-		provider.addRpcFilter(new RpcLoginCheckFilter());
+//		provider.addRpcFilter(new MyTestRpcFilter());
+//		
+//		provider.addRpcFilter(new RpcLoginCheckFilter());
 		
 		acceptor.addRpcCallListener(provider);
 		
