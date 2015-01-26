@@ -26,6 +26,10 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 		return proxy.registerRemote(iface);
 	}
 	
+	public <T> T register(Class<T> iface,String version){
+		return proxy.registerRemote(iface, version);
+	}
+	
 	@Override
 	public void startService() {
 		initConnector();
