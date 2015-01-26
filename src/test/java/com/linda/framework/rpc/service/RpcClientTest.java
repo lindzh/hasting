@@ -13,6 +13,8 @@ import com.linda.framework.rpc.LoginRpcService;
 import com.linda.framework.rpc.client.AbstractRpcClient;
 import com.linda.framework.rpc.client.MultiRpcClient;
 import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.monitor.RpcMonitorBean;
+import com.linda.framework.rpc.monitor.RpcMonitorService;
 
 public class RpcClientTest {
 	
@@ -23,6 +25,7 @@ public class RpcClientTest {
 	private LoginRpcService loginService;
 	private HelloRpcService helloRpcService;
 	private HelloRpcTestService testService;
+	private RpcMonitorService monitorService;
 	private long sleep = 10;
 	private long time = 10000L;
 	private int threadCount = 5;
@@ -50,7 +53,10 @@ public class RpcClientTest {
 		loginService = client.register(LoginRpcService.class);
 		helloRpcService = client.register(HelloRpcService.class);
 		testService = client.register(HelloRpcTestService.class);
-		startThreads();
+		monitorService = client.register(RpcMonitorService.class);
+		List<RpcMonitorBean> rpcServices = monitorService.getRpcServices();
+		logger.info("rpcServices:"+rpcServices);
+		//startThreads();
 	}
 	
 	private void startThreads(){
@@ -97,6 +103,8 @@ public class RpcClientTest {
 				if(inter){
 					break;
 				}
+				String ping = monitorService.ping();
+				logger.info("ping resp:"+ping);
 			}
 			long endTime = System.currentTimeMillis();
 			long cost = endTime-begin;
@@ -110,7 +118,7 @@ public class RpcClientTest {
 		String host = "127.0.0.1";
 		int port = 4332;
 		long sleep = 100;
-		long time = 300000L;
+		long time = 30000L;
 		int threadCount = 3;
 		if(args!=null){
 			for(String arg:args){

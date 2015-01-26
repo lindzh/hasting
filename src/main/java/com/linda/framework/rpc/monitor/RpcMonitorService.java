@@ -1,0 +1,11 @@
+package com.linda.framework.rpc.monitor;
+
+import java.util.List;
+
+public interface RpcMonitorService {
+	
+	public List<RpcMonitorBean> getRpcServices();
+	
+	public String ping();
+
+}

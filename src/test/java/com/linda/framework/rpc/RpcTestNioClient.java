@@ -54,6 +54,7 @@ public class RpcTestNioClient {
 		logger.info("hello result:"+hello);
 	
 		logger.info("exResult:"+ex);
+		
 	}
 	
 }

@@ -40,7 +40,7 @@ public class RpcServerTest {
 		
 		server.addRpcFilter(new MyTestRpcFilter());
 		
-		server.addRpcFilter(new RpcLoginCheckFilter());
+		//server.addRpcFilter(new RpcLoginCheckFilter());
 		
 		server.startService();
 		

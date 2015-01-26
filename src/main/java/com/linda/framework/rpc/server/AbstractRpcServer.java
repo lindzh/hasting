@@ -1,10 +1,11 @@
 package com.linda.framework.rpc.server;
 
 import com.linda.framework.rpc.filter.RpcFilter;
+import com.linda.framework.rpc.monitor.RpcMonitorService;
+import com.linda.framework.rpc.monitor.RpcMonitorServiceImpl;
 import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 import com.linda.framework.rpc.net.AbstractRpcNetworkBase;
 import com.linda.framework.rpc.nio.AbstractRpcNioSelector;
-import com.linda.framework.rpc.nio.ConcurrentRpcNioSelector;
 import com.linda.framework.rpc.nio.RpcNioAcceptor;
 
 public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
@@ -22,7 +23,11 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	}
 	
 	public void register(Class<?> clazz,Object ifaceImpl){
-		proxy.registerRemote(clazz, ifaceImpl);
+		proxy.registerRemote(clazz, ifaceImpl,null);
+	}
+	
+	public void register(Class<?> clazz,Object ifaceImpl,String version){
+		proxy.registerRemote(clazz, ifaceImpl,version);
 	}
 	
 	@Override
@@ -38,6 +43,7 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	@Override
 	public void startService() {
 		checkAcceptor();
+		this.addMonitor();
 		acceptor.setHost(host);
 		acceptor.setPort(port);
 		provider.setExecutor(proxy);
@@ -59,5 +65,8 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 			acceptor = new RpcNioAcceptor(getNioSelector());
 		}
 	}
-
+	
+	private void addMonitor(){
+		this.register(RpcMonitorService.class, new RpcMonitorServiceImpl(proxy));
+	}
 }

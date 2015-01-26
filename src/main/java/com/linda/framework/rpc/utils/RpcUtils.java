@@ -32,6 +32,8 @@ public class RpcUtils {
 	private static Map<String, Method> methodCache = new HashMap<String, Method>();
 
 	public static int MEM_2M = 1024 * 1024 * 2;
+	
+	public static String DEFAULT_VERSION = "0.0";
 
 	public static void writeRpc(RpcObject rpc, OutputStream dos,RpcNetExceptionHandler handler) {
 		try {

@@ -1,17 +1,20 @@
 package com.linda.framework.rpc.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.linda.framework.rpc.RemoteCall;
 import com.linda.framework.rpc.RemoteExecutor;
+import com.linda.framework.rpc.RpcServiceBean;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.exception.RpcExceptionHandler;
 import com.linda.framework.rpc.exception.SimpleRpcExceptionHandler;
 import com.linda.framework.rpc.utils.RpcUtils;
 
-public class SimpleServerRemoteExecutor implements RemoteExecutor{
+public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHolder{
 	
-	protected ConcurrentHashMap<String,Object> exeCache = new ConcurrentHashMap<String,Object>();
+	protected ConcurrentHashMap<String,RpcServiceBean> exeCache = new ConcurrentHashMap<String,RpcServiceBean>();
 
 	private RpcExceptionHandler exceptionHandler;
 	
@@ -30,6 +33,10 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor{
 	}
 	
 	public void registerRemote(Class<?> clazz,Object ifaceImpl){
+		this.registerRemote(clazz, ifaceImpl,null);
+	}
+	
+	public void registerRemote(Class<?> clazz,Object ifaceImpl,String version){
 		Object service = exeCache.get(clazz.getName());
 		if(service!=null&&service!=ifaceImpl){
 			throw new RpcException("can't register service "+clazz.getName()+" again");
@@ -37,15 +44,26 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor{
 		if(ifaceImpl==service||ifaceImpl==null){
 			return;
 		}
-		exeCache.put(clazz.getName(), ifaceImpl);
+		if(version==null){
+			version=RpcUtils.DEFAULT_VERSION;
+		}
+		exeCache.put(this.genExeKey(clazz.getName(), version), new RpcServiceBean(clazz,ifaceImpl,version));
+	}
+	
+	private String genExeKey(String service,String version){
+		if(version!=null){
+			return service+"_"+version;
+		}
+		return service;
 	}
 	
 	private Object findService(RemoteCall call){
-		Object object = exeCache.get(call.getService());
-		if(object==null){
+		String exeKey = this.genExeKey(call.getService(), call.getVersion());
+		RpcServiceBean object = exeCache.get(exeKey);
+		if(object==null||object.getBean()==null){
 			throw new RpcException("service "+call.getService()+" not exist");
 		}
-		return object;
+		return object.getBean();
 	}
 
 	@Override
@@ -64,5 +82,11 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor{
 
 	public void setExceptionHandler(RpcExceptionHandler exceptionHandler) {
 		this.exceptionHandler = exceptionHandler;
+	}
+
+	public List<RpcServiceBean> getRpcServices(){
+		ArrayList<RpcServiceBean> list = new ArrayList<RpcServiceBean>();
+		list.addAll(exeCache.values());
+		return list;
 	}
 }

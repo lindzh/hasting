@@ -5,9 +5,10 @@ import java.util.Arrays;
 
 public class RemoteCall implements Serializable{
 
-	private static final long serialVersionUID = 1267772348012469199L;
+	private static final long serialVersionUID = -2131053727191384813L;
 	
 	private String service;
+	private String version;
 	private String method;
 	private Object[] args;
 
@@ -39,10 +40,19 @@ public class RemoteCall implements Serializable{
 	public void setArgs(Object[] args) {
 		this.args = args;
 	}
+	
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
 	@Override
 	public String toString() {
-		return "RemoteCall [service=" + service + ", method=" + method
-				+ ", args=" + Arrays.toString(args) + "]";
+		return "RemoteCall [service=" + service + ", version=" + version
+				+ ", method=" + method + ", args=" + Arrays.toString(args)
+				+ "]";
 	}
 }
