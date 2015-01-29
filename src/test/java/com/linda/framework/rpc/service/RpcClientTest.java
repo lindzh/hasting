@@ -56,7 +56,7 @@ public class RpcClientTest {
 		monitorService = client.register(RpcMonitorService.class);
 		List<RpcMonitorBean> rpcServices = monitorService.getRpcServices();
 		logger.info("rpcServices:"+rpcServices);
-		//startThreads();
+		startThreads();
 	}
 	
 	private void startThreads(){
@@ -117,7 +117,7 @@ public class RpcClientTest {
 	public static void main(String[] args) {
 		String host = "127.0.0.1";
 		int port = 4332;
-		long sleep = 100;
+		long sleep = 500;
 		long time = 30000L;
 		int threadCount = 3;
 		if(args!=null){

@@ -1,6 +1,7 @@
 package com.linda.framework.rpc.server;
 
 import com.linda.framework.rpc.filter.RpcFilter;
+import com.linda.framework.rpc.filter.SimpleLogFilter;
 import com.linda.framework.rpc.monitor.RpcMonitorService;
 import com.linda.framework.rpc.monitor.RpcMonitorServiceImpl;
 import com.linda.framework.rpc.net.AbstractRpcAcceptor;
@@ -43,7 +44,11 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	@Override
 	public void startService() {
 		checkAcceptor();
+		//默认添加监控
 		this.addMonitor();
+		//默认添加logfilter方便agent统计做负载均衡
+		this.addRpcLogFilter();
+		
 		acceptor.setHost(host);
 		acceptor.setPort(port);
 		provider.setExecutor(proxy);
@@ -68,5 +73,9 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	
 	private void addMonitor(){
 		this.register(RpcMonitorService.class, new RpcMonitorServiceImpl(proxy));
+	}
+
+	private void addRpcLogFilter(){
+		this.addRpcFilter(new SimpleLogFilter());
 	}
 }

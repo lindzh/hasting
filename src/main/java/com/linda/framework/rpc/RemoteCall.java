@@ -3,6 +3,11 @@ package com.linda.framework.rpc;
 import java.io.Serializable;
 import java.util.Arrays;
 
+/**
+ * 访问bean，方法，版本的封装，目前的版本version支持粒度为service
+ * @author linda
+ *
+ */
 public class RemoteCall implements Serializable{
 
 	private static final long serialVersionUID = -2131053727191384813L;
