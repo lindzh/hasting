@@ -19,7 +19,7 @@ public class RpcServerTest {
 	
 	public static void main(String[] args) {
 		
-		String host = "127.0.0.1";
+		String host = "0.0.0.0";
 		int port = 4332;
 		AbstractRpcServer server = new ConcurrentRpcServer();
 		//server.setAcceptor(new RpcOioAcceptor());
