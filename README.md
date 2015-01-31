@@ -26,6 +26,8 @@ server.startService();
 HelloRpcService helloRpcServiceImpl = new HelloRpcServiceImpl();
 //注册为远程服务
 server.register(HelloRpcService.class, helloRpcServiceImpl);
+//注册为远程服务添加版本支持,级别为service级别
+//server.register(HelloRpcService.class, helloRpcServiceImpl,"v1.1");
 ```
 
 >添加过滤器
@@ -59,6 +61,8 @@ client.startService();
 ```java
 LoginRpcService loginService = client.register(LoginRpcService.class);
 HelloRpcService helloRpcService = client.register(HelloRpcService.class);
+//选择版本，说明：版本是远程服务service版本，若服务端未找到，不会执行，会产生remote Exception
+//HelloRpcService helloRpcService = client.register(HelloRpcService.class,"v1.1");
 ```
 
 >调用远程服务
