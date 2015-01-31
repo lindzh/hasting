@@ -1,5 +1,6 @@
 package com.linda.framework.rpc.client;
 
+import com.linda.framework.rpc.RemoteCall;
 import com.linda.framework.rpc.RemoteExecutor;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.exception.RpcException;
@@ -28,7 +29,7 @@ public class MultiClientRemoteExecutor extends AbstractClientRemoteExecutor impl
 	}
 
 	@Override
-	public AbstractRpcConnector getRpcConnector() {
+	public AbstractRpcConnector getRpcConnector(RemoteCall call) {
 		AbstractRpcConnector resource = connector.getResource();
 		if(resource==null){
 			throw new RpcException("connection lost");

@@ -1,5 +1,6 @@
 package com.linda.framework.rpc.client;
 
+import com.linda.framework.rpc.RemoteCall;
 import com.linda.framework.rpc.RemoteExecutor;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
@@ -35,7 +36,7 @@ public class SimpleClientRemoteExecutor extends AbstractClientRemoteExecutor imp
 	}
 
 	@Override
-	public AbstractRpcConnector getRpcConnector() {
+	public AbstractRpcConnector getRpcConnector(RemoteCall call) {
 		return connector;
 	}
 }
