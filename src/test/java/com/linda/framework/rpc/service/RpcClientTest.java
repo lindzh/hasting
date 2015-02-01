@@ -114,12 +114,13 @@ public class RpcClientTest {
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		String host = "127.0.0.1";
 		int port = 4332;
 		long sleep = 500;
 		long time = 30000L;
 		int threadCount = 3;
+		int clients = 5;
 		if(args!=null){
 			for(String arg:args){
 				if(arg.startsWith("-h")){
@@ -132,30 +133,42 @@ public class RpcClientTest {
 					threadCount = Integer.parseInt(arg.substring(3));
 				}else if(arg.startsWith("-t")){
 					time = Long.parseLong(arg.substring(2));
+				}else if(arg.startsWith("-c")){
+					clients = Integer.parseInt(arg.substring(2));
 				}
 			}
 		}
-		logger.info("host:"+host+" port:"+port+" sleep:"+sleep+" thc:"+threadCount+" time:"+time);
-		RpcClientTest test = new RpcClientTest();
-		test.host = host;
-		test.port = port;
-		test.sleep = sleep;
-		test.threadCount = threadCount;
-		test.time = time;
-		long myTime = test.time+3000;
-		test.start();
+		logger.info("host:"+host+" port:"+port+" sleep:"+sleep+" thc:"+threadCount+" time:"+time+" clients:"+clients);
+		int c = 0;
+		long call = 0;
+		long timeAll = 0;
+		long myTime = time+3000+200*clients;
+		List<RpcClientTest> tests = new ArrayList<RpcClientTest>();
+		while(c<clients){
+			RpcClientTest test = new RpcClientTest();
+			test.host = host;
+			test.port = port;
+			test.sleep = sleep;
+			test.threadCount = threadCount;
+			test.time = time;
+			test.start();
+			tests.add(test);
+			Thread.currentThread().sleep(200);
+		}
 		try {
 			Thread.currentThread().sleep(myTime);
 		} catch (InterruptedException e) {
 		}
-		long call = test.callAll.get();
-		long timeAll = (test.timeAll.get()/1000);
+		for(RpcClientTest test:tests){
+			call += test.callAll.get();
+			timeAll += (test.timeAll.get()/1000);
+			test.shutdown();
+		}
 		long exTime = timeAll/threadCount;
 		double tps = call/exTime;
 		double threadTps = call/timeAll;
-		long myExeTime = test.time/1000;
-		logger.info("callAll:"+call+" threadCount:"+threadCount+" timeAll:"+timeAll+" time:"+myExeTime+" tps:"+tps+" threadTps:"+threadTps);
-		test.shutdown();
+		long myExeTime = time/1000;
+		logger.info("callAll:"+call+" threadCount:"+threadCount+" timeAll:"+timeAll+" time:"+myExeTime+" tps:"+tps+" threadTps:"+threadTps+" clients:"+tests.size());
 		System.exit(0);
 	}
 
