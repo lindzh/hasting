@@ -46,6 +46,7 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 	}
 
 	public void startService(){
+		super.startService();
 		try {
 			if(socket==null){
 				socket = SSLUtils.getSocketInstance(sslContext, sslMode);
@@ -81,6 +82,7 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 
 	@Override
 	public void stopService() {
+		super.stopService();
 		stop = true;
 		RpcUtils.close(dis, dos);
 		try {
@@ -90,7 +92,6 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 		}
 		rpcContext.clear();
 		sendQueueCache.clear();
-		executor.shutdown();
 	}
 
 	public DataOutputStream getOutputStream() {

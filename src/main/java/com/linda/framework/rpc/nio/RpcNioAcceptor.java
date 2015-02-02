@@ -40,6 +40,7 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 
 	@Override
 	public void startService() {
+		super.startService();
 		try {
 			if(selector==null){
 				selector = new SimpleRpcNioSelector();
@@ -55,6 +56,7 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 
 	@Override
 	public void stopService() {
+		super.stopService();
 		if(serverSocketChannel!=null){
 			try {
 				serverSocketChannel.close();

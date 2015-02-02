@@ -76,6 +76,8 @@ public class RpcMultiConnector extends RpcNetBase implements Service{
 	private void initConnector(AbstractRpcConnector connector){
 		connector.setHost(host);
 		connector.setPort(port);
+		connector.setExecutorService(this.getExecutorService());
+		connector.setExecutorSharable(true);
 	}
 
 	private List<AbstractRpcConnector> createInstance(int count){
@@ -92,6 +94,7 @@ public class RpcMultiConnector extends RpcNetBase implements Service{
 	
 	@Override
 	public void startService() {
+		super.startService();
 		List<AbstractRpcConnector> createdConnectors = this.createInstance(connectionCount);
 		connectors.addAll(createdConnectors);
 		this.startConnectors();
@@ -109,6 +112,7 @@ public class RpcMultiConnector extends RpcNetBase implements Service{
 
 	@Override
 	public void stopService() {
+		super.stopService();
 		for(AbstractRpcConnector connector:connectors){
 			connector.stopService();
 		}

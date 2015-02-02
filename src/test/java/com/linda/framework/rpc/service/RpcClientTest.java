@@ -22,6 +22,7 @@ public class RpcClientTest {
 	private String host = "127.0.0.1";
 	private int port = 4332;
 	private AbstractRpcClient client;
+	private int clientCount = 5;
 	private LoginRpcService loginService;
 	private HelloRpcService helloRpcService;
 	private HelloRpcTestService testService;
@@ -49,6 +50,7 @@ public class RpcClientTest {
 		//client.setConnector(new RpcOioConnector());
 		client.setHost(host);
 		client.setPort(port);
+		((MultiRpcClient)client).setConnections(clientCount);
 		client.startService();
 		loginService = client.register(LoginRpcService.class);
 		helloRpcService = client.register(HelloRpcService.class);
@@ -138,22 +140,24 @@ public class RpcClientTest {
 				}
 			}
 		}
-		logger.info("host:"+host+" port:"+port+" sleep:"+sleep+" thc:"+threadCount+" time:"+time+" clients:"+clients);
+		logger.info("host:"+host+" port:"+port+" sleep:"+sleep+" thc:"+threadCount+" time:"+time+" connections:"+clients);
 		int c = 0;
 		long call = 0;
 		long timeAll = 0;
 		long myTime = time+3000+200*clients;
 		List<RpcClientTest> tests = new ArrayList<RpcClientTest>();
-		while(c<clients){
+		while(c<1){
 			RpcClientTest test = new RpcClientTest();
 			test.host = host;
 			test.port = port;
 			test.sleep = sleep;
 			test.threadCount = threadCount;
 			test.time = time;
+			test.clientCount = clients;
 			test.start();
 			tests.add(test);
 			Thread.currentThread().sleep(200);
+			c++;
 		}
 		try {
 			Thread.currentThread().sleep(myTime);
@@ -168,7 +172,7 @@ public class RpcClientTest {
 		double tps = call/exTime;
 		double threadTps = call/timeAll;
 		long myExeTime = time/1000;
-		logger.info("callAll:"+call+" threadCount:"+threadCount+" timeAll:"+timeAll+" time:"+myExeTime+" tps:"+tps+" threadTps:"+threadTps+" clients:"+tests.size());
+		logger.info("callAll:"+call+" threadCount:"+threadCount+" timeAll:"+timeAll+" time:"+myExeTime+" tps:"+tps+" threadTps:"+threadTps+" connections:"+clients);
 		System.exit(0);
 	}
 

@@ -123,11 +123,15 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 				if(delegageSelector!=null){
 					RpcNioConnector connector = new RpcNioConnector(client,delegageSelector);
 					connector.setAcceptor(acceptor);
+					connector.setExecutorService(acceptor.getExecutorService());
+					connector.setExecutorSharable(true);
 					delegageSelector.register(connector);
 					connector.startService();
 				}else{
 					RpcNioConnector connector = new RpcNioConnector(client,this);
 					connector.setAcceptor(acceptor);
+					connector.setExecutorService(acceptor.getExecutorService());
+					connector.setExecutorSharable(true);
 					this.register(connector);
 					connector.startService();
 				}

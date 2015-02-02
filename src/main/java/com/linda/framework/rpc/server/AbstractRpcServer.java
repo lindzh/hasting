@@ -14,6 +14,7 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	private AbstractRpcAcceptor acceptor;
 	private RpcServiceProvider provider = new RpcServiceProvider();
 	private SimpleServerRemoteExecutor proxy = new SimpleServerRemoteExecutor();
+	private int executorThreadCount = 20;//默认20
 	
 	public void setAcceptor(AbstractRpcAcceptor acceptor){
 		this.acceptor = acceptor;
@@ -53,6 +54,8 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 		acceptor.setPort(port);
 		provider.setExecutor(proxy);
 		acceptor.addRpcCallListener(provider);
+		acceptor.setExecutorThreadCount(executorThreadCount);
+		acceptor.setExecutorSharable(false);
 		acceptor.startService();
 	}
 
@@ -77,5 +80,13 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 
 	private void addRpcLogFilter(){
 		this.addRpcFilter(new SimpleLogFilter());
+	}
+
+	public int getExecutorThreadCount() {
+		return executorThreadCount;
+	}
+
+	public void setExecutorThreadCount(int executorThreadCount) {
+		this.executorThreadCount = executorThreadCount;
 	}
 }

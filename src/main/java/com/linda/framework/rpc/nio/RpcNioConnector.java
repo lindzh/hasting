@@ -54,6 +54,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	
 	@Override
 	public void startService() {
+		super.startService();
 		try{
 			if(channel==null){
 				channel = SocketChannel.open();
@@ -87,10 +88,10 @@ public class RpcNioConnector extends AbstractRpcConnector{
 
 	@Override
 	public void stopService() {
+		super.stopService();
 		this.selector.unRegister(this);
 		this.sendQueueCache.clear();
 		this.rpcContext.clear();
-		executor.shutdown();
 		try {
 			channel.close();
 			channelWriteBuffer.clear();

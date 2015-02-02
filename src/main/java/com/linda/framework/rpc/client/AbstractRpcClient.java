@@ -10,6 +10,8 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 	
 	protected Class<? extends AbstractRpcConnector> connectorClass;
 	
+	private int executorThreadCount = 2;//默认2
+	
 	public abstract AbstractClientRemoteExecutor getRemoteExecutor();
 	
 	public Class<? extends AbstractRpcConnector> getConnectorClass() {
@@ -20,7 +22,7 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 		this.connectorClass = connectorClass;
 	}
 	
-	public abstract void initConnector();
+	public abstract void initConnector(int threadCount);
 	
 	public <T> T register(Class<T> iface){
 		return proxy.registerRemote(iface);
@@ -32,7 +34,7 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 	
 	@Override
 	public void startService() {
-		initConnector();
+		initConnector(executorThreadCount);
 		proxy.setRemoteExecutor(getRemoteExecutor());
 		proxy.startService();
 	}

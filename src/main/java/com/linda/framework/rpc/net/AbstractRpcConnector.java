@@ -14,7 +14,6 @@ import com.linda.framework.rpc.exception.RpcException;
 public abstract class AbstractRpcConnector extends RpcNetBase implements Service,RpcSender{
 	
 	protected boolean stop = false;
-	protected ExecutorService executor = Executors.newFixedThreadPool(3);
 	private Logger logger = Logger.getLogger(AbstractRpcConnector.class);
 	protected String remoteHost;
 	protected int remotePort;
@@ -108,7 +107,7 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 	}
 
 	public void fireCall(final RpcObject rpc){
-		executor.execute(new Runnable() {
+		this.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
 				try {

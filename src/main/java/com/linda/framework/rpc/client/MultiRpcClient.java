@@ -22,11 +22,12 @@ public class MultiRpcClient extends AbstractRpcClient{
 	}
 
 	@Override
-	public void initConnector() {
+	public void initConnector(int threadCount) {
 		checkConnector();
 		connector.setHost(host);
 		connector.setPort(port);
 		connector.setConnectionCount(connections);
+		connector.setExecutorThreadCount(threadCount);
 		executor = new MultiClientRemoteExecutor(connector);
 	}
 

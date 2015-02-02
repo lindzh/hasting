@@ -35,6 +35,7 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	}
 	
 	public void startService(){
+		super.startService();
 		try {
 			server = SSLUtils.getServerSocketInstance(sslContext, sslMode);
 			server.bind(new InetSocketAddress(host,port));
@@ -47,6 +48,7 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	
 	@Override
 	public void stopService() {
+		super.stopService();
 		stop = true;
 		for(RpcOioConnector connector:connectors){
 			connector.stopService();
@@ -68,6 +70,8 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 					Socket socket = server.accept();
 					RpcOioConnector connector = new RpcOioConnector(socket,writer);
 					RpcOioAcceptor.this.addConnectorListeners(connector);
+					connector.setExecutorService(RpcOioAcceptor.this.getExecutorService());
+					connector.setExecutorSharable(true);
 					connector.startService();
 				} catch (IOException e) {
 					RpcOioAcceptor.this.handleNetException(e);
