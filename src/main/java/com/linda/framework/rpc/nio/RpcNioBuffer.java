@@ -160,7 +160,7 @@ public class RpcNioBuffer{
 		rpc.setIndex(this.readInt());
 		rpc.setLength(this.readInt());
 		if (rpc.getLength() > 0) {
-			if (rpc.getLength() > RpcUtils.MEM_2M) {
+			if (rpc.getLength() > RpcUtils.MEM_1M) {
 				throw new RpcException("rpc data too long "	+ rpc.getLength());
 			}
 			rpc.setData(this.readBytes(rpc.getLength()));

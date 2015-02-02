@@ -65,7 +65,7 @@ public class NioUtils {
 	 * @return
 	 */
 	public static boolean writeBuffer(ByteBuffer buffer,RpcObject object){
-		if (object.getLength() > RpcUtils.MEM_2M) {
+		if (object.getLength() > RpcUtils.MEM_1M) {
 			throw new RpcException("rpc data too long "+ object.getLength());
 		}
 		buffer.putInt(object.getType().getType());
@@ -86,7 +86,7 @@ public class NioUtils {
 		object.setThreadId(buffer.getLong());
 		object.setIndex(buffer.getInt());
 		object.setLength(buffer.getInt());
-		if (object.getLength() > RpcUtils.MEM_2M) {
+		if (object.getLength() > RpcUtils.MEM_1M) {
 			throw new RpcException("rpc data too long "+ object.getLength());
 		}
 		if(object.getLength()>0){

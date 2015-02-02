@@ -31,7 +31,13 @@ public class RpcUtils {
 	private static Logger logger = Logger.getLogger(RpcUtils.class);
 	private static Map<String, Method> methodCache = new HashMap<String, Method>();
 
-	public static int MEM_2M = 1024 * 1024 * 2;
+	public static int MEM_1M = 1024 * 1024;
+	
+	public static int MEM_128KB = 1024*128;
+	
+	public static int MEM_256KB = MEM_128KB*2;
+	
+	public static int MEM_512KB = MEM_128KB*4;
 	
 	public static String DEFAULT_VERSION = "0.0";
 
@@ -42,7 +48,7 @@ public class RpcUtils {
 			dos.write(RpcUtils.intToBytes(rpc.getIndex()));
 			dos.write(RpcUtils.intToBytes(rpc.getLength()));
 			if (rpc.getLength() > 0) {
-				if (rpc.getLength() > MEM_2M) {
+				if (rpc.getLength() > MEM_1M) {
 					throw new RpcException("rpc data too long "+ rpc.getLength());
 				}
 				dos.write(rpc.getData());
@@ -77,7 +83,7 @@ public class RpcUtils {
 			dos.writeInt(rpc.getIndex());
 			dos.writeInt(rpc.getLength());
 			if (rpc.getLength() > 0) {
-				if (rpc.getLength() > MEM_2M) {
+				if (rpc.getLength() > MEM_1M) {
 					throw new RpcException("rpc data too long "+ rpc.getLength());
 				}
 				dos.write(rpc.getData());
@@ -103,7 +109,7 @@ public class RpcUtils {
 			dis.read(lenBytes);
 			rpc.setLength(RpcUtils.bytesToInt(lenBytes));
 			if (rpc.getLength() > 0) {
-				if (rpc.getLength() > MEM_2M) {
+				if (rpc.getLength() > MEM_1M) {
 					throw new RpcException("rpc data too long "	+ rpc.getLength());
 				}
 				byte[] buf = new byte[rpc.getLength()];
@@ -125,7 +131,7 @@ public class RpcUtils {
 			rpc.setIndex(dis.readInt());
 			rpc.setLength(dis.readInt());
 			if (rpc.getLength() > 0) {
-				if (rpc.getLength() > MEM_2M) {
+				if (rpc.getLength() > MEM_1M) {
 					throw new RpcException("rpc data too long "+ rpc.getLength());
 				}
 				byte[] buf = new byte[rpc.getLength()];

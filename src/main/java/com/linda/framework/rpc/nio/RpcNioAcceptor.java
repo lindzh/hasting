@@ -46,7 +46,9 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 				selector = new SimpleRpcNioSelector();
 			}
 			selector.startService();
-			serverSocketChannel.bind(new InetSocketAddress(host,port));
+			serverSocketChannel.socket().bind(new InetSocketAddress(host,port));
+			//fix jdk 1.6 bind support
+			//serverSocketChannel.bind(new InetSocketAddress(host,port));
 			selector.register(this);
 			this.startListeners();
 		} catch (IOException e) {
