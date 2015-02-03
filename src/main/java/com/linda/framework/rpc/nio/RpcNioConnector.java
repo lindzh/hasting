@@ -65,8 +65,11 @@ public class RpcNioConnector extends AbstractRpcConnector{
 				selector.startService();
 				selector.register(this);
 			}
-			InetSocketAddress remoteAddress = (InetSocketAddress)channel.getRemoteAddress();
-			InetSocketAddress localAddress = (InetSocketAddress)channel.getLocalAddress();
+			InetSocketAddress remoteAddress = (InetSocketAddress)channel.socket().getRemoteSocketAddress();
+			InetSocketAddress localAddress = (InetSocketAddress)channel.socket().getLocalSocketAddress();
+			//fix jdk 1.6 not support
+			//InetSocketAddress remoteAddress = (InetSocketAddress)channel.getRemoteAddress();
+			//InetSocketAddress localAddress = (InetSocketAddress)channel.getLocalAddress();
 			String remote = RpcUtils.genAddressString("remoteAddress-> ", remoteAddress);
 			String local = RpcUtils.genAddressString("localAddress-> ", localAddress);
 			logger.info(local+"  "+remote);
