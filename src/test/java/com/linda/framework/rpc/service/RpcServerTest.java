@@ -95,7 +95,7 @@ public class RpcServerTest {
 		
 		server.stopService();
 		
-		logger.info("clients:"+clientFilter.hosts);
+		//logger.info("clients:"+clientFilter.hosts);
 		
 		logger.info("clientsSize:"+clientFilter.hosts.size());
 		

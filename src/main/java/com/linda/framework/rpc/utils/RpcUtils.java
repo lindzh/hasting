@@ -31,13 +31,15 @@ public class RpcUtils {
 	private static Logger logger = Logger.getLogger(RpcUtils.class);
 	private static Map<String, Method> methodCache = new HashMap<String, Method>();
 
-	public static int MEM_1M = 1024 * 1024;
+	public static int MEM_64KB = 1024*64;
 	
-	public static int MEM_128KB = 1024*128;
+	public static int MEM_128KB = MEM_64KB*2;
 	
 	public static int MEM_256KB = MEM_128KB*2;
 	
-	public static int MEM_512KB = MEM_128KB*4;
+	public static int MEM_512KB = MEM_256KB*2;
+	
+	public static int MEM_1M = MEM_512KB*2;
 	
 	public static String DEFAULT_VERSION = "0.0";
 
