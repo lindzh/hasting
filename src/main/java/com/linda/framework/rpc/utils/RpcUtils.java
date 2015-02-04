@@ -30,8 +30,12 @@ public class RpcUtils {
 
 	private static Logger logger = Logger.getLogger(RpcUtils.class);
 	private static Map<String, Method> methodCache = new HashMap<String, Method>();
+	
+	public static int MEM_16KB = 1024*16;
+	
+	public static int MEM_32KB = MEM_16KB*2;
 
-	public static int MEM_64KB = 1024*64;
+	public static int MEM_64KB = MEM_32KB*2;
 	
 	public static int MEM_128KB = MEM_64KB*2;
 	
