@@ -76,7 +76,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 			remotePort = remoteAddress.getPort();
 			remoteHost = remoteAddress.getAddress().getHostAddress();
 		}catch(IOException e){
-			logger.info("connect to host "+host+" port "+port+" failed");
+			logger.error("connect to host "+host+" port "+port+" failed", e);
 			throw new RpcException("connect to host error");
 		}
 	}
