@@ -36,24 +36,30 @@ public class RpcMultiConnector extends RpcNetBase implements Service{
 		this.connectorClass = connectorClass;
 	}
 	
+	/**
+	 * 负载均衡方式获取connector，采用round-robin算法
+	 * @param max
+	 * @return
+	 */
 	private AbstractRpcConnector getResource(int max){
 		if(max<1){
 			return null;
 		}
 		int load = loadBalance.getAndIncrement();
 		int size = connectors.size();
-		int index = load%size;
-		if(size>index){
-			AbstractRpcConnector connector = connectors.get(index);
-			if(connector.isStop()){
-				checkConnectors();
-				return this.getResource(max-1);
-			}else{
-				return connector;
+		if(size>0){
+			int index = load%size;
+			if(size>index){
+				AbstractRpcConnector connector = connectors.get(index);
+				if(connector.isStop()){
+					checkConnectors();
+					return this.getResource(max-1);
+				}else{
+					return connector;
+				}
 			}
-		}else{
-			return null;
 		}
+		return null;
 	}
 
 	public AbstractRpcConnector getResource(){
