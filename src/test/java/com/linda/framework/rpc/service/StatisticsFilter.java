@@ -25,6 +25,7 @@ public class StatisticsFilter implements RpcFilter,Service{
 	public void doFilter(RpcObject rpc, RemoteCall call, RpcSender sender,
 			RpcFilterChain chain) {
 		this.call.incrementAndGet();
+		chain.nextFilter(rpc, call, sender);
 	}
 
 	@Override

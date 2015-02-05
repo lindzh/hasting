@@ -1,5 +1,10 @@
 ##RPC远程调用框架
 rpc远程调用通用框架，提供一个端口多个服务同时高并发部署方案，同时提供安全，接口访问频率基础过滤器支持。
+```tps
+client: rpc-client.jar -h10.120.47.41 -p44444 -t300000 -th200 -c25000 -s1000 
+server: rpc-server.jar -h0.0.0.0 -p44444 -th200 -t600000
+average benchmark RpcServerTest.java clientsSize:29325 time:300002 calls:151307 tps:504
+```
 
 ###服务端
 
