@@ -87,7 +87,13 @@ public class RpcServerTest {
 		
 		server.addRpcFilter(clientFilter);
 		
+		StatisticsFilter statisticsFilter = new StatisticsFilter();
+		
+		server.addRpcFilter(statisticsFilter);
+		
 		server.startService();
+		
+		statisticsFilter.startService();
 		
 		logger.info("service started");
 		
@@ -95,9 +101,11 @@ public class RpcServerTest {
 		
 		server.stopService();
 		
+		statisticsFilter.stopService();
+		
 		//logger.info("clients:"+clientFilter.hosts);
 		
-		logger.info("clientsSize:"+clientFilter.hosts.size());
+		logger.info("clientsSize:"+clientFilter.hosts.size()+" time:"+statisticsFilter.getTime()+" calls:"+statisticsFilter.getCall()+" tps:"+statisticsFilter.getTps());
 		
 		System.exit(0);
 	}
