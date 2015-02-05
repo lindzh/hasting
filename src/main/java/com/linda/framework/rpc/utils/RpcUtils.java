@@ -31,7 +31,9 @@ public class RpcUtils {
 	private static Logger logger = Logger.getLogger(RpcUtils.class);
 	private static Map<String, Method> methodCache = new HashMap<String, Method>();
 	
-	public static int MEM_16KB = 1024*16;
+	public static int MEM_8KB = 1024*8;
+	
+	public static int MEM_16KB = MEM_8KB*2;
 	
 	public static int MEM_32KB = MEM_16KB*2;
 
