@@ -2,7 +2,9 @@ package com.linda.framework.rpc.monitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.linda.framework.rpc.RpcServiceBean;
 import com.linda.framework.rpc.server.RpcServicesHolder;
@@ -11,7 +13,9 @@ public class RpcMonitorServiceImpl implements RpcMonitorService{
 	
 	private RpcServicesHolder rpcServicesHolder;
 	
-	public RpcMonitorServiceImpl(RpcServicesHolder rpcServicesHolder){
+	private StatMonitor statMonitor;
+	
+	public RpcMonitorServiceImpl(RpcServicesHolder rpcServicesHolder,StatMonitor statMonitor){
 		this.rpcServicesHolder = rpcServicesHolder;
 	}
 
@@ -33,5 +37,13 @@ public class RpcMonitorServiceImpl implements RpcMonitorService{
 	@Override
 	public String ping() {
 		return "pong";
+	}
+
+	@Override
+	public Map<Long, Long> getRpcStat() {
+		if(statMonitor!=null){
+			return statMonitor.getRpcStat();
+		}
+		return new HashMap<Long, Long>();
 	}
 }

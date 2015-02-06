@@ -1,6 +1,9 @@
 package com.linda.framework.rpc.service;
 
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -10,14 +13,15 @@ import com.linda.framework.rpc.HelloRpcTestService;
 import com.linda.framework.rpc.HelloRpcTestServiceImpl;
 import com.linda.framework.rpc.LoginRpcService;
 import com.linda.framework.rpc.LoginRpcServiceImpl;
-import com.linda.framework.rpc.MyTestRpcFilter;
 import com.linda.framework.rpc.RemoteCall;
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.filter.RpcFilter;
 import com.linda.framework.rpc.filter.RpcFilterChain;
+import com.linda.framework.rpc.monitor.StatMonitor;
 import com.linda.framework.rpc.net.RpcSender;
 import com.linda.framework.rpc.server.AbstractRpcServer;
 import com.linda.framework.rpc.server.ConcurrentRpcServer;
+import com.linda.framework.rpc.utils.RpcUtils;
 
 public class RpcServerTest {
 	
@@ -34,6 +38,34 @@ public class RpcServerTest {
 			hosts.add(host);
 			chain.nextFilter(rpc, call, sender);
 		}
+	}
+	
+	private static class StatThread extends Thread {
+		
+		public StatThread(StatMonitor monitor){
+			this.monitor = monitor;
+		}
+
+		private StatMonitor monitor;
+		
+		@Override
+		public void run() {
+			while(true){
+				Map<Long, Long> stat = monitor.getRpcStat();
+				Set<Long> minutes = stat.keySet();
+				for(long minute:minutes){
+					long cc = stat.get(minute);
+					long tps = cc/60;
+					logger.info("time:"+new Date(minute)+" count:"+cc+" tps:"+tps);
+				}
+				try {
+					Thread.currentThread().sleep(RpcUtils.MINUTE);
+				} catch (InterruptedException e) {
+					break;
+				}
+			}
+		}
+		
 		
 	}
 	
@@ -91,7 +123,13 @@ public class RpcServerTest {
 		
 		server.addRpcFilter(statisticsFilter);
 		
+		StatThread thread = new StatThread(server.getStatMonitor());
+		
+		thread.setDaemon(true);
+		
 		server.startService();
+		
+		thread.start();
 		
 		statisticsFilter.startService();
 		

@@ -1,9 +1,10 @@
 package com.linda.framework.rpc.server;
 
 import com.linda.framework.rpc.filter.RpcFilter;
-import com.linda.framework.rpc.filter.SimpleLogFilter;
+import com.linda.framework.rpc.filter.RpcStatFilter;
 import com.linda.framework.rpc.monitor.RpcMonitorService;
 import com.linda.framework.rpc.monitor.RpcMonitorServiceImpl;
+import com.linda.framework.rpc.monitor.StatMonitor;
 import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 import com.linda.framework.rpc.net.AbstractRpcNetworkBase;
 import com.linda.framework.rpc.nio.AbstractRpcNioSelector;
@@ -14,6 +15,7 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	private AbstractRpcAcceptor acceptor;
 	private RpcServiceProvider provider = new RpcServiceProvider();
 	private SimpleServerRemoteExecutor proxy = new SimpleServerRemoteExecutor();
+	private RpcStatFilter statFilter = new RpcStatFilter();
 	private int executorThreadCount = 20;//默认20
 	
 	public void setAcceptor(AbstractRpcAcceptor acceptor){
@@ -45,6 +47,11 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	@Override
 	public void startService() {
 		checkAcceptor();
+		//监控filter
+		statFilter.startService();
+		
+		this.addRpcFilter(statFilter);
+		
 		//默认添加监控
 		this.addMonitor();
 		
@@ -62,6 +69,9 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 		acceptor.stopService();
 		proxy.stopService();
 		provider.stopService();
+		if(statFilter!=null){
+			statFilter.stopService();
+		}
 	}
 
 	public abstract AbstractRpcNioSelector getNioSelector();
@@ -73,7 +83,8 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	}
 	
 	private void addMonitor(){
-		this.register(RpcMonitorService.class, new RpcMonitorServiceImpl(proxy));
+		//通过filter监控访问次数
+		this.register(RpcMonitorService.class, new RpcMonitorServiceImpl(proxy,statFilter));
 	}
 
 	public int getExecutorThreadCount() {
@@ -82,5 +93,9 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 
 	public void setExecutorThreadCount(int executorThreadCount) {
 		this.executorThreadCount = executorThreadCount;
+	}
+	
+	public StatMonitor getStatMonitor(){
+		return this.statFilter;
 	}
 }

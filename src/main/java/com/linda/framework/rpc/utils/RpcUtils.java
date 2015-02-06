@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -296,6 +297,18 @@ public class RpcUtils {
 		}
 		return null;
 	}
+	
+	public static long getNowMinute(){
+		return getMinute(new Date());
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static long getMinute(Date date){
+		GregorianCalendar calendar = new GregorianCalendar(1900+date.getYear(),date.getMonth(),date.getDay(),date.getHours(),date.getMinutes());
+		return calendar.getTimeInMillis();
+	}
+	
+	public static final long MINUTE = 60*1000;
 
 	public enum RpcType {
 		ONEWAY(1), INVOKE(2), SUC(3), FAIL(4);
@@ -319,5 +332,5 @@ public class RpcUtils {
 			return ONEWAY;
 		}
 	}
-
+	
 }
