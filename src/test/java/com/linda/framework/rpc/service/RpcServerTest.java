@@ -79,7 +79,7 @@ public class RpcServerTest {
 		
 		server.register(LoginRpcService.class, loginService);
 		
-		server.addRpcFilter(new MyTestRpcFilter());
+		//server.addRpcFilter(new MyTestRpcFilter());
 		
 		//server.addRpcFilter(new RpcLoginCheckFilter());
 		
@@ -99,9 +99,9 @@ public class RpcServerTest {
 		
 		Thread.currentThread().sleep(sleep);
 		
-		server.stopService();
-		
 		statisticsFilter.stopService();
+		
+		server.stopService();
 		
 		//logger.info("clients:"+clientFilter.hosts);
 		

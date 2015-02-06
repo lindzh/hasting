@@ -13,7 +13,7 @@ public class LoginRpcServiceImpl implements LoginRpcService{
 
 	@Override
 	public boolean login(String username, String password) {
-		logger.info("login user:"+username+" password:"+password);
+		//logger.info("login user:"+username+" password:"+password);
 		String pass = cache.get(username);
 		return pass!=null&&pass.equals(password);
 	}

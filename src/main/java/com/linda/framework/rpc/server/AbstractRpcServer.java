@@ -47,8 +47,6 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 		checkAcceptor();
 		//默认添加监控
 		this.addMonitor();
-		//默认添加logfilter方便agent统计做负载均衡
-		this.addRpcLogFilter();
 		
 		acceptor.setHost(host);
 		acceptor.setPort(port);
@@ -76,10 +74,6 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	
 	private void addMonitor(){
 		this.register(RpcMonitorService.class, new RpcMonitorServiceImpl(proxy));
-	}
-
-	private void addRpcLogFilter(){
-		this.addRpcFilter(new SimpleLogFilter());
 	}
 
 	public int getExecutorThreadCount() {

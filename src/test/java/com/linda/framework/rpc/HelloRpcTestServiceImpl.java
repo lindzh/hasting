@@ -8,8 +8,8 @@ public class HelloRpcTestServiceImpl implements HelloRpcTestService{
 	
 	@Override
 	public String index(int index, String key) {
-		logger.info("index:"+index+" key:"+key);
-		return "HelloRpcTestServiceImpl-"+index;
+		//logger.info("index:"+index+" key:"+key);
+		return "HelloRpcTestServiceImpl-"+index+" key:"+key;
 	}
 
 }

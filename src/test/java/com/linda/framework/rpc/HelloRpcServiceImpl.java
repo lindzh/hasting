@@ -8,7 +8,7 @@ public class HelloRpcServiceImpl implements HelloRpcService{
 	
 	@Override
 	public void sayHello(String message,int tt) {
-		logger.info("sayHello:"+message+" intValue:"+tt);
+		//logger.info("sayHello:"+message+" intValue:"+tt);
 	}
 
 	@Override
@@ -18,7 +18,7 @@ public class HelloRpcServiceImpl implements HelloRpcService{
 
 	@Override
 	public TestRemoteBean getBean(TestBean bean, int id) {
-		logger.info("id:"+id+" bean:"+bean.toString());
+		//logger.info("id:"+id+" bean:"+bean.toString());
 		TestRemoteBean remoteBean = new TestRemoteBean();
 		remoteBean.setAction("fff-"+id);
 		remoteBean.setAge(id*2);
