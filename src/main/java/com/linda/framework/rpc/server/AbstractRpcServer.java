@@ -2,6 +2,8 @@ package com.linda.framework.rpc.server;
 
 import com.linda.framework.rpc.filter.RpcFilter;
 import com.linda.framework.rpc.filter.RpcStatFilter;
+import com.linda.framework.rpc.generic.GenericService;
+import com.linda.framework.rpc.generic.SimpleGenericService;
 import com.linda.framework.rpc.monitor.RpcMonitorService;
 import com.linda.framework.rpc.monitor.RpcMonitorServiceImpl;
 import com.linda.framework.rpc.monitor.StatMonitor;
@@ -54,6 +56,8 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 		
 		//默认添加监控
 		this.addMonitor();
+		//添加对泛型的支持
+		this.addGenericSupport();
 		
 		acceptor.setHost(host);
 		acceptor.setPort(port);
@@ -85,6 +89,13 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	private void addMonitor(){
 		//通过filter监控访问次数
 		this.register(RpcMonitorService.class, new RpcMonitorServiceImpl(proxy,statFilter));
+	}
+	
+	/**
+	 * 添加泛型的支持
+	 */
+	private void addGenericSupport(){
+		this.register(GenericService.class, new SimpleGenericService(proxy));
 	}
 
 	public int getExecutorThreadCount() {
