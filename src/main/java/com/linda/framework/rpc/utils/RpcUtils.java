@@ -6,12 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -161,6 +164,19 @@ public class RpcUtils {
 		} catch (IOException e) {
 			// close all
 		}
+	}
+	
+	public static List<Field> getFields(Class clazz){
+		Field[] fields = clazz.getDeclaredFields();
+		ArrayList<Field> fs = new ArrayList<Field>();
+		for(Field f:fields){
+			fs.add(f);
+		}
+		Class superclass = clazz.getSuperclass();
+		if(superclass!=null&&superclass!=Object.class){
+			fs.addAll(getFields(superclass));
+		}
+		return fs;
 	}
 
 	public static Object invokeMethod(Object obj, String methodName,Object[] args,RpcExceptionHandler exceptionHandler) {

@@ -69,6 +69,9 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 			byte[] data = serializer.serialize(result);
 			rpc.setLength(data.length);
 			rpc.setData(data);
+		}else{
+			rpc.setLength(0);
+			rpc.setData(new byte[0]);
 		}
 		sender.sendRpcObject(rpc, timeout);
 	}

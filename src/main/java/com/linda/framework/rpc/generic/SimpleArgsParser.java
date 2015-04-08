@@ -1,6 +1,7 @@
 package com.linda.framework.rpc.generic;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.linda.framework.rpc.exception.RpcException;
+import com.linda.framework.rpc.utils.RpcUtils;
 
 public class SimpleArgsParser implements ArgsParser{
 
@@ -33,9 +35,12 @@ public class SimpleArgsParser implements ArgsParser{
 			Set<String> keys = params.keySet();
 			for(String key:keys){
 				try {
-					Field field = clazz.getField(key);
+					Field field = clazz.getDeclaredField(key);
 					field.setAccessible(true);
-					field.set(object, params.get(key));
+					Object vvv = params.get(key);
+					Class<?> type = field.getType();
+					Object arg = this.parseArg(type.getCanonicalName(), vvv);
+					field.set(object, arg);
 				} catch (NoSuchFieldException e) {
 					throw new RpcException(e);
 				} catch (SecurityException e) {
@@ -116,25 +121,20 @@ public class SimpleArgsParser implements ArgsParser{
 		}
 	}
 	
-	private String getType(String type){
-		int index = type.indexOf('<');
-		if(index>0){
-			int end = type.indexOf('>');
-			if(end>index){
-				String str = type.substring(index+1, end);
-				index = str.indexOf(',');
-				if(index>0){
-					return str.substring(index+1, str.length());
-				}else{
-					return str;
-				}
+	private String[] getType(String type){
+		int start = type.indexOf('<');
+		int end = type.lastIndexOf('>');
+		if(start>0&&end>start){
+			int bb = type.indexOf(',', start);
+			if(bb>0){
+				String ss = type.substring(start, bb);
+				String s2 = type.substring(bb+2, end);
+				return new String[]{ss,s2};
+			}else{
+				return new String[]{type.substring(start+1, end)};
 			}
 		}
-		index = type.indexOf("[");
-		if(index>0){
-			return type.substring(0, index);
-		}
-		return type;
+		throw new RpcException("unknown type:"+type);
 	}
 	
 	private Object parseArg(String type, Object arg) {
@@ -144,7 +144,7 @@ public class SimpleArgsParser implements ArgsParser{
 				this.checkCollectionType(type, arg);
 				List<Object> argList = (List<Object>) arg;
 				List<Object> nargList = new ArrayList<Object>();
-				String paramType = this.getType(type);
+				String paramType = this.getType(type)[0];
 				for (Object a : argList) {
 					Object object = this.parseJdkObject(paramType, a);
 					nargList.add(object);
@@ -154,7 +154,7 @@ public class SimpleArgsParser implements ArgsParser{
 				this.checkCollectionType(type, arg);
 				Set<Object> list = (Set<Object>) arg;
 				Set<Object> nargList = new HashSet<Object>();
-				String paramType = this.getType(type);
+				String paramType = this.getType(type)[0];
 				for (Object a : list) {
 					Object object = this.parseJdkObject(paramType, a);
 					nargList.add(object);
@@ -162,17 +162,18 @@ public class SimpleArgsParser implements ArgsParser{
 				return nargList;
 			} else if (arg instanceof Map) {
 				this.checkCollectionType(type, arg);
-				Map<String, Object> list = (Map<String, Object>) arg;
-				Map<String, Object> nargList = new HashMap<String, Object>();
-				String paramType = this.getType(type);
-				Set<String> keys = list.keySet();
-				for (String key : keys) {
+				Map<Object, Object> list = (Map<Object, Object>) arg;
+				Map<Object, Object> nargList = new HashMap<Object, Object>();
+				String[] mapType = this.getType(type);
+				Set<Object> keys = list.keySet();
+				for (Object key : keys) {
+					Object k = this.parseArg(mapType[0], nargList);
 					Object a = list.get(key);
 					if (a != null) {
-						Object object = this.parseJdkObject(paramType, a);
-						nargList.put(key, object);
+						Object v = this.parseJdkObject(mapType[1], a);
+						nargList.put(k, v);
 					} else {
-						nargList.put(key, a);
+						nargList.put(k, null);
 					}
 				}
 				return nargList;
@@ -180,7 +181,7 @@ public class SimpleArgsParser implements ArgsParser{
 				this.checkCollectionType(type, arg);
 				Iterable<Object> list = (Iterable<Object>) arg;
 				List<Object> nargList = new ArrayList<Object>();
-				String paramType = this.getType(type);
+				String paramType = this.getType(type)[0];
 				for (Object a : list) {
 					Object object = this.parseJdkObject(paramType, a);
 					nargList.add(object);
@@ -190,7 +191,7 @@ public class SimpleArgsParser implements ArgsParser{
 				this.checkCollectionType(type, arg);
 				Stack<Object> list = (Stack<Object>) arg;
 				Stack<Object> nargList = new Stack<Object>();
-				String paramType = this.getType(type);
+				String paramType = this.getType(type)[0];
 				for (Object a : list) {
 					Object object = this.parseJdkObject(paramType, a);
 					nargList.add(object);
@@ -200,26 +201,66 @@ public class SimpleArgsParser implements ArgsParser{
 				this.checkCollectionType(type, arg);
 				Queue<Object> queue = (Queue<Object>) arg;
 				LinkedList<Object> nargList = new LinkedList<Object>();
-				String paramType = this.getType(type);
+				String paramType = this.getType(type)[0];
 				for (Object a : queue) {
 					Object object = this.parseJdkObject(paramType, a);
 					nargList.add(object);
 				}
 				return nargList;
-			} else if (type.endsWith("[]")) {
-				Object[] array = (Object[]) arg;
-				List<Object> nargList = new ArrayList<Object>();
-				String paramType = this.getType(type);
-				for (Object a : array) {
-					Object object = this.parseJdkObject(paramType, a);
-					nargList.add(object);
+			} else if (arg.getClass().isArray()) {
+				Class<? extends Object> class1 = arg.getClass();
+				Class<?> componentType = class1.getComponentType();
+				if(componentType==int.class){
+					return arg;
+				}else if(componentType==long.class){
+					return arg;
+				}else if(componentType==short.class){
+					return arg;
+				}else if(componentType==double.class){
+					return arg;
+				}else if(componentType==float.class){
+					return arg;
+				}else if(componentType==char.class){
+					return arg;
+				}else if(componentType==boolean.class){
+					return arg;
+				}else if(componentType==byte.class){
+					return arg;
+				}else{
+					Object[] array = (Object[]) arg;
+					List<Object> nargList = new ArrayList<Object>();
+					String paramType = componentType.getCanonicalName();
+					for (Object a : array) {
+						Object object = this.parseJdkObject(paramType, a);
+						nargList.add(object);
+					}
+					return nargList.toArray();
 				}
-				return nargList.toArray();
 			}
 			throw new RpcException("not supported type:"+type+" :"+argClass);
 		} else {
 			return this.parseJdkObject(type, arg);
 		}
+	}
+	
+	private Map<String,Object> parseObjectToMap(Object obj){
+		HashMap<String,Object> map = new HashMap<String,Object>();
+		Class<? extends Object> clazz = obj.getClass();
+		List<Field> fields = RpcUtils.getFields(clazz);
+		for(Field f:fields){
+			f.setAccessible(true);
+			String name = f.getName();
+			try {
+				Object v = f.get(obj);
+				Object object = this.parseResult(v);
+				map.put(name, object);
+			} catch (IllegalArgumentException e) {
+				throw new RpcException(e);
+			} catch (IllegalAccessException e) {
+				throw new RpcException(e);
+			}
+		}
+		return map;
 	}
 	
 	private Object parseObject(Object obj){
@@ -258,14 +299,100 @@ public class SimpleArgsParser implements ArgsParser{
 		}else if(obj.getClass()==String.class){
 			return obj;
 		}else{
-			return obj;
+			return this.parseObjectToMap(obj);
 		}
 	}
 
 	@Override
 	public Object parseResult(Object result) {
-		
-		return result;
+		if(result==null){
+			return null;
+		}
+		if(result instanceof List){
+			List<Object> list = new ArrayList<Object>();
+			List<Object> is = (List<Object>)result;
+			for(Object i:is){
+				Object object = this.parseResult(i);
+				list.add(object);
+			}
+			return list;
+		}else if(result instanceof Set){
+			Set<Object> list = new HashSet<Object>();
+			Set<Object> is = (Set<Object>)result;
+			for(Object i:is){
+				Object object = this.parseResult(i);
+				list.add(object);
+			}
+			return list;
+		}else if(result instanceof Map){
+			Map<Object,Object> map = new HashMap<Object,Object>();
+			Map<Object,Object> is = (Map<Object,Object>)result;
+			Set<Object> keys = is.keySet();
+			for(Object i:keys){
+				Object key = this.parseResult(i);
+				Object vv = is.get(i);
+				if(vv!=null){
+					Object object = this.parseResult(vv);
+					map.put(key, object);
+				}else{
+					map.put(key, null);
+				}
+			}
+			return map;
+		}else if(result instanceof Stack){
+			List<Object> list = new LinkedList<Object>();
+			Stack<Object> is = (Stack<Object>)result;
+			for(Object i:is){
+				Object object = this.parseResult(i);
+				list.add(object);
+			}
+			return list;
+		}else if(result instanceof Queue){
+			List<Object> list = new LinkedList<Object>();
+			Queue<Object> is = (Queue<Object>)result;
+			for(Object i:is){
+				Object object = this.parseResult(i);
+				list.add(object);
+			}
+			return list;
+		}else if(result instanceof Iterable){
+			List<Object> list = new ArrayList<Object>();
+			Iterable<Object> is = (Iterable<Object>)result;
+			for(Object i:is){
+				Object object = this.parseResult(i);
+				list.add(object);
+			}
+			return list;
+		}else if(result.getClass().isArray()){//数组
+			Class<? extends Object> class1 = result.getClass();
+			Class<?> componentType = class1.getComponentType();
+			if(componentType==int.class){
+				return result;
+			}else if(componentType==long.class){
+				return result;
+			}else if(componentType==short.class){
+				return result;
+			}else if(componentType==double.class){
+				return result;
+			}else if(componentType==float.class){
+				return result;
+			}else if(componentType==char.class){
+				return result;
+			}else if(componentType==boolean.class){
+				return result;
+			}else if(componentType==byte.class){
+				return result;
+			}else{
+				List<Object> list = new ArrayList<Object>();
+				Object[] is = (Object[])result;
+				for(Object i:is){
+					Object object = this.parseResult(i);
+					list.add(object);
+				}
+				return list.toArray();
+			}
+		}
+		return this.parseObject(result);
 	}
 
 	@Override

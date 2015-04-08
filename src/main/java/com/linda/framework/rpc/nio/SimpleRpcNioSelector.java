@@ -32,7 +32,6 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 	private static final int READ_OP = SelectionKey.OP_READ;
 	private static final int READ_WRITE_OP = SelectionKey.OP_READ|SelectionKey.OP_WRITE;
 	private LinkedList<Runnable> selectTasks = new LinkedList<Runnable>();
-	private AtomicBoolean inSelect = new AtomicBoolean(false);
 	
 	private AbstractRpcNioSelector delegageSelector;
 	
@@ -268,7 +267,6 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 				}
 				boolean needSend = checkSend();
 				try {
-					inSelect.set(true);
 					if (needSend) {
 						selector.selectNow();
 					} else {
@@ -277,7 +275,6 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 				} catch (IOException e) {
 					SimpleRpcNioSelector.this.handleNetException(e);
 				}
-				inSelect.set(false);
 				Set<SelectionKey> selectionKeys = selector.selectedKeys();
 				for (SelectionKey selectionKey : selectionKeys) {
 					doDispatchSelectionKey(selectionKey);
@@ -300,9 +297,7 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 
 	@Override
 	public void notifySend(AbstractRpcConnector connector) {
-		if(inSelect.get()){
-			selector.wakeup();
-		}
+		selector.wakeup();
 	}
 	
 	private void addSelectTask(Runnable task){
