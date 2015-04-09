@@ -79,3 +79,30 @@ helloRpcService.sayHello("this is HelloRpcService",564);
 loginService.login("linda", "123456");
 String hello = helloRpcService.getHello();
 ```
+
+>泛型支持
+客户端无需知道服务端提供的rpc服务class，和参数object，只需知道名称，版本，对象包含参数
+除jdk基本类型，包装对象，集合外的对象用Map表示
+
+客户端调用
+
+```java
+GenericService service = client.register(GenericService.class);
+
+String[] getBeanTypes = new String[]{"com.linda.framework.rpc.TestBean","int"};
+HashMap<String,Object> map = new HashMap<String,Object>();
+map.put("limit", 111);
+map.put("offset", 322);
+map.put("order", "trtr");
+map.put("message", "this is a test");
+Object[] getBeanArgs = new Object[]{map,543543};
+//调用泛型，无需服务端class，只需知道service名称，版本，方法，参数类型和参数
+Object hh = service.invoke("com.linda.framework.rpc.HelloRpcService", 
+	RpcUtils.DEFAULT_VERSION,"getBean", getBeanTypes, getBeanArgs);
+System.out.println(hh);
+
+String[] argTypes = new String[]{"java.lang.String","int"};
+Object[] args = new Object[]{"hello,this is linda",543543};
+Object invoke = service.invoke("com.linda.framework.rpc.HelloRpcService", 
+	RpcUtils.DEFAULT_VERSION, "sayHello", argTypes, args);
+```
