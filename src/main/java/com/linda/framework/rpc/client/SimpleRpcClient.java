@@ -13,12 +13,7 @@ public class SimpleRpcClient extends AbstractRpcClient{
 
 	private void checkConnector(){
 		if(connector==null){
-			SimpleRpcNioSelector nioSelector = new SimpleRpcNioSelector();
-			SimpleRpcOioWriter writer = new SimpleRpcOioWriter();
-			if(connectorClass==null){
-				connectorClass = RpcNioConnector.class;
-			}
-			connector = RpcUtils.createRpcConnector(nioSelector, writer, connectorClass);
+			connector = RpcUtils.createConnector(connectorClass);
 		}
 	}
 

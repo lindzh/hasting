@@ -8,7 +8,7 @@ public class HelloRpcServiceImpl implements HelloRpcService{
 	
 	@Override
 	public void sayHello(String message,int tt) {
-		//logger.info("sayHello:"+message+" intValue:"+tt);
+		System.out.println("sayHello:"+message+" intValue:"+tt);
 	}
 
 	@Override

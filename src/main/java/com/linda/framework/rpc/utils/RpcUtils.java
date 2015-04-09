@@ -27,8 +27,10 @@ import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
 import com.linda.framework.rpc.nio.AbstractRpcNioSelector;
 import com.linda.framework.rpc.nio.RpcNioConnector;
+import com.linda.framework.rpc.nio.SimpleRpcNioSelector;
 import com.linda.framework.rpc.oio.AbstractRpcOioWriter;
 import com.linda.framework.rpc.oio.RpcOioConnector;
+import com.linda.framework.rpc.oio.SimpleRpcOioWriter;
 
 public class RpcUtils {
 
@@ -286,6 +288,15 @@ public class RpcUtils {
 		}catch(Exception e){
 			throw new RpcException(e);
 		}
+	}
+	
+	public static AbstractRpcConnector createConnector(Class connectorClass){
+		SimpleRpcNioSelector nioSelector = new SimpleRpcNioSelector();
+		SimpleRpcOioWriter writer = new SimpleRpcOioWriter();
+		if(connectorClass==null){
+			connectorClass = RpcNioConnector.class;
+		}
+		return RpcUtils.createRpcConnector(nioSelector, writer, connectorClass);
 	}
 	
 	public static String bytesToHexString(byte[] bytes){   
