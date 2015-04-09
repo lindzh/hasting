@@ -85,7 +85,7 @@ public class RpcNioBuffer{
     }
     
     public boolean hasRpcObject(){
-    	if(writeIndex-readIndex>NioUtils.RPC_PROTOCOL_HEAD_LEN){
+    	if(writeIndex-readIndex>=NioUtils.RPC_PROTOCOL_HEAD_LEN){
     		byte[] lenBuf = new byte[4];
     		System.arraycopy(buf, readIndex+16, lenBuf, 0, 4);
     		int len = RpcUtils.bytesToInt(lenBuf);

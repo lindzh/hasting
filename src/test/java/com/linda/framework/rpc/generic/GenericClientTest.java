@@ -10,7 +10,7 @@ public class GenericClientTest {
 	
 	public static void main(String[] a) {
 		SimpleRpcClient client = new SimpleRpcClient();
-		client.setHost("192.168.139.129");
+		client.setHost("127.0.0.1");
 		client.setPort(4445);
 		client.startService();
 		GenericService service = client.register(GenericService.class);
@@ -27,8 +27,10 @@ public class GenericClientTest {
 		
 		String[] argTypes = new String[]{"java.lang.String","int"};
 		Object[] args = new Object[]{"hello,this is linda",543543};
-		service.invoke("com.linda.framework.rpc.HelloRpcService", RpcUtils.DEFAULT_VERSION, "sayHello", argTypes, args);
-
+		Object invoke = service.invoke("com.linda.framework.rpc.HelloRpcService", RpcUtils.DEFAULT_VERSION, "sayHello", argTypes, args);
+		System.out.println("result:"+invoke);
+		System.out.println("---------------");
+		client.stopService();
 	}
 
 }

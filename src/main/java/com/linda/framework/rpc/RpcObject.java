@@ -12,7 +12,7 @@ public class RpcObject {
 	private long threadId;
 	private int index;
 	private int length;
-	private byte[] data;
+	private byte[] data = new byte[0];
 	
 	private String host;
 	private int port;
