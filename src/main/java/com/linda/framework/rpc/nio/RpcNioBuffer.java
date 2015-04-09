@@ -149,7 +149,9 @@ public class RpcNioBuffer{
     	this.writeLong(rpc.getThreadId());
     	this.writeInt(rpc.getIndex());
     	this.writeInt(rpc.getLength());
-    	this.write(rpc.getData());
+    	if(rpc.getLength()>0){
+        	this.write(rpc.getData());
+    	}
     }
     
     public RpcObject readRpcObject(){

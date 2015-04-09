@@ -8,7 +8,7 @@ public class GenericServerTest {
 
 	public static void main(String[] args) {
 		SimpleRpcServer server = new SimpleRpcServer();
-		server.setHost("127.0.0.1");
+		server.setHost("0.0.0.0");
 		server.setPort(4445);
 		server.register(HelloRpcService.class, new HelloRpcServiceImpl());
 		server.startService();
