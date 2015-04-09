@@ -10,7 +10,7 @@ public class GenericClientTest {
 	
 	public static void main(String[] a) {
 		SimpleRpcClient client = new SimpleRpcClient();
-		client.setHost("192.168.139.1");
+		client.setHost("192.168.139.129");
 		client.setPort(4445);
 		client.startService();
 		GenericService service = client.register(GenericService.class);

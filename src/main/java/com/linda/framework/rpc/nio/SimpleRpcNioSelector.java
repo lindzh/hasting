@@ -167,7 +167,6 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 						channelReadBuf.clear();
 						while(connectorReadBuf.hasRpcObject()){
 							RpcObject rpc = connectorReadBuf.readRpcObject();
-							System.out.println("read:"+rpc);
 							this.fireRpc(connector, rpc);
 						}
 					}
@@ -195,7 +194,6 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 				ByteBuffer channelWriteBuf = connector.getChannelWriteBuffer();
 				while (connector.isNeedToSend()) {
 					RpcObject rpc = connector.getToSend();
-					System.out.println("send:"+rpc);
 					connectorWriteBuf.writeRpcObject(rpc);
 					channelWriteBuf.put(connectorWriteBuf.readBytes());
 					channelWriteBuf.flip();
@@ -329,10 +327,4 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 		logger.error("selector exception:"+e.getMessage());
 	}
 	
-	public static void main(String[] args) {
-		SimpleRpcNioSelector s1 = new SimpleRpcNioSelector();
-		SimpleRpcNioSelector s2 = new SimpleRpcNioSelector();
-		System.out.println(s2==s1);
-	}
-
 }
