@@ -80,8 +80,9 @@ loginService.login("linda", "123456");
 String hello = helloRpcService.getHello();
 ```
 
->泛型支持
-客户端无需知道服务端提供的rpc服务class，和参数object，只需知道名称，版本，对象包含参数
+##泛型支持
+
+>客户端无需知道服务端提供的rpc服务class，和参数object，只需知道名称，版本，对象包含参数
 除jdk基本类型，包装对象，集合外的对象用Map表示
 
 客户端调用
