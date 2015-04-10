@@ -60,6 +60,7 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 			this.getRpcWriter().registerWrite(this);
 			this.getRpcWriter().startService();
 			new ClientThread().start();
+			this.fireStartNetListeners();
 		} catch (Exception e) {
 			this.handleNetException(e);
 		}
@@ -99,7 +100,7 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 	}
 
 	@Override
-	public void handleNetException(Exception e){
+	public void handleConnectorException(Exception e) {
 		this.getRpcWriter().unRegWrite(this);
 		this.stopService();
 		logger.error("connection caught io exception close");

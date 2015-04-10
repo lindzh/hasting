@@ -12,9 +12,11 @@ import com.linda.framework.rpc.client.AbstractClientRemoteExecutor;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.generic.GenericService;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
+import com.linda.framework.rpc.net.RpcNetBase;
+import com.linda.framework.rpc.net.RpcNetListener;
 import com.linda.framework.rpc.utils.RpcUtils;
 
-public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRemoteExecutor{
+public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRemoteExecutor implements RpcNetListener{
 	
 	public abstract List<RpcHostAndPort> getHostAndPorts();
 	
@@ -25,6 +27,8 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	public abstract void stopRpcCluster();
 	
 	public abstract String hash(List<String> servers);
+	
+	public abstract void onClose(RpcHostAndPort hostAndPort);
 	
 	private Map<String,List<String>> serviceServerCache = new HashMap<String,List<String>>();
 	
@@ -82,6 +86,7 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		connector.setHost(hostAndPort.getHost());
 		connector.setPort(hostAndPort.getPort());
 		connector.addRpcCallListener(this);
+		connector.addRpcNetListener(this);
 		connector.startService();
 		serverConnectorCache.put(hostAndPort.toString(), connector);
 		return true;
@@ -118,6 +123,12 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		}
 	}
 	
+	@Override
+	public void onClose(RpcNetBase network, Exception e) {
+		this.removeServer(network.getHost()+":"+network.getPort());
+		this.onClose(new RpcHostAndPort(network.getHost(),network.getPort()));
+	}
+
 	@Override
 	public AbstractRpcConnector getRpcConnector(RemoteCall call) {
 		List<String> servers = Collections.emptyList();

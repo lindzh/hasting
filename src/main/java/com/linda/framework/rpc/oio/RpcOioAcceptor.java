@@ -41,6 +41,7 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 			server.bind(new InetSocketAddress(host,port));
 			this.startListeners();
 			new AcceptThread().start();
+			this.fireStartNetListeners();
 		} catch (Exception e) {
 			throw new RpcException(e);
 		}

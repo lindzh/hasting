@@ -4,9 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
+import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 
 public abstract class RpcNetBase extends AbstractRpcNetworkBase implements RpcNetExceptionHandler{
@@ -18,12 +20,15 @@ public abstract class RpcNetBase extends AbstractRpcNetworkBase implements RpcNe
 
 	protected List<RpcCallListener> callListeners;
 	
+	protected List<RpcNetListener> netListeners;
+	
 	private static final int DEFAULT_EXECUTOR_THREAD_COUNT = 3;
 	//执行器数量
 	private int executorThreadCount = DEFAULT_EXECUTOR_THREAD_COUNT;
 	
 	public RpcNetBase(){
 		callListeners = new LinkedList<RpcCallListener>();
+		netListeners = new LinkedList<RpcNetListener>();
 	}
 	
 	public ExecutorService getExecutorService() {
@@ -87,7 +92,23 @@ public abstract class RpcNetBase extends AbstractRpcNetworkBase implements RpcNe
 			connector.addRpcCallListener(listener);
 		}
 	}
+	
+	public void addRpcNetListener(RpcNetListener listener){
+		netListeners.add(listener);
+	}
+	
+	public void fireCloseNetListeners(Exception e){
+		for(RpcNetListener listener:netListeners){
+			listener.onClose(this,e);
+		}
+	}
 
+	public void fireStartNetListeners(){
+		for(RpcNetListener listener:netListeners){
+			listener.onStart(this);
+		}
+	}
+	
 	@Override
 	public void startService() {
 		if(this.executorService==null){

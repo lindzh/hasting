@@ -82,7 +82,7 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	
 	private void checkAcceptor(){
 		if(acceptor==null){
-			acceptor = new RpcNioAcceptor(getNioSelector());
+			this.setAcceptor(new RpcNioAcceptor(getNioSelector()));
 		}
 	}
 	

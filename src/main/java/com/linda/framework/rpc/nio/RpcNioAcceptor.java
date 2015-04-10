@@ -51,6 +51,7 @@ public class RpcNioAcceptor extends AbstractRpcAcceptor{
 			//serverSocketChannel.bind(new InetSocketAddress(host,port));
 			selector.register(this);
 			this.startListeners();
+			this.fireStartNetListeners();
 		} catch (IOException e) {
 			this.handleNetException(e);
 		}

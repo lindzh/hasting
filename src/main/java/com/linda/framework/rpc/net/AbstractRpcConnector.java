@@ -105,6 +105,14 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 	public boolean isStop() {
 		return stop;
 	}
+	
+	public abstract void handleConnectorException(Exception e);
+	
+	@Override
+	public final void handleNetException(Exception e) {
+		this.fireCloseNetListeners(e);
+		this.handleConnectorException(e);
+	}
 
 	public void fireCall(final RpcObject rpc){
 		this.getExecutorService().execute(new Runnable() {

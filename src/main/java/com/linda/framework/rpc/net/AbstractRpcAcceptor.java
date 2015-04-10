@@ -1,6 +1,7 @@
 package com.linda.framework.rpc.net;
 
 import com.linda.framework.rpc.Service;
+import com.linda.framework.rpc.exception.RpcException;
 
 
 public abstract class AbstractRpcAcceptor extends RpcNetBase implements Service {
@@ -15,6 +16,7 @@ public abstract class AbstractRpcAcceptor extends RpcNetBase implements Service 
 
 	@Override
 	public void stopService() {
+		this.fireCloseNetListeners(new RpcException("acceptor close"));
 		super.stopService();
 	}
 }

@@ -3,6 +3,7 @@ package com.linda.framework.rpc.cluster;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.linda.framework.rpc.net.RpcNetBase;
 import com.linda.framework.rpc.utils.RpcUtils;
 
 public class SimpleClusterExecutor extends AbstractRpcClusterClientExecutor{
@@ -36,5 +37,17 @@ public class SimpleClusterExecutor extends AbstractRpcClusterClientExecutor{
 	@Override
 	public String hash(List<String> servers) {
 		return servers.get(0);
+	}
+
+
+	@Override
+	public void onClose(RpcHostAndPort hostAndPort) {
+		System.out.println("close:"+hostAndPort);
+	}
+
+
+	@Override
+	public void onStart(RpcNetBase network) {
+		System.out.println("start:"+network.getHost()+":"+network.getPort());
 	}
 }

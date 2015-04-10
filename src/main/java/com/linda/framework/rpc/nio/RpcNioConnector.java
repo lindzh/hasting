@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
+import com.linda.framework.rpc.net.RpcNetListener;
 import com.linda.framework.rpc.utils.RpcUtils;
 
 public class RpcNioConnector extends AbstractRpcConnector{
@@ -41,6 +42,12 @@ public class RpcNioConnector extends AbstractRpcConnector{
 		this.initBuf();
 	}
 	
+	@Override
+	public void addRpcNetListener(RpcNetListener listener) {
+		super.addRpcNetListener(listener);
+		this.selector.addRpcNetListener(listener);
+	}
+
 	public RpcNioConnector(){
 		this(null);
 	}
@@ -75,6 +82,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 			logger.info(local+"  "+remote);
 			remotePort = remoteAddress.getPort();
 			remoteHost = remoteAddress.getAddress().getHostAddress();
+			this.fireStartNetListeners();
 		}catch(IOException e){
 			logger.error("connect to host "+host+" port "+port+" failed", e);
 			throw new RpcException("connect to host error");
@@ -136,17 +144,17 @@ public class RpcNioConnector extends AbstractRpcConnector{
 		return rpcNioWriteBuffer;
 	}
 
-	@Override
-	public void handleNetException(Exception e) {
-		logger.error("connector "+this.host+":"+this.port+" io exception start to shutdown");
-		this.stopService();
-	}
-
 	public RpcNioAcceptor getAcceptor() {
 		return acceptor;
 	}
 
 	public void setAcceptor(RpcNioAcceptor acceptor) {
 		this.acceptor = acceptor;
+	}
+
+	@Override
+	public void handleConnectorException(Exception e) {
+		logger.error("connector "+this.host+":"+this.port+" io exception start to shutdown");
+		this.stopService();
 	}
 }

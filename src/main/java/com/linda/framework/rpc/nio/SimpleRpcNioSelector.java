@@ -38,6 +38,7 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 	private Logger logger = Logger.getLogger(SimpleRpcNioSelector.class);
 	
 	public SimpleRpcNioSelector(){
+		super();
 		try {
 			selector = Selector.open();
 			connectorCache = new ConcurrentHashMap<SocketChannel,RpcNioConnector>();
@@ -227,12 +228,14 @@ public class SimpleRpcNioSelector extends AbstractRpcNioSelector{
 			RpcNioAcceptor acceptor = acceptorCache.get(channel);
 			if(acceptor!=null){
 				logger.error("acceptor "+acceptor.getHost()+":"+acceptor.getPort()+" selection error "+e.getClass()+" "+e.getMessage()+" start to shutdown");
+				this.fireNetListeners(acceptor, e);
 				acceptor.stopService();
 			}
 		}else{
 			RpcNioConnector connector = connectorCache.get(channel);
 			if(connector!=null){
 				logger.error("connector "+connector.getHost()+":"+connector.getPort()+" selection error "+e.getClass()+" "+e.getMessage()+" start to shutdown");
+				this.fireNetListeners(connector, e);
 				connector.stopService();
 			}
 		}
