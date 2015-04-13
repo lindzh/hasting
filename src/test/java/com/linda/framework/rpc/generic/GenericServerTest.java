@@ -12,22 +12,23 @@ public class GenericServerTest {
 		RpcClusterServer server = new RpcClusterServer(){
 			@Override
 			public void onClose(RpcNetBase network, Exception e) {
-				
+				System.out.println("server close:"+network.getHost()+":"+network.getPort());
 			}
 
 			@Override
 			public void onStart(RpcNetBase network) {
-				
+				System.out.println("server start:"+network.getHost()+":"+network.getPort());
 			}
 
 			@Override
 			protected void doRegister(Class<?> clazz, Object ifaceImpl) {
-				
+				System.out.println("server reg:"+clazz+":"+ifaceImpl.getClass());
 			}
 
 			@Override
 			protected void doRegister(Class<?> clazz, Object ifaceImpl,
 					String version) {
+				System.out.println("server reg:"+clazz+":"+ifaceImpl.getClass()+" v:"+version);
 			}
 		};
 		server.setAcceptor(new RpcOioAcceptor());

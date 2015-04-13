@@ -1,6 +1,7 @@
 package com.linda.framework.rpc.generic;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,11 @@ public class SimpleArgsParser implements ArgsParser{
 			for(String key:keys){
 				try {
 					Field field = clazz.getDeclaredField(key);
+					int mod = field.getModifiers();
+					//final不可修改字段去掉
+					if(Modifier.isFinal(mod)){
+						continue;
+					}
 					field.setAccessible(true);
 					Object vvv = params.get(key);
 					Class<?> type = field.getType();
@@ -249,6 +255,11 @@ public class SimpleArgsParser implements ArgsParser{
 		List<Field> fields = RpcUtils.getFields(clazz);
 		for(Field f:fields){
 			f.setAccessible(true);
+			int mod = f.getModifiers();
+			//final 不可修改字段去掉
+			if(Modifier.isFinal(mod)){
+				continue;
+			}
 			String name = f.getName();
 			try {
 				Object v = f.get(obj);
