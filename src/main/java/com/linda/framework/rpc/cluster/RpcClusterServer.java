@@ -5,6 +5,11 @@ import com.linda.framework.rpc.net.RpcNetBase;
 import com.linda.framework.rpc.net.RpcNetListener;
 import com.linda.framework.rpc.server.SimpleRpcServer;
 
+/**
+ * 集群配置管理服务支持，统一管理rpc服务
+ * @author lindezhi
+ * 及时通知管理服务器提供的rpc和状态
+ */
 public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNetListener{
 	
 	@Override

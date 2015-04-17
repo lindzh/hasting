@@ -16,6 +16,11 @@ import com.linda.framework.rpc.net.RpcNetBase;
 import com.linda.framework.rpc.net.RpcNetListener;
 import com.linda.framework.rpc.utils.RpcUtils;
 
+/**
+ * 
+ * @author lindezhi
+ * rpc 客户端调用方执行器，及时更新rpc服务器列表和rpc列表
+ */
 public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRemoteExecutor implements RpcNetListener{
 	
 	public abstract List<RpcHostAndPort> getHostAndPorts();
