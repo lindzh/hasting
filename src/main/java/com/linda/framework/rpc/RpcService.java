@@ -1,11 +1,17 @@
-package com.linda.framework.rpc.monitor;
+package com.linda.framework.rpc;
 
 import java.io.Serializable;
 
-public class RpcMonitorBean implements Serializable{
+public class RpcService implements Serializable{
+	
 	private static final long serialVersionUID = -4621627630242399962L;
 	
-	public RpcMonitorBean(String name,String version,String impl){
+	public RpcService(String name,String version){
+		this.name = name;
+		this.version = version;
+	}
+	
+	public RpcService(String name,String version,String impl){
 		this.name = name;
 		this.version = version;
 		this.impl = impl;

@@ -3,6 +3,7 @@ package com.linda.framework.rpc.cluster;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.linda.framework.rpc.RpcService;
 import com.linda.framework.rpc.net.RpcNetBase;
 import com.linda.framework.rpc.utils.RpcUtils;
 
@@ -17,10 +18,10 @@ public class SimpleClusterExecutor extends AbstractRpcClusterClientExecutor{
 
 	
 	@Override
-	public List<ServiceAndVersion> getServerService(RpcHostAndPort hostAndPort) {
-		List<ServiceAndVersion> services = new ArrayList<ServiceAndVersion>();
-		services.add(new ServiceAndVersion("com.linda.framework.rpc.HelloRpcService",RpcUtils.DEFAULT_VERSION));
-		services.add(new ServiceAndVersion("com.linda.framework.rpc.generic.GenericService",RpcUtils.DEFAULT_VERSION));
+	public List<RpcService> getServerService(RpcHostAndPort hostAndPort) {
+		List<RpcService> services = new ArrayList<RpcService>();
+		services.add(new RpcService("com.linda.framework.rpc.HelloRpcService",RpcUtils.DEFAULT_VERSION));
+		services.add(new RpcService("com.linda.framework.rpc.generic.GenericService",RpcUtils.DEFAULT_VERSION));
 		return services;
 	}
 

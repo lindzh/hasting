@@ -10,10 +10,10 @@ import org.apache.log4j.Logger;
 import com.linda.framework.rpc.HelloRpcService;
 import com.linda.framework.rpc.HelloRpcTestService;
 import com.linda.framework.rpc.LoginRpcService;
+import com.linda.framework.rpc.RpcService;
 import com.linda.framework.rpc.client.AbstractRpcClient;
 import com.linda.framework.rpc.client.MultiRpcClient;
 import com.linda.framework.rpc.exception.RpcException;
-import com.linda.framework.rpc.monitor.RpcMonitorBean;
 import com.linda.framework.rpc.monitor.RpcMonitorService;
 
 public class RpcClientTest {
@@ -56,7 +56,7 @@ public class RpcClientTest {
 		helloRpcService = client.register(HelloRpcService.class);
 		testService = client.register(HelloRpcTestService.class);
 		monitorService = client.register(RpcMonitorService.class);
-		List<RpcMonitorBean> rpcServices = monitorService.getRpcServices();
+		List<RpcService> rpcServices = monitorService.getRpcServices();
 		logger.info("rpcServices:"+rpcServices);
 		startThreads();
 	}

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.linda.framework.rpc.RpcService;
 import com.linda.framework.rpc.RpcServiceBean;
 import com.linda.framework.rpc.server.RpcServicesHolder;
 
@@ -20,13 +21,13 @@ public class RpcMonitorServiceImpl implements RpcMonitorService{
 	}
 
 	@Override
-	public List<RpcMonitorBean> getRpcServices() {
+	public List<RpcService> getRpcServices() {
 		if(rpcServicesHolder!=null){
 			List<RpcServiceBean> services = rpcServicesHolder.getRpcServices();
 			if(services!=null&&services.size()>0){
-				List<RpcMonitorBean> list = new ArrayList<RpcMonitorBean>();
+				List<RpcService> list = new ArrayList<RpcService>();
 				for(RpcServiceBean service:services){
-					list.add(new RpcMonitorBean(service.getInterf().getName(),service.getVersion(),service.getBean().getClass().getName()));
+					list.add(new RpcService(service.getInterf().getName(),service.getVersion(),service.getBean().getClass().getName()));
 				}
 				return list;
 			}

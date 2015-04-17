@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.linda.framework.rpc.RemoteCall;
+import com.linda.framework.rpc.RpcService;
 import com.linda.framework.rpc.client.AbstractClientRemoteExecutor;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.generic.GenericService;
@@ -25,7 +26,7 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	
 	public abstract List<RpcHostAndPort> getHostAndPorts();
 	
-	public abstract List<ServiceAndVersion> getServerService(RpcHostAndPort hostAndPort);
+	public abstract List<RpcService> getServerService(RpcHostAndPort hostAndPort);
 	
 	public abstract void startRpcCluster();
 	
@@ -66,13 +67,14 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		for(RpcHostAndPort hostAndPort:hostAndPorts){
 			boolean initAndStartConnector = this.initAndStartConnector(hostAndPort);
 			if(initAndStartConnector){
-				List<ServiceAndVersion> serverServices = this.getServerService(hostAndPort);
+				List<RpcService> serverServices = this.getServerService(hostAndPort);
 				if(serverServices!=null){
-					for(ServiceAndVersion serverService:serverServices){
-						List<String> servers = serviceServerCache.get(serverService.toString());
+					for(RpcService serverService:serverServices){
+						String key = serverService.getName()+":"+serverService.getVersion();
+						List<String> servers = serviceServerCache.get(key);
 						if(servers==null){
 							servers = new ArrayList<String>();
-							serviceServerCache.put(serverService.toString(), servers);
+							serviceServerCache.put(key, servers);
 						}
 						servers.add(hostAndPort.toString());
 					}
