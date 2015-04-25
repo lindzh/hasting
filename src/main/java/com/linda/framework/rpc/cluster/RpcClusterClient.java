@@ -1,5 +1,8 @@
 package com.linda.framework.rpc.cluster;
 
+import java.util.List;
+
+import com.linda.framework.rpc.RpcService;
 import com.linda.framework.rpc.client.AbstractClientRemoteExecutor;
 import com.linda.framework.rpc.client.AbstractRpcClient;
 import com.linda.framework.rpc.client.SimpleClientRemoteProxy;
@@ -10,12 +13,8 @@ public class RpcClusterClient extends AbstractRpcClient{
 	private SimpleClientRemoteProxy proxy;
 	
 	private AbstractRpcClusterClientExecutor executor;
-	
-	public AbstractRpcClusterClientExecutor getExecutor() {
-		return executor;
-	}
 
-	public void setExecutor(AbstractRpcClusterClientExecutor executor) {
+	public void setRemoteExecutor(AbstractRpcClusterClientExecutor executor) {
 		this.executor = executor;
 	}
 
@@ -51,6 +50,14 @@ public class RpcClusterClient extends AbstractRpcClient{
 	public void setConnectorClass(Class<? extends AbstractRpcConnector> connectorClass) {
 		executor.setConnectorClass(connectorClass);
 	}
-	
-	
+
+	//生成代理方便管理
+	public List<RpcHostAndPort> getHostAndPorts() {
+		return executor.getHostAndPorts();
+	}
+
+	//生成代理方便管理
+	public List<RpcService> getServerService(RpcHostAndPort hostAndPort) {
+		return executor.getServerService(hostAndPort);
+	}
 }

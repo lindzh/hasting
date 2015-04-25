@@ -10,7 +10,7 @@ public class SimpleClientTest {
 	
 	public static void main(String[] args) {
 		RpcClusterClient client = new RpcClusterClient();
-		client.setExecutor(new SimpleClusterExecutor());
+		client.setRemoteExecutor(new SimpleClusterExecutor());
 		client.startService();
 		HelloRpcService service = client.register(HelloRpcService.class);
 		service.sayHello("this is linda", 32);
