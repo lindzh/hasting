@@ -20,11 +20,13 @@ public class RpcClusterClient extends AbstractRpcClient{
 
 	@Override
 	public <T> T register(Class<T> iface) {
+		this.checkProxy();
 		return proxy.registerRemote(iface);
 	}
 
 	@Override
 	public <T> T register(Class<T> iface, String version) {
+		this.checkProxy();
 		return proxy.registerRemote(iface, version);
 	}
 
@@ -32,12 +34,16 @@ public class RpcClusterClient extends AbstractRpcClient{
 	public AbstractClientRemoteExecutor getRemoteExecutor() {
 		return executor;
 	}
-
-	@Override
-	public void initConnector(int threadCount) {
+	
+	private void checkProxy(){
 		if(proxy==null){
 			proxy = new SimpleClientRemoteProxy();
 		}
+	}
+
+	@Override
+	public void initConnector(int threadCount) {
+		this.checkProxy();
 		proxy.setRemoteExecutor(executor);
 	}
 

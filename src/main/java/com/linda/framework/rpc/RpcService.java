@@ -6,6 +6,10 @@ public class RpcService implements Serializable{
 	
 	private static final long serialVersionUID = -4621627630242399962L;
 	
+	public RpcService(){
+		
+	}
+	
 	public RpcService(String name,String version){
 		this.name = name;
 		this.version = version;

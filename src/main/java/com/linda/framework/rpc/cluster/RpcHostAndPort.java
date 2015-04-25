@@ -1,27 +1,38 @@
 package com.linda.framework.rpc.cluster;
 
-import com.linda.framework.rpc.net.AbstractRpcNetworkBase;
+public class RpcHostAndPort {
 
-public class RpcHostAndPort extends AbstractRpcNetworkBase{
-	
-	public RpcHostAndPort(String host,int port){
+	private String host;
+	private int port;
+
+	public RpcHostAndPort() {
+
+	}
+
+	public RpcHostAndPort(String host, int port) {
 		this.host = host;
 		this.port = port;
 	}
 
-	@Override
-	public void startService() {
-		
+	public String getHost() {
+		return host;
 	}
 
-	@Override
-	public void stopService() {
-		
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 	@Override
 	public String toString() {
 		return host + ":" + port;
 	}
-	
+
 }
