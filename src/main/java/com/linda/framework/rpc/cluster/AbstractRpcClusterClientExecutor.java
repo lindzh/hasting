@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.linda.framework.rpc.RemoteCall;
 import com.linda.framework.rpc.RpcService;
 import com.linda.framework.rpc.client.AbstractClientRemoteExecutor;
@@ -40,6 +42,8 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	
 	private Map<String,AbstractRpcConnector> serverConnectorCache = new HashMap<String,AbstractRpcConnector>();
 	
+	private Logger logger = Logger.getLogger(AbstractRpcClusterClientExecutor.class);
+	
 	private Class connectorClass;
 	
 	public Class getConnectorClass() {
@@ -56,15 +60,8 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		this.startConnectors();
 	}
 	
-	/**
-	 * 启动集群，并加入
-	 */
-	private void startConnectors(){
-		List<RpcHostAndPort> hostAndPorts = this.getHostAndPorts();
-		if(hostAndPorts==null){
-			throw new RpcException("can't find any server");
-		}
-		for(RpcHostAndPort hostAndPort:hostAndPorts){
+	protected boolean startConnector(RpcHostAndPort hostAndPort){
+		try{
 			boolean initAndStartConnector = this.initAndStartConnector(hostAndPort);
 			if(initAndStartConnector){
 				List<RpcService> serverServices = this.getServerService(hostAndPort);
@@ -80,6 +77,23 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 					}
 				}
 			}
+			return initAndStartConnector;
+		}catch(Exception e){
+			logger.error("connect to "+hostAndPort.toString()+" error:"+e.getMessage());
+			return false;
+		}
+	}
+	
+	/**
+	 * 启动集群，并加入
+	 */
+	private void startConnectors(){
+		List<RpcHostAndPort> hostAndPorts = this.getHostAndPorts();
+		if(hostAndPorts==null){
+			throw new RpcException("can't find any server");
+		}
+		for(RpcHostAndPort hostAndPort:hostAndPorts){
+			this.startConnector(hostAndPort);
 		}
 	}
 	
@@ -89,6 +103,10 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	 * @return
 	 */
 	private boolean initAndStartConnector(RpcHostAndPort hostAndPort){
+		AbstractRpcConnector rpcConnector = serverConnectorCache.get(hostAndPort.toString());
+		if(rpcConnector!=null){
+			return false;
+		}
 		AbstractRpcConnector connector = RpcUtils.createConnector(connectorClass);
 		connector.setHost(hostAndPort.getHost());
 		connector.setPort(hostAndPort.getPort());
