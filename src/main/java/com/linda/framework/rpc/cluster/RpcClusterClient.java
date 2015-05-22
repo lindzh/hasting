@@ -35,6 +35,10 @@ public class RpcClusterClient extends AbstractRpcClient{
 		return executor;
 	}
 	
+	private AbstractRpcClusterClientExecutor getClusterClientExecutor(){
+		return (AbstractRpcClusterClientExecutor)this.getRemoteExecutor();
+	}
+	
 	private void checkProxy(){
 		if(proxy==null){
 			proxy = new SimpleClientRemoteProxy();
@@ -44,26 +48,26 @@ public class RpcClusterClient extends AbstractRpcClient{
 	@Override
 	public void initConnector(int threadCount) {
 		this.checkProxy();
-		proxy.setRemoteExecutor(executor);
+		proxy.setRemoteExecutor(getRemoteExecutor());
 	}
 
 	@Override
 	public Class<? extends AbstractRpcConnector> getConnectorClass() {
-		return executor.getConnectorClass();
+		return getClusterClientExecutor().getConnectorClass();
 	}
 
 	@Override
 	public void setConnectorClass(Class<? extends AbstractRpcConnector> connectorClass) {
-		executor.setConnectorClass(connectorClass);
+		getClusterClientExecutor().setConnectorClass(connectorClass);
 	}
 
 	//生成代理方便管理
 	public List<RpcHostAndPort> getHostAndPorts() {
-		return executor.getHostAndPorts();
+		return getClusterClientExecutor().getHostAndPorts();
 	}
 
 	//生成代理方便管理
 	public List<RpcService> getServerService(RpcHostAndPort hostAndPort) {
-		return executor.getServerService(hostAndPort);
+		return getClusterClientExecutor().getServerService(hostAndPort);
 	}
 }

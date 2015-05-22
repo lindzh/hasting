@@ -158,7 +158,7 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	public AbstractRpcConnector getRpcConnector(RemoteCall call) {
 		List<String> servers = Collections.emptyList();
 		//泛型每台服务器都会有，所以需要转换server，做过滤处理
-		if(call.getClass()==GenericService.class){
+		if(call.getService().equals(GenericService.class.getCanonicalName())){
 			String service = (String)call.getArgs()[0];
 			String version = (String)call.getArgs()[1];
 			servers = serviceServerCache.get(service+":"+version);
