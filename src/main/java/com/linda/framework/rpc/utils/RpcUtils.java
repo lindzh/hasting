@@ -9,9 +9,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +59,57 @@ public class RpcUtils {
 	public static int MEM_1M = MEM_512KB*2;
 	
 	public static String DEFAULT_VERSION = "0.0";
+	
+	public static List<String> getLocalIPs(){
+		List<String> ips = new ArrayList<String>();
+		try {
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			while(interfaces.hasMoreElements()){
+				NetworkInterface ni = interfaces.nextElement();
+				Enumeration<InetAddress> addresses = ni.getInetAddresses();
+				while(addresses.hasMoreElements()){
+					InetAddress address = addresses.nextElement();
+					ips.add(address.getHostAddress());
+				}
+			}
+		} catch (SocketException e) {
+			logger.error("localips error",e);
+		}
+		return ips;
+	}
+	
+	public static String chooseIP(List<String> ips){
+		Collections.sort(ips);
+		String ip = "127.0.0.1";
+		if(ips!=null){
+			for(String localip:ips){
+				if(localip.startsWith("127.")){
+					
+				}else if(localip.startsWith("192.168")){
+					if(ip.startsWith("127.")){
+						ip = localip;
+					}else if(ip.startsWith("192.168")&&ip.endsWith(".1")){
+						ip = localip;
+					}
+					if(!localip.startsWith("192.168")&&!localip.endsWith(".1")){
+						ip = localip;
+					}
+				}else if(localip.startsWith("10.")){
+					if(ip.startsWith("127.")){
+						ip = localip;
+					}else if(ip.startsWith("10.")&&ip.endsWith(".1")){
+						ip = localip;
+					}
+					if(!localip.startsWith("10.")&&!localip.endsWith(".1")){
+						ip = localip;
+					}
+				}else{
+					ip = localip;
+				}
+			}
+		}
+		return ip;
+	}
 
 	public static void writeRpc(RpcObject rpc, OutputStream dos,RpcNetExceptionHandler handler) {
 		try {

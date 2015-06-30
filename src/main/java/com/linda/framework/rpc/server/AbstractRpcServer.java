@@ -1,5 +1,7 @@
 package com.linda.framework.rpc.server;
 
+import java.util.List;
+
 import com.linda.framework.rpc.filter.RpcFilter;
 import com.linda.framework.rpc.filter.RpcStatFilter;
 import com.linda.framework.rpc.generic.GenericService;
@@ -11,6 +13,7 @@ import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 import com.linda.framework.rpc.net.AbstractRpcNetworkBase;
 import com.linda.framework.rpc.nio.AbstractRpcNioSelector;
 import com.linda.framework.rpc.nio.RpcNioAcceptor;
+import com.linda.framework.rpc.utils.RpcUtils;
 
 public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 
@@ -37,13 +40,19 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	}
 	
 	@Override
-	public void setHost(String host) {
-		super.setHost(host);
+	public String getHost() {
+		String host = super.getHost();
+		if(host==null||host.equals("0.0.0.0")){
+			List<String> iPs = RpcUtils.getLocalIPs();
+			String chooseIP = RpcUtils.chooseIP(iPs);
+			super.setHost(chooseIP);
+		}
+		return super.getHost();
 	}
 
 	@Override
-	public void setPort(int port) {
-		super.setPort(port);
+	public void setHost(String host) {
+		super.setHost(host);
 	}
 
 	@Override
