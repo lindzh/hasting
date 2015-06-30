@@ -6,8 +6,8 @@ import com.linda.framework.rpc.Service;
 
 public abstract class AbstractRpcNetworkBase implements Service{
 	
-	protected String host;
-	protected int port;
+	private String host;
+	private int port;
 	
 	protected SSLContext sslContext;
 	protected int sslMode;

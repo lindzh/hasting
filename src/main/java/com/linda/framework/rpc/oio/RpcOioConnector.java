@@ -50,7 +50,7 @@ public class RpcOioConnector extends AbstractRpcConnector implements RpcNetExcep
 		try {
 			if(socket==null){
 				socket = SSLUtils.getSocketInstance(sslContext, sslMode);
-				socket.connect(new InetSocketAddress(host,port));
+				socket.connect(new InetSocketAddress(this.getHost(),this.getPort()));
 			}
 			InetSocketAddress remoteAddress = (InetSocketAddress)socket.getRemoteSocketAddress();
 			remotePort = remoteAddress.getPort();

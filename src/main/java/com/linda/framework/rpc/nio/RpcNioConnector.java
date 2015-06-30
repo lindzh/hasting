@@ -65,10 +65,10 @@ public class RpcNioConnector extends AbstractRpcConnector{
 		try{
 			if(channel==null){
 				channel = SocketChannel.open();
-				channel.connect(new InetSocketAddress(host,port));
+				channel.connect(new InetSocketAddress(this.getHost(),this.getPort()));
 				channel.configureBlocking(false);
 				while(!channel.isConnected());
-				logger.info("connect to "+host+":"+port+" success");
+				logger.info("connect to "+this.getHost()+":"+this.getPort()+" success");
 				selector.startService();
 				selector.register(this);
 			}
@@ -84,7 +84,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 			remoteHost = remoteAddress.getAddress().getHostAddress();
 			this.fireStartNetListeners();
 		}catch(IOException e){
-			logger.error("connect to host "+host+" port "+port+" failed", e);
+			logger.error("connect to host "+this.getHost()+" port "+this.getPort()+" failed", e);
 			throw new RpcException("connect to host error");
 		}
 	}
@@ -154,7 +154,7 @@ public class RpcNioConnector extends AbstractRpcConnector{
 
 	@Override
 	public void handleConnectorException(Exception e) {
-		logger.error("connector "+this.host+":"+this.port+" io exception start to shutdown");
+		logger.error("connector "+this.getHost()+":"+this.getPort()+" io exception start to shutdown");
 		this.stopService();
 	}
 }

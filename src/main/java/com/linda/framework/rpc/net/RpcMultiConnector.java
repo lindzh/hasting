@@ -80,8 +80,8 @@ public class RpcMultiConnector extends RpcNetBase implements Service{
 	}
 	
 	private void initConnector(AbstractRpcConnector connector){
-		connector.setHost(host);
-		connector.setPort(port);
+		connector.setHost(this.getHost());
+		connector.setPort(this.getPort());
 		connector.setExecutorService(this.getExecutorService());
 		connector.setExecutorSharable(true);
 	}

@@ -38,7 +38,7 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 		super.startService();
 		try {
 			server = SSLUtils.getServerSocketInstance(sslContext, sslMode);
-			server.bind(new InetSocketAddress(host,port));
+			server.bind(new InetSocketAddress(this.getHost(),this.getPort()));
 			this.startListeners();
 			new AcceptThread().start();
 			this.fireStartNetListeners();
@@ -79,22 +79,6 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 				}
 			}
 		}
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
 	}
 
 	@Override

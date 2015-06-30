@@ -59,8 +59,8 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 		//添加对泛型的支持
 		this.addGenericSupport();
 		
-		acceptor.setHost(host);
-		acceptor.setPort(port);
+		acceptor.setHost(this.getHost());
+		acceptor.setPort(this.getPort());
 		provider.setExecutor(proxy);
 		acceptor.addRpcCallListener(provider);
 		acceptor.setExecutorThreadCount(executorThreadCount);

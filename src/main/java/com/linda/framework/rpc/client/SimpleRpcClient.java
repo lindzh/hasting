@@ -25,8 +25,8 @@ public class SimpleRpcClient extends AbstractRpcClient{
 	@Override
 	public void initConnector(int threadCount) {
 		checkConnector();
-		connector.setHost(host);
-		connector.setPort(port);
+		connector.setHost(this.getHost());
+		connector.setPort(this.getPort());
 		connector.setExecutorThreadCount(threadCount);
 		executor = new SimpleClientRemoteExecutor(connector);
 	}
