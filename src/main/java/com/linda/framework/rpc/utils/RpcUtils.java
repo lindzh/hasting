@@ -60,16 +60,28 @@ public class RpcUtils {
 	
 	public static String DEFAULT_VERSION = "0.0";
 	
-	public static List<String> getLocalIPs(){
+	/**
+	 * 获取本机ipv4地址列表
+	 * @return
+	 */
+	public static List<String> getLocalV4IPs(){
 		List<String> ips = new ArrayList<String>();
 		try {
 			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 			while(interfaces.hasMoreElements()){
 				NetworkInterface ni = interfaces.nextElement();
-				Enumeration<InetAddress> addresses = ni.getInetAddresses();
-				while(addresses.hasMoreElements()){
-					InetAddress address = addresses.nextElement();
-					ips.add(address.getHostAddress());
+				String name = ni.getDisplayName();
+				if(!ni.isLoopback()&&!ni.isVirtual()&&ni.isUp()){
+					if(name==null||!name.contains("Loopback")){
+						Enumeration<InetAddress> addresses = ni.getInetAddresses();
+						while(addresses.hasMoreElements()){
+							InetAddress address = addresses.nextElement();
+							String ip = address.getHostAddress();
+							if(!ip.contains(":")){
+								ips.add(ip);
+							}
+						}
+					}
 				}
 			}
 		} catch (SocketException e) {

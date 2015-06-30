@@ -43,7 +43,7 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	public String getHost() {
 		String host = super.getHost();
 		if(host==null||host.equals("0.0.0.0")){
-			List<String> iPs = RpcUtils.getLocalIPs();
+			List<String> iPs = RpcUtils.getLocalV4IPs();
 			String chooseIP = RpcUtils.chooseIP(iPs);
 			super.setHost(chooseIP);
 		}
