@@ -4,6 +4,7 @@ public class RpcHostAndPort {
 
 	private String host;
 	private int port;
+	private long time;
 
 	public RpcHostAndPort() {
 
@@ -33,6 +34,14 @@ public class RpcHostAndPort {
 	@Override
 	public String toString() {
 		return host + ":" + port;
+	}
+
+	public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
 	}
 
 	@Override

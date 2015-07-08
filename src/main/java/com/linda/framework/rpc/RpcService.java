@@ -2,28 +2,37 @@ package com.linda.framework.rpc;
 
 import java.io.Serializable;
 
-public class RpcService implements Serializable{
-	
+public class RpcService implements Serializable {
+
 	private static final long serialVersionUID = -4621627630242399962L;
-	
-	public RpcService(){
-		
+
+	public RpcService() {
+
 	}
-	
-	public RpcService(String name,String version){
+
+	public RpcService(String name, String version) {
 		this.name = name;
 		this.version = version;
 	}
-	
-	public RpcService(String name,String version,String impl){
+
+	public RpcService(String name, String version, String impl) {
 		this.name = name;
 		this.version = version;
 		this.impl = impl;
 	}
-	
+
 	private String name;
 	private String version;
 	private String impl;
+	private long time;
+
+	public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
+	}
 
 	public String getName() {
 		return name;
@@ -88,7 +97,6 @@ public class RpcService implements Serializable{
 
 	@Override
 	public String toString() {
-		return "RpcMonitorBean [name=" + name + ", version=" + version
-				+ ", impl=" + impl + "]";
+		return "RpcMonitorBean [name=" + name + ", version=" + version + ", impl=" + impl + "]";
 	}
 }
