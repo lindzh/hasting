@@ -16,8 +16,11 @@ public class RpcMonitorServiceImpl implements RpcMonitorService{
 	
 	private StatMonitor statMonitor;
 	
+	private long time = 0;
+	
 	public RpcMonitorServiceImpl(RpcServicesHolder rpcServicesHolder,StatMonitor statMonitor){
 		this.rpcServicesHolder = rpcServicesHolder;
+		time = System.currentTimeMillis();
 	}
 
 	@Override
@@ -27,7 +30,9 @@ public class RpcMonitorServiceImpl implements RpcMonitorService{
 			if(services!=null&&services.size()>0){
 				List<RpcService> list = new ArrayList<RpcService>();
 				for(RpcServiceBean service:services){
-					list.add(new RpcService(service.getInterf().getName(),service.getVersion(),service.getBean().getClass().getName()));
+					RpcService rpcService = new RpcService(service.getInterf().getName(),service.getVersion(),service.getBean().getClass().getName());
+					rpcService.setTime(time);
+					list.add(rpcService);
 				}
 				return list;
 			}
