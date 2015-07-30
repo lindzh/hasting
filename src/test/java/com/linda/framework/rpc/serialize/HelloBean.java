@@ -2,10 +2,10 @@ package com.linda.framework.rpc.serialize;
 
 import java.io.Serializable;
 
-public class HelloBean implements Serializable{
-	
+public class HelloBean implements Serializable {
+
 	private static final long serialVersionUID = -7651276822721819289L;
-	
+
 	private long id;
 	private String name;
 	private long lnt;
@@ -185,6 +185,19 @@ public class HelloBean implements Serializable{
 
 	public void setLastPrice(double lastPrice) {
 		this.lastPrice = lastPrice;
+	}
+
+	@Override
+	public String toString() {
+		return "HelloBean [id=" + id + ", name=" + name + ", lnt=" + lnt
+				+ ", lat=" + lat + ", price=" + price + ", category="
+				+ category + ", classic=" + classic + ", age=" + age
+				+ ", desc=" + desc + ", addTime=" + addTime + ", addUserId="
+				+ addUserId + ", estimate=" + estimate + ", lastName="
+				+ lastName + ", firstName=" + firstName + ", fullName="
+				+ fullName + ", country=" + country + ", provice=" + provice
+				+ ", city=" + city + ", belongs=" + belongs + ", lastPrice="
+				+ lastPrice + "]";
 	}
 
 }

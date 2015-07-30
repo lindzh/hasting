@@ -1,22 +1,24 @@
 package com.linda.framework.rpc.serialize;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.linda.framework.rpc.serializer.JdkSerializer;
+import com.linda.framework.rpc.utils.NioUtils;
 
 public class BeanSizeTest {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
 		int idx = 0;
 		long now = System.currentTimeMillis();
 		
 		List<HelloBean> list = new ArrayList<HelloBean>();
 		
-		while(idx<100){
+		while(idx<400){
 			HelloBean bean = new HelloBean();
 			bean.setAddTime(now+idx);
 			bean.setAddUserId(123+idx);
@@ -48,8 +50,19 @@ public class BeanSizeTest {
 		map.put("data", list);
 		map.put("msg", "success");
 		JdkSerializer serializer = new JdkSerializer();
+		long start = System.currentTimeMillis();
 		byte[] bs = serializer.serialize(map);
-		System.out.println(bs.length);
+		
+		byte[] zip = NioUtils.zip(bs);
+		byte[] unzip = NioUtils.unzip(zip);
+		
+		long end = System.currentTimeMillis();
+		long cost = end-start;
+		System.out.println("src:"+bs.length+" zip:"+zip.length+" unzip:"+unzip.length+" cost:"+cost);
+		
+		Map<String,Object> mp = (Map<String,Object>)serializer.deserialize(unzip);
+		System.out.println("hahahahha");
+//		System.out.println(mp);
 	}
 
 }
