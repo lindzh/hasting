@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.RemoteCall;
 import com.linda.framework.rpc.RemoteExecutor;
+import com.linda.framework.rpc.RpcContext;
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.exception.RpcExceptionHandler;
@@ -41,6 +42,8 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 	@Override
 	public void onRpcMessage(RpcObject rpc, RpcSender sender) {
 		RemoteCall call = this.deserializeCall(rpc, sender);
+		//服务提供方得到上下文
+		RpcContext.getContext().putAll(call.getAttachment());
 		try{
 			if(call!=null){
 				filterChain.startFilter(rpc, call, sender);

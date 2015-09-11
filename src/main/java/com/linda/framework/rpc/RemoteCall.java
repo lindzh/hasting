@@ -2,6 +2,7 @@ package com.linda.framework.rpc;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * 访问bean，方法，版本的封装，目前的版本version支持粒度为service
@@ -10,12 +11,12 @@ import java.util.Arrays;
  */
 public class RemoteCall implements Serializable{
 
-	private static final long serialVersionUID = -2131053727191384813L;
-	
+	private static final long serialVersionUID = 2769999854843571360L;
 	private String service;
 	private String version;
 	private String method;
 	private Object[] args;
+	private Map<String,Object> attachment;
 
 	public RemoteCall(String service,String method) {
 		this.service = service;
@@ -52,6 +53,14 @@ public class RemoteCall implements Serializable{
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	
+	public Map<String, Object> getAttachment() {
+		return attachment;
+	}
+
+	public void setAttachment(Map<String, Object> attachment) {
+		this.attachment = attachment;
 	}
 
 	@Override

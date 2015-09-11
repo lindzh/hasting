@@ -1,5 +1,7 @@
 package com.linda.framework.rpc;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.filter.RpcFilter;
@@ -13,6 +15,7 @@ public class MyTestRpcFilter implements RpcFilter{
 	@Override
 	public void doFilter(RpcObject rpc, RemoteCall call, RpcSender sender,
 			RpcFilterChain chain) {
+		Map<String, Object> context = rpc.getRpcContext();
 		logger.info("request ip:"+rpc.getHost()+" port:"+rpc.getPort());
 		chain.nextFilter(rpc, call, sender);
 	}

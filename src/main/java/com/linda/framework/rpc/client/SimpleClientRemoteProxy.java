@@ -3,10 +3,12 @@ package com.linda.framework.rpc.client;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.linda.framework.rpc.RemoteCall;
 import com.linda.framework.rpc.RemoteExecutor;
+import com.linda.framework.rpc.RpcContext;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.utils.RpcUtils;
 
@@ -30,6 +32,11 @@ public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 		}else{
 			call.setVersion(RpcUtils.DEFAULT_VERSION);
 		}
+		
+		//加入上下文附件传送支持
+		Map<String, Object> attachment = RpcContext.getContext().getAttachment();
+		call.setAttachment(attachment);
+		
 		if(method.getReturnType()==void.class){
 			remoteExecutor.oneway(call);
 			return null;

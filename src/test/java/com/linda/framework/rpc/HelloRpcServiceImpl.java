@@ -8,6 +8,8 @@ public class HelloRpcServiceImpl implements HelloRpcService{
 	
 	@Override
 	public void sayHello(String message,int tt) {
+		Object attachment = RpcContext.getContext().getAttachment("myattachment");
+		System.out.println("my attachment:"+attachment);
 		System.out.println("sayHello:"+message+" intValue:"+tt);
 	}
 
@@ -18,6 +20,8 @@ public class HelloRpcServiceImpl implements HelloRpcService{
 
 	@Override
 	public TestRemoteBean getBean(TestBean bean, int id) {
+		Object attachment = RpcContext.getContext().getAttachment("myhaha");
+		System.out.println("my attachment:"+attachment);
 		//logger.info("id:"+id+" bean:"+bean.toString());
 		TestRemoteBean remoteBean = new TestRemoteBean();
 		remoteBean.setAction("fff-"+id);

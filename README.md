@@ -107,3 +107,47 @@ Object[] args = new Object[]{"hello,this is linda",543543};
 Object invoke = service.invoke("com.linda.framework.rpc.HelloRpcService", 
 	RpcUtils.DEFAULT_VERSION, "sayHello", argTypes, args);
 ```
+
+##RPC上下文附件支持
+>提供rpc上下文支持，可以将任意对象放入client上下文中，当client发起方调用rpc服务时，服务提供方可以从上下文中获取client端上传来的上下文附件。
+运用场景：定义一个服务时没有必要接收风控参数作为rpc的入参，但是可以把这些风控参数放在rpc的上下文中，可以从filter中获取或在service实现中获取。
+
+```java
+#服务调用方client加入附件
+RpcContext.getContext().setAttachment("myhaha", "myattachment value");
+//rpc call 
+helloService.sayHello("hahaha", 100);
+//clear rpc context
+RpcContext.getContext().clear();
+
+//服务提供方获取附件
+	@Override
+	public void sayHello(String message,int tt) {
+		//获取值
+		Object attachment = RpcContext.getContext().getAttachment("myattachment");
+		System.out.println("my attachment:"+attachment);
+		System.out.println("sayHello:"+message+" intValue:"+tt);
+		//清理
+		RpcContext.getContext().clear();
+	}
+	
+	//另一种清理方式
+	server.addRpcFilter(new RpcContextClearFilter());
+	
+	public class RpcContextClearFilter implements RpcFilter{
+	@Override
+	public void doFilter(RpcObject rpc, RemoteCall call, RpcSender sender,
+			RpcFilterChain chain) {
+		try{
+			chain.nextFilter(rpc, call, sender);
+		}finally{
+			System.out.println("clean rpc context");
+			RpcContext.getContext().clear();
+		}
+	}
+}	
+```
+
+
+
+

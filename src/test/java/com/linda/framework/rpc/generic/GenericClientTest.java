@@ -3,6 +3,7 @@ package com.linda.framework.rpc.generic;
 import java.util.HashMap;
 
 import com.linda.framework.rpc.HelloRpcService;
+import com.linda.framework.rpc.RpcContext;
 import com.linda.framework.rpc.client.SimpleRpcClient;
 import com.linda.framework.rpc.utils.RpcUtils;
 
@@ -22,13 +23,17 @@ public class GenericClientTest {
 		map.put("order", "trtr");
 		map.put("message", "this is a test");
 		Object[] getBeanArgs = new Object[]{map,543543};
+		RpcContext.getContext().setAttachment("myhaha", "myattachment value");
 		Object hh = service.invoke("com.linda.framework.rpc.HelloRpcService", RpcUtils.DEFAULT_VERSION, "getBean", getBeanTypes, getBeanArgs);
-		System.out.println(hh);
+		RpcContext.getContext().clear();
+		System.out.println("getBean result:"+hh);
 		
 		String[] argTypes = new String[]{"java.lang.String","int"};
 		Object[] args = new Object[]{"hello,this is linda",543543};
+		RpcContext.getContext().setAttachment("myattachment","myhaha value");
 		Object invoke = service.invoke("com.linda.framework.rpc.HelloRpcService", RpcUtils.DEFAULT_VERSION, "sayHello", argTypes, args);
-		System.out.println("result:"+invoke);
+		RpcContext.getContext().clear();
+		System.out.println("sayHello result:"+invoke);
 		System.out.println("---------------");
 		client.stopService();
 	}
