@@ -12,12 +12,7 @@ public class HelloRpcServiceImpl implements HelloRpcService{
 		System.out.println("my attachment:"+attachment);
 		System.out.println("sayHello:"+message+" intValue:"+tt);
 	}
-
-	@Override
-	public String getHello() {
-		return "this is hello service";
-	}
-
+	
 	@Override
 	public TestRemoteBean getBean(TestBean bean, int id) {
 		Object attachment = RpcContext.getContext().getAttachment("myhaha");
@@ -29,6 +24,13 @@ public class HelloRpcServiceImpl implements HelloRpcService{
 		remoteBean.setName("serviceBean");
 		return remoteBean;
 	}
+
+	@Override
+	public String getHello() {
+		return "this is hello service";
+	}
+
+
 
 	@Override
 	public int callException(boolean exception) {
