@@ -1,153 +1,86 @@
-##RPC远程调用框架
-rpc远程调用通用框架，提供一个端口多个服务同时高并发部署方案，同时提供安全，接口访问频率基础过滤器支持。
-```tps
-client: rpc-client.jar -h10.120.47.41 -p44444 -t300000 -th200 -c25000 -s1000 
-server: rpc-server.jar -h0.0.0.0 -p44444 -th200 -t600000
-average benchmark RpcServerTest.java clientsSize:29325 time:300002 calls:151307 tps:504
+#轻量级分布式服务化框架
+##基本原理
+![Alt text](http://img2.ph.126.net/oMJOdxjM93wKtlsF764_DQ==/6630102394491146555.jpg)
+```
+轻量级分部署服务调度框架的基本原理是服务提供方Provider提供rpc服务，同时把ip和端口以及发布的rpc服务注册到注册中心，客户端或者rpc消费者从注册中心获取服务Provider列表，同时获取Provider提供的服务列表。另外客户端还会监听注册中心的数据变化，获知server宕机或者服务不可用，将该Provider从客户端Provider缓存列表中剔除，方便做容错和负载均衡。
 ```
 
-###服务端
-
->添加远程服务
-
-添加一个远程服务
-```java
-String host = "127.0.0.1";
-int port = 4332;
-AbstractRpcServer server = new SimpleRpcServer();
-server.setHost(host);
-server.setPort(port);
-//TODO注册远程服务
-//TODO注册过滤器
-//注册完远程服务和过滤器之后再启动服务
-server.startService();
+##特性
+```
+一、	负载均衡
+提供基于RoundRobin和随机方式的负载均衡
+二、	高可用
+Consumer会从注册中心获取到服务列表及该服务的提供者列表，如果某个提供者Provider网络异常或者宕机，Consumer能马上感知到，加入不可用列表，如果从注册中心收到服务不可用会剔除缓存，不可用列表会重新尝试发起连接，如果网络正常了会立即恢复。
+三、	泛型
+一般的rpc调用需要拿到服务提供方的业务api(interface class，入参class，返回值class打包到一个jar中，依赖该jar)，如果使用泛型，只需要填写interface的name,版本，方法名称，参数名称，参数值，如果是对象，将对象字段封装到一个Map中即可，无需依赖任何业务jar即可完成rpc调用。
+四、	Rpc上下文附件
+Rpc调用方可以将需要传递的上下文信息填写到上下文中，而不是作为rpc的入参，这样Provider可以从上下文中获取到掉用方的上下文信息。
+五、	高可用注册中心
+Rpc 框架提供了zookeeper，etcd，redis pubsub（支持单个，或者sentinel集群模式）的注册中心，具备高可用功能。
+六、	实时动态监控
+Provider提供了监控的api，监控可以使用该api加入到项目或者公司的监控平台。
+七、	内存使用少
+Rpc使用的内存模型是tcp连接建立后自动分配一块内存，读和写都在该内存中，不需要为每次请求分配内存，同一个tcp内存复用，数据使用了压缩的方式保存和发送，不支持返回数据量超大的调用（压缩后超过1m）。
 ```
 
->注册远程服务
-
-简单注册多个远程服务，接口自定义
-```java
-//实例化一个实现接口HelloRpcService的对象
-HelloRpcService helloRpcServiceImpl = new HelloRpcServiceImpl();
-//注册为远程服务
-server.register(HelloRpcService.class, helloRpcServiceImpl);
-//注册为远程服务添加版本支持,级别为service级别
-//server.register(HelloRpcService.class, helloRpcServiceImpl,"v1.1");
+##整体架构
+![Alt text](http://img1.ph.126.net/oOtoQoleQRdL79YDFZCmqw==/6631377827978585092.png)
+```
+泛型：GenericService，Consumer不依赖Provider的api jar包即可完成remote api调用
+监控：StatMonitor,consumer注册需要的远程服务StatMonitor，调用rpc获取监控数据
+Webui:一个可视化rpc管理界面，https://github.com/lindzh/rpc-webui
+RPC调用：使用jdk proxy封装发送tcp数据，并等待数据返回，完成RPC调用。
+负载均衡：在集群模式下，同一个版本的Rpc服务在多台服务器上部署，Consumer发起rpc调用使用负载均衡。
+自动容错：发现rpc provider不可用及时剔除，当可用时加入。
+代理：rpcClient注册一个remote intface时会返回一个代理。
+多注册中心：提供Zookeeper，etcd，redis等注册中心，并可以实现高可用。
+```
+##使用
+>Provider
+```
+SimpleRpcServer rpcServer = new SimpleRpcServer();
+rpcServer.setHost("192.168.132.87");
+rpcServer.setPort(4321);
+//将一个service暴露为rpc服务
+rpcServer.register(LoginRpcService.class, new LoginRpcServiceImpl());
+rpcServer.startService();
+// Thread.currentThread().sleep(100000);//wait for call
+rpcServer.stopService();
 ```
 
->添加过滤器
-
-添加ip端口 log和安全检查过滤器,过滤器实现RpcFilter接口即可
-
-```java
-server.addRpcFilter(new MyTestRpcFilter());
-server.addRpcFilter(new RpcLoginCheckFilter());
+>Consumer
+```
+SimpleRpcClient rpcClient = new SimpleRpcClient();
+rpcClient.setHost("192.168.132.87");
+rpcClient.setPort(4321);
+LoginRpcService loginRpcService = rpcClient.register(LoginRpcService.class);
+rpcClient.startService();
+boolean loginResult = loginRpcService.login("admin", "admin");
+rpcClient.stopService();
 ```
 
-###客户端
-
->注册远程服务
-
-初始化并启动
-```java
-String host = "127.0.0.1";
-int port = 4332;
-client = new SimpleRpcClient();
-client.setHost(host);
-client.setPort(port);
-//启动服务
-client.startService();
+##Lisence
 ```
+(The MIT License)
 
->添加远程接口，得到实现代理对象
+Copyright (c) 2012-2014 Netease, Inc. and other pomelo contributors
 
-添加远程调用bean
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-```java
-LoginRpcService loginService = client.register(LoginRpcService.class);
-HelloRpcService helloRpcService = client.register(HelloRpcService.class);
-//选择版本，说明：版本是远程服务service版本，若服务端未找到，不会执行，会产生remote Exception
-//HelloRpcService helloRpcService = client.register(HelloRpcService.class,"v1.1");
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
-
->调用远程服务
-
-业务逻辑
-
-```java
-helloRpcService.sayHello("this is HelloRpcService",564);
-loginService.login("linda", "123456");
-String hello = helloRpcService.getHello();
-```
-
-##泛型支持
-
->客户端无需知道服务端提供的rpc服务class，和参数object，只需知道名称，版本，对象包含参数
-除jdk基本类型，包装对象，集合外的对象用Map表示
-
-客户端调用
-
-```java
-GenericService service = client.register(GenericService.class);
-
-String[] getBeanTypes = new String[]{"com.linda.framework.rpc.TestBean","int"};
-HashMap<String,Object> map = new HashMap<String,Object>();
-map.put("limit", 111);
-map.put("offset", 322);
-map.put("order", "trtr");
-map.put("message", "this is a test");
-Object[] getBeanArgs = new Object[]{map,543543};
-//调用泛型，无需服务端class，只需知道service名称，版本，方法，参数类型和参数
-Object hh = service.invoke("com.linda.framework.rpc.HelloRpcService", 
-	RpcUtils.DEFAULT_VERSION,"getBean", getBeanTypes, getBeanArgs);
-System.out.println(hh);
-
-String[] argTypes = new String[]{"java.lang.String","int"};
-Object[] args = new Object[]{"hello,this is linda",543543};
-Object invoke = service.invoke("com.linda.framework.rpc.HelloRpcService", 
-	RpcUtils.DEFAULT_VERSION, "sayHello", argTypes, args);
-```
-
-##RPC上下文附件支持
->提供rpc上下文支持，可以将任意对象放入client上下文中，当client发起方调用rpc服务时，服务提供方可以从上下文中获取client端上传来的上下文附件。
-运用场景：定义一个服务时没有必要接收风控参数作为rpc的入参，但是可以把这些风控参数放在rpc的上下文中，可以从filter中获取或在service实现中获取。
-
-```java
-#服务调用方client加入附件
-RpcContext.getContext().setAttachment("myhaha", "myattachment value");
-//rpc call 
-helloService.sayHello("hahaha", 100);
-//clear rpc context
-RpcContext.getContext().clear();
-
-//服务提供方获取附件
-	@Override
-	public void sayHello(String message,int tt) {
-		//获取值
-		Object attachment = RpcContext.getContext().getAttachment("myattachment");
-		System.out.println("my attachment:"+attachment);
-		System.out.println("sayHello:"+message+" intValue:"+tt);
-		//清理
-		RpcContext.getContext().clear();
-	}
-	
-	//另一种清理方式
-	server.addRpcFilter(new RpcContextClearFilter());
-	
-	public class RpcContextClearFilter implements RpcFilter{
-	@Override
-	public void doFilter(RpcObject rpc, RemoteCall call, RpcSender sender,
-			RpcFilterChain chain) {
-		try{
-			chain.nextFilter(rpc, call, sender);
-		}finally{
-			System.out.println("clean rpc context");
-			RpcContext.getContext().clear();
-		}
-	}
-}	
-```
-
-
-
-
