@@ -76,7 +76,7 @@ QQ:839861706
 ```
 (The MIT License)
 
-Copyright (c) 2012-2014 Netease, Inc. and other pomelo contributors
+Copyright (c) 2013-2015 github/lindzh
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
