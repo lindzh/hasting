@@ -8,20 +8,20 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class SimpleAioEchoService {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		
-		AsynchronousChannelGroup channelGroup = AsynchronousChannelGroup.withCachedThreadPool(Executors.newFixedThreadPool(10), 10);
+		AsynchronousChannelGroup channelGroup = AsynchronousChannelGroup.withThreadPool(Executors.newFixedThreadPool(4));
 		
-		final AsynchronousServerSocketChannel serverChannel = AsynchronousServerSocketChannel.open(channelGroup);
+		final AsynchronousServerSocketChannel serverChannel = AsynchronousServerSocketChannel.open(channelGroup).bind(new InetSocketAddress("127.0.0.1", 4321));
 		
 //		serverChannel.setOption(StandardSocketOptions.TCP_NODELAY, true);
-		serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-		serverChannel.setOption(StandardSocketOptions.SO_RCVBUF, 16 * 1024);
+//		serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+//		serverChannel.setOption(StandardSocketOptions.SO_RCVBUF, 16 * 1024);
 		
-		serverChannel.bind(new InetSocketAddress("127.0.0.1", 4321));
 		
 		Object attachment = null;
 		
@@ -55,5 +55,6 @@ public class SimpleAioEchoService {
 		});
 		
 		System.out.println("start listening----");
+		channelGroup.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
 	}
 }
