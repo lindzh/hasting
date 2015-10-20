@@ -8,6 +8,7 @@ public class SocketReadHandler<A> implements CompletionHandler<Integer,A>{
 	public void completed(Integer result, A attachment) {
 		SimpleAioConnector connector = (SimpleAioConnector)attachment;
 		connector.fireRead(result);
+//		connector.getChannel().read(connector.getReadBuf(), attachment, connector.getReadHandler());
 	}
 
 	@Override

@@ -34,12 +34,15 @@ public class SimpleAioConnector<A> {
 			readBuf.get(buf);
 			System.out.println(new String(buf));
 			writeBuf.put(buf);
+			writeBuf.flip();
 			this.channel.write(writeBuf, attachment, writeHandler);
 			readBuf.clear();
+			this.channel.read(readBuf, attachment, readHandler);
 		}
 	}
 	
 	public void fireWrite(int count){
+		writeBuf.clear();
 		System.out.println("write finish");
 	}
 	

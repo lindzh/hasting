@@ -8,6 +8,7 @@ public class SocketWriteHandler<A> implements CompletionHandler<Integer,A> {
 	public void completed(Integer result, A attachment) {
 		SimpleAioConnector connector = (SimpleAioConnector)attachment;
 		connector.fireWrite(result);
+//		connector.getChannel().write(connector.getWriteBuf(), attachment, connector.getWriteHandler());
 	}
 
 	@Override
