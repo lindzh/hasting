@@ -2,6 +2,7 @@ package com.linda.framework.rpc.monitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class RpcMonitorServiceImpl implements RpcMonitorService{
 
 	@Override
 	public String ping() {
-		return "pong";
+		return "pong "+new Date();
 	}
 
 	@Override
