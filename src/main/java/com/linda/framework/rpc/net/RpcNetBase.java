@@ -4,11 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.Service;
-import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.exception.RpcNetExceptionHandler;
 
 public abstract class RpcNetBase extends AbstractRpcNetworkBase implements RpcNetExceptionHandler{

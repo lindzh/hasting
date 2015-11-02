@@ -2,7 +2,6 @@ package com.linda.framework.rpc.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 
 import org.apache.log4j.Logger;

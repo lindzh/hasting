@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -16,7 +14,6 @@ import com.linda.framework.rpc.utils.SSLUtils;
 public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	
 	private ServerSocket server;
-	private List<RpcOioConnector> connectors;
 	private AbstractRpcOioWriter writer;
 	private Logger logger = Logger.getLogger(RpcOioAcceptor.class);
 	
@@ -31,7 +28,6 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 		}else{
 			this.writer = writer;
 		}
-		connectors = new ArrayList<RpcOioConnector>();
 	}
 	
 	public void startService(){
@@ -51,10 +47,6 @@ public class RpcOioAcceptor extends AbstractRpcAcceptor{
 	public void stopService() {
 		super.stopService();
 		stop = true;
-		for(RpcOioConnector connector:connectors){
-			connector.stopService();
-		}
-		connectors.clear();
 		this.stopListeners();
 		try {
 			server.close();
