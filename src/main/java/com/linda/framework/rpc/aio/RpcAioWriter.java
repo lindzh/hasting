@@ -9,6 +9,10 @@ import com.linda.framework.rpc.net.AbstractRpcWriter;
  *
  */
 public class RpcAioWriter extends AbstractRpcWriter{
+	
+	public RpcAioWriter(){
+		super();
+	}
 
 	@Override
 	public boolean doSend(AbstractRpcConnector connector) {

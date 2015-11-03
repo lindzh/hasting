@@ -38,11 +38,14 @@ public class RpcAioAcceptor extends AbstractRpcAcceptor{
 	public void startService() {
 		super.startService();
 		try {
+			
 			acceptHandler = new RpcAcceptCompletionHandler();
 			acceptHandler.startService();
 			channelGroup = AsynchronousChannelGroup.withThreadPool(Executors.newFixedThreadPool(channelGroupThreads));
 			serverChannel = AsynchronousServerSocketChannel.open(channelGroup).bind(new InetSocketAddress(this.getHost(), this.getPort()));
 			serverChannel.accept(this, acceptHandler);
+			this.startListeners();
+			this.fireStartNetListeners();
 		} catch (IOException e) {
 			throw new RpcException(e);
 		}

@@ -1,8 +1,7 @@
 package com.linda.framework.rpc.net;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
@@ -19,7 +18,7 @@ public abstract class AbstractRpcWriter implements Service,RpcOutputNofity{
 	private AtomicBoolean started = new AtomicBoolean(false);
 	
 	public AbstractRpcWriter(){
-		connectors = Collections.synchronizedList(new LinkedList<AbstractRpcConnector>());
+		connectors = new CopyOnWriteArrayList<AbstractRpcConnector>();
 	}
 	
 	public void registerWrite(AbstractRpcConnector connector){

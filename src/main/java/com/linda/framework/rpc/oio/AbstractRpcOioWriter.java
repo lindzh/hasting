@@ -9,6 +9,10 @@ import com.linda.framework.rpc.utils.RpcUtils;
 
 public abstract class AbstractRpcOioWriter extends AbstractRpcWriter{
 	
+	public AbstractRpcOioWriter(){
+		super();
+	}
+	
 	public boolean exeSend(AbstractRpcConnector con){
 		boolean hasSend = false;
 		RpcOioConnector connector = (RpcOioConnector)con;

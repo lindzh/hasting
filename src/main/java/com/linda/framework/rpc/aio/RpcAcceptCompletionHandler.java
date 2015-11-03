@@ -12,11 +12,11 @@ public class RpcAcceptCompletionHandler implements CompletionHandler<Asynchronou
 	
 	@Override
 	public void completed(AsynchronousSocketChannel channel, RpcAioAcceptor acceptor) {
-		//
 		RpcAioConnector connector = new RpcAioConnector(acceptor.getAioWriter(),channel);
 		try{
 			connector.setReadHandler(readHandler);
 			connector.setWriteHandler(writeHandler);
+			acceptor.addConnectorListeners(connector);
 			connector.startService();
 		}catch(Exception e){
 			connector.handleConnectorException(e);

@@ -109,6 +109,8 @@ public class RpcAioConnector extends AbstractRpcConnector {
 			this.getRpcWriter().startService();
 			
 			this.fireStartNetListeners();
+			//start read
+			this.channel.read(readBuf, this, readHandler);
 		}catch(IOException e){
 			logger.error("connect to host "+this.getHost()+" port "+this.getPort()+" failed", e);
 			throw new RpcException("connect to host error");
