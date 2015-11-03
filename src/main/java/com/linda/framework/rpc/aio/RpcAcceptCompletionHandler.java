@@ -11,7 +11,6 @@ public class RpcAcceptCompletionHandler<A> implements CompletionHandler<Asynchro
 	private RpcReadCompletionHandler readHandler;
 	private RpcWriteCompletionHandler writeHandler;
 	
-	
 	public RpcAcceptCompletionHandler(RpcAioAcceptor acceptor){
 		this.acceptor = acceptor;
 	}
@@ -24,8 +23,7 @@ public class RpcAcceptCompletionHandler<A> implements CompletionHandler<Asynchro
 			connector.setWriteHandler(writeHandler);
 			connector.startService();
 		}catch(Exception e){
-			//TODO
-			connector.stopService();
+			connector.handleConnectorException(e);
 		}finally{
 			acceptor.getServerChannel().accept(att, this);
 		}
@@ -44,8 +42,8 @@ public class RpcAcceptCompletionHandler<A> implements CompletionHandler<Asynchro
 
 	@Override
 	public void stopService() {
-		// TODO Auto-generated method stub
-		
+		readHandler = null;
+		writeHandler = null;
 	}
 
 }

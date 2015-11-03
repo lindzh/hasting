@@ -88,4 +88,11 @@ public abstract class AbstractClientRemoteExecutor implements RemoteExecutor,Rpc
 
 	public abstract AbstractRpcConnector getRpcConnector(RemoteCall call);
 
+	public RpcSerializer getSerializer() {
+		return serializer;
+	}
+
+	public void setSerializer(RpcSerializer serializer) {
+		this.serializer = serializer;
+	}
 }

@@ -13,6 +13,7 @@ import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 import com.linda.framework.rpc.net.AbstractRpcNetworkBase;
 import com.linda.framework.rpc.nio.AbstractRpcNioSelector;
 import com.linda.framework.rpc.nio.RpcNioAcceptor;
+import com.linda.framework.rpc.serializer.RpcSerializer;
 import com.linda.framework.rpc.utils.RpcUtils;
 
 public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
@@ -117,5 +118,13 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	
 	public StatMonitor getStatMonitor(){
 		return this.statFilter;
+	}
+
+	public RpcSerializer getSerializer() {
+		return provider.getSerializer();
+	}
+
+	public void setSerializer(RpcSerializer serializer) {
+		provider.setSerializer(serializer);
 	}
 }

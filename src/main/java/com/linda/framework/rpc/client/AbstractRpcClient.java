@@ -5,10 +5,13 @@ import com.linda.framework.rpc.net.AbstractRpcNetworkBase;
 import com.linda.framework.rpc.nio.RpcNioConnector;
 import com.linda.framework.rpc.nio.SimpleRpcNioSelector;
 import com.linda.framework.rpc.oio.SimpleRpcOioWriter;
+import com.linda.framework.rpc.serializer.RpcSerializer;
 import com.linda.framework.rpc.utils.RpcUtils;
 
 public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 
+	//序列化可设置
+	private RpcSerializer serializer;
 
 	private SimpleClientRemoteProxy proxy = new SimpleClientRemoteProxy();
 	
@@ -39,7 +42,11 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 	@Override
 	public void startService() {
 		initConnector(executorThreadCount);
-		proxy.setRemoteExecutor(getRemoteExecutor());
+		AbstractClientRemoteExecutor executor = getRemoteExecutor();
+		if(serializer!=null){
+			executor.setSerializer(serializer);
+		}
+		proxy.setRemoteExecutor(executor);
 		proxy.startService();
 	}
 	
@@ -47,5 +54,12 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 	public void stopService() {
 		proxy.stopService();
 	}
-	
+
+	public RpcSerializer getSerializer() {
+		return serializer;
+	}
+
+	public void setSerializer(RpcSerializer serializer) {
+		this.serializer = serializer;
+	}
 }
