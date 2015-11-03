@@ -5,19 +5,15 @@ import java.nio.channels.CompletionHandler;
 
 import com.linda.framework.rpc.Service;
 
-public class RpcAcceptCompletionHandler<A> implements CompletionHandler<AsynchronousSocketChannel,A>,Service {
+public class RpcAcceptCompletionHandler implements CompletionHandler<AsynchronousSocketChannel,RpcAioAcceptor>,Service {
 
-	private RpcAioAcceptor acceptor;
 	private RpcReadCompletionHandler readHandler;
 	private RpcWriteCompletionHandler writeHandler;
 	
-	public RpcAcceptCompletionHandler(RpcAioAcceptor acceptor){
-		this.acceptor = acceptor;
-	}
-	
 	@Override
-	public void completed(AsynchronousSocketChannel channel, A att) {
-		RpcAioConnector connector = new RpcAioConnector(channel);
+	public void completed(AsynchronousSocketChannel channel, RpcAioAcceptor acceptor) {
+		//
+		RpcAioConnector connector = new RpcAioConnector(acceptor.getAioWriter(),channel);
 		try{
 			connector.setReadHandler(readHandler);
 			connector.setWriteHandler(writeHandler);
@@ -25,13 +21,13 @@ public class RpcAcceptCompletionHandler<A> implements CompletionHandler<Asynchro
 		}catch(Exception e){
 			connector.handleConnectorException(e);
 		}finally{
-			acceptor.getServerChannel().accept(att, this);
+			acceptor.getServerChannel().accept(acceptor, this);
 		}
 	}
 
 	@Override
-	public void failed(Throwable th, A att) {
-		acceptor.handleFail(th, att);
+	public void failed(Throwable th, RpcAioAcceptor acceptor) {
+		acceptor.handleFail(th, acceptor);
 	}
 
 	@Override

@@ -13,7 +13,7 @@ public abstract class AbstractRpcWriter implements Service,RpcOutputNofity{
 
 	private Logger logger = Logger.getLogger(AbstractRpcWriter.class);
 	private List<AbstractRpcConnector> connectors;
-	private Thread sendThread;
+	protected Thread sendThread;
 	private int interval = 50;
 	private boolean stop = false;
 	private AtomicBoolean started = new AtomicBoolean(false);

@@ -21,6 +21,8 @@ public abstract class AbstractRpcConnector extends RpcNetBase implements Service
 	private RpcOutputNofity outputNotify;
 	
 	protected ConcurrentLinkedQueue<RpcObject> sendQueueCache = new ConcurrentLinkedQueue<RpcObject>();
+	
+	//写线程
 	private AbstractRpcWriter rpcWriter;
 	
 	public AbstractRpcConnector(AbstractRpcWriter rpcWriter){
