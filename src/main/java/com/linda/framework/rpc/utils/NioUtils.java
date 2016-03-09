@@ -14,6 +14,11 @@ import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.utils.RpcUtils.RpcType;
 
+/**
+ * NIO以及网络utils
+ * @author lindezhi
+ * 2016年3月9日 上午11:36:15
+ */
 public class NioUtils {
 	
 	private static Logger logger = Logger.getLogger(NioUtils.class);
