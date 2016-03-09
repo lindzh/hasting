@@ -3,6 +3,11 @@ package com.linda.framework.rpc;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * rpc上下文，用于传递附件，获取当前环境值
+ * @author lindezhi
+ * 2016年3月9日 上午11:25:26
+ */
 public class RpcContext {
 
 	private static ThreadLocal<RpcContext> context = new ThreadLocal<RpcContext>(){

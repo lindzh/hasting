@@ -55,6 +55,15 @@ public class RpcTestNioClient {
 	
 		logger.info("exResult:"+ex);
 		
+		long start = System.currentTimeMillis();
+		int total = 10000;
+		for(int i=0;i<total;i++){
+			helloRpcService.sayHello("this is HelloRpcService",564);
+		}
+		long end = System.currentTimeMillis();
+		System.out.println("cost:"+(end-start));
+		
+		
 	}
 	
 }

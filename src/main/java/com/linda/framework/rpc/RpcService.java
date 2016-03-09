@@ -2,9 +2,35 @@ package com.linda.framework.rpc;
 
 import java.io.Serializable;
 
+/**
+ * 服务名称，版本，实现类，以及服务启动时间
+ * 用于存储zookeeper或者etcd，方便服务发现，json存储
+ * @author lindezhi
+ * 2016年3月9日 上午11:16:53
+ */
 public class RpcService implements Serializable {
 
 	private static final long serialVersionUID = -4621627630242399962L;
+	
+	/**
+	 * 服务名称，取impl类实现的接口class全名
+	 */
+	private String name;
+	
+	/**
+	 * 服务版本，方便服务升级
+	 */
+	private String version;
+	
+	/**
+	 * 服务实现类
+	 */
+	private String impl;
+	
+	/**
+	 * 服务启动时间，用于监控与统计
+	 */
+	private long time;
 
 	public RpcService() {
 
@@ -20,11 +46,6 @@ public class RpcService implements Serializable {
 		this.version = version;
 		this.impl = impl;
 	}
-
-	private String name;
-	private String version;
-	private String impl;
-	private long time;
 
 	public long getTime() {
 		return time;

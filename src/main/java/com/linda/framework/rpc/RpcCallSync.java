@@ -5,12 +5,23 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * rpc请求线程同步bean
+ * @author lindezhi
+ * 2016年3月9日 上午11:25:59
+ */
 public class RpcCallSync implements Future{
 	
 	private int index;
 	
+	/**
+	 * 请求发送包
+	 */
 	private RpcObject request;
 	
+	/**
+	 * 请求返回数据包
+	 */
 	private RpcObject response;
 
 	public RpcCallSync(int index,RpcObject request){

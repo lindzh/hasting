@@ -12,10 +12,30 @@ import java.util.Map;
 public class RemoteCall implements Serializable{
 
 	private static final long serialVersionUID = 2769999854843571360L;
+	
+	/**
+	 * 服务名称 classname
+	 */
 	private String service;
+	
+	/**
+	 * 服务版本
+	 */
 	private String version;
+	
+	/**
+	 * 方法
+	 */
 	private String method;
+	
+	/**
+	 * 方法参数
+	 */
 	private Object[] args;
+	
+	/**
+	 * 上下文，用户传递相关参数，使用案例如分布式环境下log跟踪，同一个客户端请求，经过的所有服务器处理flag一致，方便搜索与跟踪
+	 */
 	private Map<String,Object> attachment;
 
 	public RemoteCall(String service,String method) {
