@@ -8,8 +8,16 @@ import java.io.ObjectOutputStream;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.utils.NioUtils;
 
+/**
+ * 使用jdk自带序列化
+ * @author lindezhi
+ * 2016年6月13日 下午4:25:03
+ */
 public class JdkSerializer implements RpcSerializer {
 
+	/**
+	 * 先序列化再执行压缩，减少网络流量
+	 */
 	@Override
 	public byte[] serialize(Object obj) {
 		try {
@@ -25,6 +33,9 @@ public class JdkSerializer implements RpcSerializer {
 		}
 	}
 
+	/**
+	 * 先解压缩，再反序列化
+	 */
 	@Override
 	public Object deserialize(byte[] bytes) {
 		try {
