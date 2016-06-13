@@ -1,9 +1,23 @@
 package com.linda.framework.rpc.cluster;
 
+/**
+ * 服务提供者provider，用于注册存储
+ * @author lindezhi
+ * 2015年6月13日 下午2:59:18
+ */
 public class RpcHostAndPort {
-
+	
+	/**
+	 * provider host
+	 */
 	private String host;
+	/**
+	 * provider port
+	 */
 	private int port;
+	/**
+	 * provider启动时间
+	 */
 	private long time;
 
 	public RpcHostAndPort() {

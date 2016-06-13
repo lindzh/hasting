@@ -12,6 +12,7 @@ import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 /**
  * 
  * @author lindezhi
+ * provider tcp连接接受
  *
  */
 public class RpcAioAcceptor extends AbstractRpcAcceptor{
@@ -38,7 +39,7 @@ public class RpcAioAcceptor extends AbstractRpcAcceptor{
 	public void startService() {
 		super.startService();
 		try {
-			
+			//启动acceptor，开始接受连接
 			acceptHandler = new RpcAcceptCompletionHandler();
 			acceptHandler.startService();
 			channelGroup = AsynchronousChannelGroup.withThreadPool(Executors.newFixedThreadPool(channelGroupThreads));

@@ -19,18 +19,22 @@ import com.linda.framework.rpc.utils.RpcUtils;
 /**
  * 添加异步aio支持 java7
  * @author lindezhi
- *
+ * 默认使用32kb，实际长度为压缩过的32kb
  */
 public class RpcAioConnector extends AbstractRpcConnector {
 	
 	private AsynchronousSocketChannel channel;
 	
 	private ByteBuffer readBuf;
+	
 	private ByteBuffer writeBuf;
+	
 	private RpcNioBuffer nioReadBuffer;
+	
 	private RpcNioBuffer nioWriteBuffer;
 	
 	private RpcReadCompletionHandler readHandler;
+	
 	private RpcWriteCompletionHandler writeHandler;
 	
 	private AsynchronousChannelGroup channelGroup;
@@ -52,6 +56,9 @@ public class RpcAioConnector extends AbstractRpcConnector {
 		this(new RpcAioWriter(),null);
 	}
 	
+	/**
+	 * 读写缓冲池
+	 */
 	private void initBuf(){
 		writeBuf = ByteBuffer.allocate(RpcUtils.MEM_32KB);
 		readBuf = ByteBuffer.allocate(RpcUtils.MEM_32KB);
@@ -59,6 +66,9 @@ public class RpcAioConnector extends AbstractRpcConnector {
 		nioWriteBuffer = new RpcNioBuffer(RpcUtils.MEM_32KB);
 	}
 	
+	/**
+	 * 如果是consumer，readwritehandler需要自己初始化，如果是acceptor则缓冲池使用公共的，避免多次初始化
+	 */
 	private void checkWriter(){
 		if(this.getRpcWriter()==null){
 			this.setRpcWriter(new RpcAioWriter());
@@ -72,6 +82,9 @@ public class RpcAioConnector extends AbstractRpcConnector {
 		}
 	}
 	
+	/**
+	 * 通道异步线程池
+	 */
 	private void checkChannelGroup(){
 		//检查group
 		if(channelGroup==null){
@@ -89,6 +102,7 @@ public class RpcAioConnector extends AbstractRpcConnector {
 		//检查writer
 		this.checkWriter();
 		try{
+			//如果TCP连接已经建立，不需要建立连接，如acceptor，如果是服务消费者，则直接跳过
 			if(channel==null){
 				this.checkChannelGroup();
 				channel = AsynchronousSocketChannel.open(channelGroup);
@@ -132,17 +146,22 @@ public class RpcAioConnector extends AbstractRpcConnector {
 	public void readCallback(int num){
 		if(num<1){
 			if(num<0){
+				//num == -1 表示连接已经关闭，需要关闭当前连接
 				this.handleConnectorException(new RpcException("connection closed"));
 			}else{
+				//没有接受到数据，继续接收数据
 				this.channel.read(readBuf, this, readHandler);
 			}
 		}else{
+			//接受到了数据，将数据放到buffer中
 			readBuf.flip();
 			byte[] readBytes = new byte[num];
 			readBuf.get(readBytes);
 			nioReadBuffer.write(readBytes);
 			readBuf.clear();
+			//如果二进制数据中有rpc对象，提交到上层，否则，保存当前数据，继续接受，否则可能读取到部分数据，导致数据不全，rpcobject不全
 			while(nioReadBuffer.hasRpcObject()){
+				//读取rpc对象提交到上层
 				RpcObject rpc = nioReadBuffer.readRpcObject();
 				this.fireCall(rpc);
 			}
@@ -174,6 +193,9 @@ public class RpcAioConnector extends AbstractRpcConnector {
 		}
 	}
 	
+	/**
+	 * 执行发送
+	 */
 	public void exeSend(){
 		//需要发送数据
 		if(!inWrite.get()&&this.isNeedToSend()){
@@ -186,6 +208,9 @@ public class RpcAioConnector extends AbstractRpcConnector {
 		}
 	}
 	
+	/**
+	 * 关闭连接，清空buff
+	 */
 	@Override
 	public void stopService() {
 		super.stopService();

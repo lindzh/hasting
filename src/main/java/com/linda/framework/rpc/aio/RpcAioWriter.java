@@ -14,6 +14,9 @@ public class RpcAioWriter extends AbstractRpcWriter{
 		super();
 	}
 
+	/**
+	 * 使用channel执行发送
+	 */
 	@Override
 	public boolean doSend(AbstractRpcConnector connector) {
 		RpcAioConnector aioConnector = (RpcAioConnector)connector;

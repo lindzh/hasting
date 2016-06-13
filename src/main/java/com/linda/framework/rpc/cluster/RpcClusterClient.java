@@ -8,6 +8,11 @@ import com.linda.framework.rpc.client.AbstractRpcClient;
 import com.linda.framework.rpc.client.SimpleClientRemoteProxy;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
 
+/**
+ * 集群模式client
+ * @author lindezhi
+ * 2016年6月13日 下午4:20:23
+ */
 public class RpcClusterClient extends AbstractRpcClient{
 	
 	private SimpleClientRemoteProxy proxy;
