@@ -11,6 +11,11 @@ import com.linda.framework.rpc.RpcService;
 import com.linda.framework.rpc.RpcServiceBean;
 import com.linda.framework.rpc.server.RpcServicesHolder;
 
+/**
+ * 
+ * @author lindezhi
+ * 2014年6月13日 下午4:49:38
+ */
 public class RpcMonitorServiceImpl implements RpcMonitorService{
 	
 	private RpcServicesHolder rpcServicesHolder;
@@ -24,6 +29,9 @@ public class RpcMonitorServiceImpl implements RpcMonitorService{
 		time = System.currentTimeMillis();
 	}
 
+	/**
+	 * 本机提供的服务列表
+	 */
 	@Override
 	public List<RpcService> getRpcServices() {
 		if(rpcServicesHolder!=null){
@@ -41,6 +49,9 @@ public class RpcMonitorServiceImpl implements RpcMonitorService{
 		return Collections.emptyList();
 	}
 
+	/**
+	 * ping 返回当前时间
+	 */
 	@Override
 	public String ping() {
 		return "pong "+new Date();

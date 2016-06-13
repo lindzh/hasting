@@ -8,6 +8,11 @@ import com.linda.framework.rpc.RpcObject;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.net.RpcSender;
 
+/**
+ * chain，使用thread local的方式
+ * @author lindezhi
+ * 2014年6月13日 下午4:40:20
+ */
 public class SimpleRpcFilterChain implements RpcFilterChain{
 	
 	private List<RpcFilter> filters = new ArrayList<RpcFilter>();

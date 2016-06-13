@@ -20,14 +20,19 @@ import com.linda.framework.rpc.utils.RpcUtils;
 /**
  * 访问频率监控，以分钟统计
  * @author linda
- *
+ * 使用一个异步线程的方式
  */
 public class RpcStatFilter implements RpcFilter,Service,StatMonitor{
 	
 	private ConcurrentHashMap<Long, AtomicLong> staCache = new ConcurrentHashMap<Long, AtomicLong>();
+	
 	private AtomicBoolean running = new AtomicBoolean(false);
+	
 	private StatThread thread = new StatThread();
 
+	/**
+	 * filter回调
+	 */
 	@Override
 	public void doFilter(RpcObject rpc, RemoteCall call, RpcSender sender,
 			RpcFilterChain chain) {
@@ -37,6 +42,9 @@ public class RpcStatFilter implements RpcFilter,Service,StatMonitor{
 		chain.nextFilter(rpc, call, sender);
 	}
 
+	/**
+	 * 启动filter，启动异步采集线程
+	 */
 	@Override
 	public void startService() {
 		List<Long> keys = getStatTime();

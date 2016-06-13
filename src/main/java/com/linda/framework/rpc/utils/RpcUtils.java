@@ -37,6 +37,11 @@ import com.linda.framework.rpc.oio.AbstractRpcOioWriter;
 import com.linda.framework.rpc.oio.RpcOioConnector;
 import com.linda.framework.rpc.oio.SimpleRpcOioWriter;
 
+/**
+ * 通用工具
+ * @author lindezhi
+ * 2016年6月13日 下午4:30:32
+ */
 public class RpcUtils {
 
 	private static Logger logger = Logger.getLogger(RpcUtils.class);

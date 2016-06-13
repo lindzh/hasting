@@ -14,6 +14,11 @@ import org.apache.log4j.Logger;
 
 import com.linda.framework.rpc.exception.RpcException;
 
+/**
+ * ssl的方式，目前不支持
+ * @author lindezhi
+ * 2016年6月13日 下午4:29:59
+ */
 public class SSLUtils {
 
 	private static Logger logger = Logger.getLogger(SSLUtils.class);

@@ -21,6 +21,9 @@ public class SimpleLogFilter implements RpcFilter{
 		return String.format(logFormat, host,port,service,version,method);
 	}
 	
+	/**
+	 * 日志打印
+	 */
 	@Override
 	public void doFilter(RpcObject rpc, RemoteCall call, RpcSender sender,
 			RpcFilterChain chain) {

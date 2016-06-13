@@ -16,6 +16,11 @@ import java.util.Stack;
 import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.utils.RpcUtils;
 
+/**
+ * 参数转换器实现
+ * @author lindezhi
+ * 2016年6月13日 下午4:42:35
+ */
 public class SimpleArgsParser implements ArgsParser{
 
 	@Override
