@@ -254,6 +254,14 @@ public class RpcUtils {
 		return fs;
 	}
 
+	/**
+	 * 调用对象的方法执行
+	 * @param obj
+	 * @param methodName
+	 * @param args
+	 * @param exceptionHandler
+	 * @return
+	 */
 	public static Object invokeMethod(Object obj, String methodName,Object[] args,RpcExceptionHandler exceptionHandler) {
 		Class<? extends Object> clazz = obj.getClass();
 		String key = clazz.getCanonicalName() + "." + methodName;
@@ -268,6 +276,14 @@ public class RpcUtils {
 		return RpcUtils.invoke(method, obj, args,exceptionHandler);
 	}
 
+	/**
+	 * 调用对象的方法执行
+	 * @param method
+	 * @param obj
+	 * @param args
+	 * @param exceptionHandler
+	 * @return
+	 */
 	public static Object invoke(Method method, Object obj, Object[] args,RpcExceptionHandler exceptionHandler) {
 		try {
 			return method.invoke(obj, args);

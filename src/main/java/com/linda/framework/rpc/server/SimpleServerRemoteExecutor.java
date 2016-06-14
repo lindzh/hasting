@@ -12,30 +12,58 @@ import com.linda.framework.rpc.exception.RpcExceptionHandler;
 import com.linda.framework.rpc.exception.SimpleRpcExceptionHandler;
 import com.linda.framework.rpc.utils.RpcUtils;
 
+/**
+ * provider业务代码执行
+ * @author lindezhi
+ * 2016年6月14日 上午10:18:37
+ */
 public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHolder{
 	
+	/**
+	 * remote api注册
+	 */
 	protected ConcurrentHashMap<String,RpcServiceBean> exeCache = new ConcurrentHashMap<String,RpcServiceBean>();
 
+	/**
+	 * 业务方法执行异常处理器
+	 */
 	private RpcExceptionHandler exceptionHandler;
 	
 	public SimpleServerRemoteExecutor(){
 		exceptionHandler = new SimpleRpcExceptionHandler();
 	}
 	
+	/**
+	 * 使用反射调用业务方法执行
+	 */
 	@Override
 	public void oneway(RemoteCall call) {
 		RpcUtils.invokeMethod(this.findService(call), call.getMethod(), call.getArgs(),exceptionHandler);
 	}
 
+	/**
+	 * 使用反射调用业务方法执行
+	 */
 	@Override
 	public Object invoke(RemoteCall call) {
 		return RpcUtils.invokeMethod(this.findService(call), call.getMethod(), call.getArgs(),exceptionHandler);
 	}
 	
+	/**
+	 * 注册remote服务
+	 * @param clazz
+	 * @param ifaceImpl
+	 */
 	public void registerRemote(Class<?> clazz,Object ifaceImpl){
 		this.registerRemote(clazz, ifaceImpl,null);
 	}
 	
+	/**
+	 * 注册remote服务
+	 * @param clazz
+	 * @param ifaceImpl
+	 * @param version
+	 */
 	public void registerRemote(Class<?> clazz,Object ifaceImpl,String version){
 		Object service = exeCache.get(clazz.getName());
 		if(service!=null&&service!=ifaceImpl){
@@ -57,6 +85,11 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 		return service;
 	}
 	
+	/**
+	 * 通过service和版本找到实现对象
+	 * @param call
+	 * @return
+	 */
 	private Object findService(RemoteCall call){
 		String exeKey = this.genExeKey(call.getService(), call.getVersion());
 		RpcServiceBean object = exeCache.get(exeKey);
@@ -84,6 +117,9 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 		this.exceptionHandler = exceptionHandler;
 	}
 
+	/**
+	 * 获取列表，用于监控使用
+	 */
 	public List<RpcServiceBean> getRpcServices(){
 		ArrayList<RpcServiceBean> list = new ArrayList<RpcServiceBean>();
 		list.addAll(exeCache.values());
