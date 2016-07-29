@@ -135,7 +135,7 @@ public class RpcUtils {
 			dos.write(RpcUtils.intToBytes(rpc.getIndex()));
 			dos.write(RpcUtils.intToBytes(rpc.getLength()));
 			if (rpc.getLength() > 0) {
-				if (rpc.getLength() > MEM_1M) {
+				if (rpc.getLength() > MEM_512KB) {
 					throw new RpcException("rpc data too long "+ rpc.getLength());
 				}
 				dos.write(rpc.getData());
@@ -170,7 +170,7 @@ public class RpcUtils {
 			dos.writeInt(rpc.getIndex());
 			dos.writeInt(rpc.getLength());
 			if (rpc.getLength() > 0) {
-				if (rpc.getLength() > MEM_1M) {
+				if (rpc.getLength() > MEM_512KB) {
 					throw new RpcException("rpc data too long "+ rpc.getLength());
 				}
 				dos.write(rpc.getData());
@@ -196,7 +196,7 @@ public class RpcUtils {
 			dis.read(lenBytes);
 			rpc.setLength(RpcUtils.bytesToInt(lenBytes));
 			if (rpc.getLength() > 0) {
-				if (rpc.getLength() > MEM_1M) {
+				if (rpc.getLength() > MEM_512KB) {
 					throw new RpcException("rpc data too long "	+ rpc.getLength());
 				}
 				byte[] buf = new byte[rpc.getLength()];
@@ -218,7 +218,7 @@ public class RpcUtils {
 			rpc.setIndex(dis.readInt());
 			rpc.setLength(dis.readInt());
 			if (rpc.getLength() > 0) {
-				if (rpc.getLength() > MEM_1M) {
+				if (rpc.getLength() > MEM_512KB) {
 					throw new RpcException("rpc data too long "+ rpc.getLength());
 				}
 				byte[] buf = new byte[rpc.getLength()];

@@ -60,10 +60,10 @@ public class RpcAioConnector extends AbstractRpcConnector {
 	 * 读写缓冲池
 	 */
 	private void initBuf(){
-		writeBuf = ByteBuffer.allocate(RpcUtils.MEM_32KB);
-		readBuf = ByteBuffer.allocate(RpcUtils.MEM_32KB);
-		nioReadBuffer = new RpcNioBuffer(RpcUtils.MEM_32KB);
-		nioWriteBuffer = new RpcNioBuffer(RpcUtils.MEM_32KB);
+		writeBuf = ByteBuffer.allocate(RpcUtils.MEM_512KB);
+		readBuf = ByteBuffer.allocate(RpcUtils.MEM_512KB);
+		nioReadBuffer = new RpcNioBuffer(RpcUtils.MEM_512KB);
+		nioWriteBuffer = new RpcNioBuffer(RpcUtils.MEM_512KB);
 	}
 	
 	/**

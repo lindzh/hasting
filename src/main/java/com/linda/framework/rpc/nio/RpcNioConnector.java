@@ -53,10 +53,10 @@ public class RpcNioConnector extends AbstractRpcConnector{
 	}
 	
 	private void initBuf(){
-		channelWriteBuffer = ByteBuffer.allocate(RpcUtils.MEM_32KB);
-		channelReadBuffer = ByteBuffer.allocate(RpcUtils.MEM_32KB);
-		rpcNioReadBuffer = new RpcNioBuffer(RpcUtils.MEM_32KB);
-		rpcNioWriteBuffer = new RpcNioBuffer(RpcUtils.MEM_32KB);
+		channelWriteBuffer = ByteBuffer.allocate(RpcUtils.MEM_512KB);
+		channelReadBuffer = ByteBuffer.allocate(RpcUtils.MEM_512KB);
+		rpcNioReadBuffer = new RpcNioBuffer(RpcUtils.MEM_512KB);
+		rpcNioWriteBuffer = new RpcNioBuffer(RpcUtils.MEM_512KB);
 	}
 	
 	@Override
