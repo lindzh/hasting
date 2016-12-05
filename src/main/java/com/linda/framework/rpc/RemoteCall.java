@@ -38,6 +38,10 @@ public class RemoteCall implements Serializable{
 	 */
 	private Map<String,Object> attachment;
 
+	public RemoteCall(){
+
+	}
+
 	public RemoteCall(String service,String method) {
 		this.service = service;
 		this.method = method;
