@@ -288,9 +288,9 @@ public class RpcUtils {
 		try {
 			return method.invoke(obj, args);
 		} catch (IllegalAccessException e) {
-			throw new RpcException("IllegalAccess request access error");
+			throw new RpcException("invoke IllegalAccess request access error");
 		} catch (IllegalArgumentException e) {
-			throw new RpcException("IllegalArgument request param wrong");
+			throw new RpcException("invoke IllegalArgument request param wrong");
 		} catch (InvocationTargetException e) {
 			if(e.getCause()!=null){
 				exceptionHandler.handleException(null, null, e.getCause());

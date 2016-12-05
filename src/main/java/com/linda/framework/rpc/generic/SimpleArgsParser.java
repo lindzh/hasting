@@ -1,5 +1,6 @@
 package com.linda.framework.rpc.generic;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.TypeVariable;
@@ -238,14 +239,17 @@ public class SimpleArgsParser implements ArgsParser{
 				}else if(componentType==byte.class){
 					return arg;
 				}else{
+					//数组类型 bug
 					Object[] array = (Object[]) arg;
-					List<Object> nargList = new ArrayList<Object>();
+					Object result = Array.newInstance(componentType,array.length);
+					int index = 0;
 					String paramType = componentType.getCanonicalName();
 					for (Object a : array) {
 						Object object = this.parseJdkObject(paramType, a);
-						nargList.add(object);
+						Array.set(result,index,object);
+						index++;
 					}
-					return nargList.toArray();
+					return result;
 				}
 			}
 			throw new RpcException("not supported type:"+type+" :"+argClass);
