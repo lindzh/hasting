@@ -25,6 +25,11 @@ public class RpcHostAndPort {
 	 */
 	private String token;
 
+	/**
+	 * 权重,用于应用部署权重
+	 */
+	private int weight = 100;
+
 	public RpcHostAndPort() {
 
 	}
@@ -71,6 +76,15 @@ public class RpcHostAndPort {
 		this.token = token;
 	}
 
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -79,6 +93,7 @@ public class RpcHostAndPort {
 		RpcHostAndPort that = (RpcHostAndPort) o;
 
 		if (port != that.port) return false;
+		if (weight != that.weight) return false;
 		if (host != null ? !host.equals(that.host) : that.host != null) return false;
 		return token != null ? token.equals(that.token) : that.token == null;
 	}
@@ -88,6 +103,7 @@ public class RpcHostAndPort {
 		int result = host != null ? host.hashCode() : 0;
 		result = 31 * result + port;
 		result = 31 * result + (token != null ? token.hashCode() : 0);
+		result = 31 * result + weight;
 		return result;
 	}
 }
