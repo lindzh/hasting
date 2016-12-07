@@ -32,6 +32,16 @@ public class RpcService implements Serializable {
 	 */
 	private long time;
 
+	/**
+	 * 所属应用,用于应用标记
+	 */
+	private String application;
+
+	/**
+	 * 应用部署分组,用于业务隔离
+	 */
+	private String group;
+
 	public RpcService() {
 
 	}
@@ -79,45 +89,56 @@ public class RpcService implements Serializable {
 		this.impl = impl;
 	}
 
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		RpcService that = (RpcService) o;
+
+		if (name != null ? !name.equals(that.name) : that.name != null) return false;
+		if (version != null ? !version.equals(that.version) : that.version != null) return false;
+		if (impl != null ? !impl.equals(that.impl) : that.impl != null) return false;
+		if (application != null ? !application.equals(that.application) : that.application != null) return false;
+		return group != null ? group.equals(that.group) : that.group == null;
+
+	}
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((impl == null) ? 0 : impl.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		int result = name != null ? name.hashCode() : 0;
+		result = 31 * result + (version != null ? version.hashCode() : 0);
+		result = 31 * result + (impl != null ? impl.hashCode() : 0);
+		result = 31 * result + (application != null ? application.hashCode() : 0);
+		result = 31 * result + (group != null ? group.hashCode() : 0);
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RpcService other = (RpcService) obj;
-		if (impl == null) {
-			if (other.impl != null)
-				return false;
-		} else if (!impl.equals(other.impl))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (version == null) {
-			if (other.version != null)
-				return false;
-		} else if (!version.equals(other.version))
-			return false;
-		return true;
-	}
-
-	@Override
 	public String toString() {
-		return "RpcMonitorBean [name=" + name + ", version=" + version + ", impl=" + impl + "]";
+		return "RpcService{" +
+				"name='" + name + '\'' +
+				", version='" + version + '\'' +
+				", impl='" + impl + '\'' +
+				", time=" + time +
+				", application='" + application + '\'' +
+				", group='" + group + '\'' +
+				'}';
 	}
 }

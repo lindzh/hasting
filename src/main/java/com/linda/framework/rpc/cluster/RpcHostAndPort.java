@@ -20,6 +20,11 @@ public class RpcHostAndPort {
 	 */
 	private long time;
 
+	/**
+	 * token校验,用于验证客户端调用服务器service必须从注册中心拉取到
+	 */
+	private String token;
+
 	public RpcHostAndPort() {
 
 	}
@@ -58,32 +63,31 @@ public class RpcHostAndPort {
 		this.time = time;
 	}
 
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		RpcHostAndPort that = (RpcHostAndPort) o;
+
+		if (port != that.port) return false;
+		if (host != null ? !host.equals(that.host) : that.host != null) return false;
+		return token != null ? token.equals(that.token) : that.token == null;
+	}
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((host == null) ? 0 : host.hashCode());
-		result = prime * result + port;
+		int result = host != null ? host.hashCode() : 0;
+		result = 31 * result + port;
+		result = 31 * result + (token != null ? token.hashCode() : 0);
 		return result;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RpcHostAndPort other = (RpcHostAndPort) obj;
-		if (host == null) {
-			if (other.host != null)
-				return false;
-		} else if (!host.equals(other.host))
-			return false;
-		if (port != other.port)
-			return false;
-		return true;
-	}
-
 }
