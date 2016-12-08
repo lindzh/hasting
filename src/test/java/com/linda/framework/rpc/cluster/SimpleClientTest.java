@@ -23,7 +23,7 @@ public class SimpleClientTest {
 		map.put("order", "trtr");
 		map.put("message", "this is a test");
 		Object[] getBeanArgs = new Object[]{map,543543};
-		Object hh = genService.invoke("com.linda.framework.rpc.HelloRpcService", RpcUtils.DEFAULT_VERSION, "getBean", getBeanTypes, getBeanArgs);
+		Object hh = genService.invoke(null,"com.linda.framework.rpc.HelloRpcService", RpcUtils.DEFAULT_VERSION, "getBean", getBeanTypes, getBeanArgs);
 		System.out.println(hh);
 		client.stopService();
 	}

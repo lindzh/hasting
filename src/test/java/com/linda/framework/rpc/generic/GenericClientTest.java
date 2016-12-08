@@ -26,7 +26,7 @@ public class GenericClientTest {
 		map.put("message", "this is a test");
 		Object[] getBeanArgs = new Object[] { map, 543543 };
 		RpcContext.getContext().setAttachment("myhaha", "myattachment value");
-		Object hh = service.invoke("com.linda.framework.rpc.HelloRpcService",
+		Object hh = service.invoke("aapp","com.linda.framework.rpc.HelloRpcService",
 				RpcUtils.DEFAULT_VERSION, "getBean", getBeanTypes, getBeanArgs);
 		RpcContext.getContext().clear();
 		System.out.println("getBean result:" + hh);
@@ -34,7 +34,7 @@ public class GenericClientTest {
 		String[] argTypes = new String[] { "java.lang.String", "int" };
 		Object[] args = new Object[] { "hello,this is linda", 543543 };
 		RpcContext.getContext().setAttachment("myattachment", "myhaha value");
-		Object invoke = service.invoke(
+		Object invoke = service.invoke("aapp",
 				"com.linda.framework.rpc.HelloRpcService",
 				RpcUtils.DEFAULT_VERSION, "sayHello", argTypes, args);
 		RpcContext.getContext().clear();

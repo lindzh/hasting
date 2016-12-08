@@ -105,7 +105,7 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 		String exeKey = this.genExeKey(call.getService(), call.getVersion(),call.getGroup());
 		RpcServiceBean object = exeCache.get(exeKey);
 		if(object==null||object.getBean()==null){
-			throw new RpcException("service "+call.getService()+" version:"+call.getVersion()+" not exist");
+			throw new RpcException("group:"+call.getGroup()+" service:"+call.getService()+" version:"+call.getVersion()+" not exist");
 		}
 		return object.getBean();
 	}
