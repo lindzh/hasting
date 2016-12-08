@@ -32,11 +32,15 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 	public abstract void initConnector(int threadCount);
 	
 	public <T> T register(Class<T> iface){
-		return proxy.registerRemote(iface);
+		return this.register(iface,RpcUtils.DEFAULT_VERSION);
 	}
 	
 	public <T> T register(Class<T> iface,String version){
-		return proxy.registerRemote(iface, version);
+		return this.register(iface, version,RpcUtils.DEFAULT_GROUP);
+	}
+
+	public <T> T register(Class<T> iface,String version,String group){
+		return proxy.registerRemote(iface, version,group);
 	}
 	
 	@Override

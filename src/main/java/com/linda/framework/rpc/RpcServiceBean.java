@@ -31,7 +31,12 @@ public class RpcServiceBean implements Serializable {
 	 */
 	private String application;
 
-	public RpcServiceBean(Class interf, Object bean, String version,String application) {
+	/**
+	 * 分组
+	 */
+	private String group;
+
+	public RpcServiceBean(Class interf, Object bean, String version,String application,String group) {
 		this.interf = interf;
 		this.bean = bean;
 		this.version = version;
@@ -68,5 +73,13 @@ public class RpcServiceBean implements Serializable {
 
 	public void setApplication(String application) {
 		this.application = application;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
 	}
 }

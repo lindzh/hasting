@@ -17,7 +17,7 @@ public interface GenericService {
 	 * @param args
 	 * @return
 	 */
-	public Object invoke(String service,String version,String method,String[] argtype,Object[] args);
+	public Object invoke(String group,String service,String version,String method,String[] argtype,Object[] args);
 	
 	/**
 	 * 不需要等待返回值的调用
@@ -27,6 +27,6 @@ public interface GenericService {
 	 * @param argtype
 	 * @param args
 	 */
-	public void oneway(String service,String version,String method,String[] argtype,Object[] args);
+	public void oneway(String group,String service,String version,String method,String[] argtype,Object[] args);
 
 }

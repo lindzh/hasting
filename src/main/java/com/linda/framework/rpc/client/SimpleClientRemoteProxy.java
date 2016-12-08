@@ -18,6 +18,8 @@ public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 	
 	private ConcurrentHashMap<Class,String> versionCache = new ConcurrentHashMap<Class,String>();
 
+	private ConcurrentHashMap<Class,String> groupCache = new ConcurrentHashMap<Class,String>();
+
 	/**
 	 * 应用
 	 */
@@ -37,6 +39,12 @@ public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 		}else{
 			call.setVersion(RpcUtils.DEFAULT_VERSION);
 		}
+
+		String group = groupCache.get(service);
+		if(group==null){
+			group = RpcUtils.DEFAULT_GROUP;
+		}
+		call.setGroup(group);
 		
 		//加入上下文附件传送支持
 		Map<String, Object> attachment = RpcContext.getContext().getAttachment();
@@ -61,15 +69,24 @@ public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 	}
 	
 	public <Iface> Iface registerRemote(Class<Iface> remote){
-		return this.registerRemote(remote, null);
+		return this.registerRemote(remote, RpcUtils.DEFAULT_VERSION);
 	}
 	
 	public <Iface> Iface registerRemote(Class<Iface> remote,String version){
+		return this.registerRemote(remote, version,RpcUtils.DEFAULT_GROUP);
+	}
+
+	public <Iface> Iface registerRemote(Class<Iface> remote,String version,String group){
 		Iface result = (Iface)Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{remote}, this);
 		if(version==null){
 			version = RpcUtils.DEFAULT_VERSION;
 		}
 		versionCache.put(remote, version);
+
+		if(group==null){
+			group = RpcUtils.DEFAULT_GROUP;
+		}
+		groupCache.put(remote,group);
 		return result;
 	}
 

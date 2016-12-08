@@ -13,6 +13,11 @@ import java.util.Map;
 public class RemoteCall implements Serializable{
 
 	private static final long serialVersionUID = 2769999854843571360L;
+
+	/**
+	 * 分组
+	 */
+	private String group;
 	
 	/**
 	 * 服务名称 classname
@@ -88,10 +93,18 @@ public class RemoteCall implements Serializable{
 		this.attachment = attachment;
 	}
 
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
 	@Override
 	public String toString() {
 		return "RemoteCall [service=" + service + ", version=" + version
 				+ ", method=" + method + ", args=" + Arrays.toString(args)
-				+ "]";
+				+", group="+group +"]";
 	}
 }

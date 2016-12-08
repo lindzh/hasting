@@ -66,7 +66,7 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	 * @param ifaceImpl
 	 */
 	public void register(Class<?> clazz,Object ifaceImpl){
-		proxy.registerRemote(clazz, ifaceImpl,null);
+		this.register(clazz,ifaceImpl,null);
 	}
 	
 	/**
@@ -76,7 +76,18 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	 * @param version
 	 */
 	public void register(Class<?> clazz,Object ifaceImpl,String version){
-		proxy.registerRemote(clazz, ifaceImpl,version);
+		this.register(clazz, ifaceImpl, version,null);
+	}
+
+	/**
+	 * 添加组的支持
+	 * @param clazz
+	 * @param ifaceImpl
+	 * @param version
+     * @param group
+     */
+	public void register(Class<?> clazz,Object ifaceImpl,String version,String group){
+		proxy.registerRemote(clazz, ifaceImpl,version,group);
 	}
 	
 	/**

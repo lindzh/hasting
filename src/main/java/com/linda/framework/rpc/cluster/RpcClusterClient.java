@@ -7,6 +7,7 @@ import com.linda.framework.rpc.client.AbstractClientRemoteExecutor;
 import com.linda.framework.rpc.client.AbstractRpcClient;
 import com.linda.framework.rpc.client.SimpleClientRemoteProxy;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
+import com.linda.framework.rpc.utils.RpcUtils;
 
 /**
  * 集群模式client
@@ -25,14 +26,26 @@ public class RpcClusterClient extends AbstractRpcClient{
 
 	@Override
 	public <T> T register(Class<T> iface) {
-		this.checkProxy();
-		return proxy.registerRemote(iface);
+		return this.register(iface, RpcUtils.DEFAULT_VERSION);
 	}
 
 	@Override
 	public <T> T register(Class<T> iface, String version) {
+		return this.register(iface, version,RpcUtils.DEFAULT_GROUP);
+	}
+
+	@Override
+	public <T> T register(Class<T> iface, String version, String group) {
 		this.checkProxy();
-		return proxy.registerRemote(iface, version);
+		if(version == null){
+			version=RpcUtils.DEFAULT_VERSION;
+		}
+
+		if(group == null){
+			group=RpcUtils.DEFAULT_GROUP;
+		}
+
+		return proxy.registerRemote(iface, version,group);
 	}
 
 	@Override

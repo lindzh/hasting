@@ -61,7 +61,11 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		this.startRpcCluster();
 		this.startConnectors();
 	}
-	
+
+	private String genserviceServersKey(String group,String name,String version){
+		return group+":"+name+":"+version;
+	}
+
 	protected boolean startConnector(RpcHostAndPort hostAndPort){
 		try{
 			boolean initAndStartConnector = this.initAndStartConnector(hostAndPort);
@@ -69,7 +73,7 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 				List<RpcService> serverServices = this.getServerService(hostAndPort);
 				if(serverServices!=null){
 					for(RpcService serverService:serverServices){
-						String key = serverService.getName()+":"+serverService.getVersion();
+						String key = this.genserviceServersKey(serverService.getGroup(),serverService.getName(),serverService.getVersion());
 						List<String> servers = serviceServerCache.get(key);
 						if(servers==null){
 							servers = new ArrayList<String>();
@@ -164,11 +168,14 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		List<String> servers = Collections.emptyList();
 		//泛型每台服务器都会有，所以需要转换server，做过滤处理
 		if(call.getService().equals(GenericService.class.getCanonicalName())){
-			String service = (String)call.getArgs()[0];
-			String version = (String)call.getArgs()[1];
-			servers = serviceServerCache.get(service+":"+version);
+			String group = (String)call.getArgs()[0];
+			String service = (String)call.getArgs()[1];
+			String version = (String)call.getArgs()[2];
+			String key = this.genserviceServersKey(group,service,version);
+			servers = serviceServerCache.get(key);
 		}else{
-			servers = serviceServerCache.get(call.getService()+":"+call.getVersion());
+			String key = this.genserviceServersKey(call.getGroup(),call.getService(),call.getVersion());
+			servers = serviceServerCache.get(key);
 		}
 		if(servers==null||servers.size()<1){
 			throw new RpcException("can't find server for:"+call);

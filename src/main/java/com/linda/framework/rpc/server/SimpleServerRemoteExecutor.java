@@ -60,7 +60,7 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 	 * @param ifaceImpl
 	 */
 	public void registerRemote(Class<?> clazz,Object ifaceImpl){
-		this.registerRemote(clazz, ifaceImpl,null);
+		this.registerRemote(clazz, ifaceImpl,null,null);
 	}
 	
 	/**
@@ -69,7 +69,8 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 	 * @param ifaceImpl
 	 * @param version
 	 */
-	public void registerRemote(Class<?> clazz,Object ifaceImpl,String version){
+	public void registerRemote(Class<?> clazz,Object ifaceImpl,String version,String group){
+		//validate impl java object
 		Object service = exeCache.get(clazz.getName());
 		if(service!=null&&service!=ifaceImpl){
 			throw new RpcException("can't register service "+clazz.getName()+" again");
@@ -80,12 +81,17 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 		if(version==null){
 			version=RpcUtils.DEFAULT_VERSION;
 		}
-		exeCache.put(this.genExeKey(clazz.getName(), version), new RpcServiceBean(clazz,ifaceImpl,version,application));
+
+		//默认分组
+		if(group==null){
+			group = RpcUtils.DEFAULT_GROUP;
+		}
+		exeCache.put(this.genExeKey(clazz.getName(), version,group), new RpcServiceBean(clazz,ifaceImpl,version,application,group));
 	}
 	
-	private String genExeKey(String service,String version){
+	private String genExeKey(String service,String version,String group){
 		if(version!=null){
-			return service+"_"+version;
+			return group+"_"+service+"_"+version;
 		}
 		return service;
 	}
@@ -96,7 +102,7 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 	 * @return
 	 */
 	private Object findService(RemoteCall call){
-		String exeKey = this.genExeKey(call.getService(), call.getVersion());
+		String exeKey = this.genExeKey(call.getService(), call.getVersion(),call.getGroup());
 		RpcServiceBean object = exeCache.get(exeKey);
 		if(object==null||object.getBean()==null){
 			throw new RpcException("service "+call.getService()+" version:"+call.getVersion()+" not exist");

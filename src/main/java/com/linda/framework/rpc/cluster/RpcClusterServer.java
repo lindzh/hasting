@@ -5,6 +5,7 @@ import com.linda.framework.rpc.net.AbstractRpcAcceptor;
 import com.linda.framework.rpc.net.RpcNetBase;
 import com.linda.framework.rpc.net.RpcNetListener;
 import com.linda.framework.rpc.server.SimpleRpcServer;
+import com.linda.framework.rpc.utils.RpcUtils;
 
 import java.util.Random;
 import java.util.UUID;
@@ -25,14 +26,17 @@ public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNet
 	
 	@Override
 	public void register(Class<?> clazz, Object ifaceImpl) {
-		super.register(clazz, ifaceImpl);
-		this.doRegister(clazz, ifaceImpl);
+		this.register(clazz, ifaceImpl, RpcUtils.DEFAULT_VERSION);
 	}
 
 	@Override
 	public void register(Class<?> clazz, Object ifaceImpl, String version) {
-		super.register(clazz, ifaceImpl, version);
-		this.doRegister(clazz, ifaceImpl, version);
+		this.register(clazz, ifaceImpl, version,RpcUtils.DEFAULT_GROUP);
+	}
+
+	public void register(Class<?> clazz, Object ifaceImpl, String version,String group) {
+		super.register(clazz, ifaceImpl, version,group);
+		this.doRegister(clazz, ifaceImpl, version,group);
 	}
 
 	/**
@@ -60,6 +64,8 @@ public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNet
 	protected abstract void doRegister(Class<?> clazz, Object ifaceImpl);
 	
 	protected abstract void doRegister(Class<?> clazz, Object ifaceImpl, String version);
+
+	protected abstract void doRegister(Class<?> clazz, Object ifaceImpl, String version,String group);
 
 	@Override
 	public void setAcceptor(AbstractRpcAcceptor acceptor) {

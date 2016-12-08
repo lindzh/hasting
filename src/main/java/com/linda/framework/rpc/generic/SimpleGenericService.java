@@ -35,13 +35,14 @@ public class SimpleGenericService implements GenericService{
 	 * @param args
 	 * @return
 	 */
-	private Object execute(String service, String version, String method,String[] argtype,
+	private Object execute(String group,String service, String version, String method,String[] argtype,
 			Object[] args){
 		argsParser.checkArgs(argtype, args);
 		Object[] args2 = argsParser.parseArgs(argtype, args);
 		RemoteCall call = new RemoteCall(service, method);
 		call.setVersion(version);
 		call.setArgs(args2);
+		call.setGroup(group);
 		return executor.invoke(call);
 	}
 	
@@ -49,10 +50,10 @@ public class SimpleGenericService implements GenericService{
 	 * 同步调用
 	 */
 	@Override
-	public Object invoke(String service, String version, String method,String[] argtype,
+	public Object invoke(String group,String service, String version, String method,String[] argtype,
 			Object[] args) {
 		//执行
-		Object result = this.execute(service, version, method, argtype, args);
+		Object result = this.execute(group,service, version, method, argtype, args);
 		//invoke需要返回值，需要转换执行结果
 		return argsParser.parseResult(result);
 	}
@@ -61,10 +62,10 @@ public class SimpleGenericService implements GenericService{
 	 * 异步调用
 	 */
 	@Override
-	public void oneway(String service, String version, String method,
+	public void oneway(String group,String service, String version, String method,
 			String[] argtype, Object[] args) {
 		//转换入参，执行
-		this.execute(service, version, method, argtype, args);
+		this.execute(group,service, version, method, argtype, args);
 		//无需返回值
 	}
 }
