@@ -140,6 +140,14 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 		}
 	}
 
+	public int getTimeout() {
+		return provider.getTimeout();
+	}
+
+	public void setTimeout(int timeout) {
+		provider.setTimeout(timeout);
+	}
+
 	/**
 	 * 这个提供nio支持的，非nio的不需要
 	 * @return

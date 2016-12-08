@@ -190,4 +190,12 @@ public class RpcServiceProvider implements RpcCallListener,RpcFilter,Service{
 			this.execute(call, rpc.getThreadId(), index, sender);
 		}
 	}
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
 }
