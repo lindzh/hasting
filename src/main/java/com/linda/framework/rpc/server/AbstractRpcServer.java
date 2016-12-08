@@ -47,6 +47,11 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 	 * 执行线程数量
 	 */
 	private int executorThreadCount = 20;//默认20
+
+	/**
+	 * 当前应用
+	 */
+	private String application;
 	
 	public void setAcceptor(AbstractRpcAcceptor acceptor){
 		this.acceptor = acceptor;
@@ -184,5 +189,13 @@ public abstract class AbstractRpcServer extends AbstractRpcNetworkBase{
 
 	public void setSerializer(RpcSerializer serializer) {
 		provider.setSerializer(serializer);
+	}
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
 	}
 }

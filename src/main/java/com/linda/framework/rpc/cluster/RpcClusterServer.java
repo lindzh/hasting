@@ -11,6 +11,13 @@ import com.linda.framework.rpc.server.SimpleRpcServer;
  * 及时通知管理服务器提供的rpc和状态
  */
 public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNetListener{
+
+	/**
+	 * 是否校验token
+	 */
+	protected boolean validateToken;
+
+	protected String token;
 	
 	@Override
 	public void register(Class<?> clazz, Object ifaceImpl) {
@@ -32,5 +39,21 @@ public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNet
 	public void setAcceptor(AbstractRpcAcceptor acceptor) {
 		super.setAcceptor(acceptor);
 		acceptor.addRpcNetListener(this);
+	}
+
+	public boolean isValidateToken() {
+		return validateToken;
+	}
+
+	public void setValidateToken(boolean validateToken) {
+		this.validateToken = validateToken;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 }

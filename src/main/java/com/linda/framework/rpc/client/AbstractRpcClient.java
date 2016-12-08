@@ -18,7 +18,12 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 	protected Class<? extends AbstractRpcConnector> connectorClass;
 	
 	private int executorThreadCount = 2;//默认2
-	
+
+	/**
+	 * 当前应用
+	 */
+	private String application;
+
 	public abstract AbstractClientRemoteExecutor getRemoteExecutor();
 	
 	public Class<? extends AbstractRpcConnector> getConnectorClass() {
@@ -61,5 +66,13 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 
 	public void setSerializer(RpcSerializer serializer) {
 		this.serializer = serializer;
+	}
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
 	}
 }

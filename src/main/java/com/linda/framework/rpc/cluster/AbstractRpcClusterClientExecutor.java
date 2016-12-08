@@ -39,6 +39,8 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	public abstract void onClose(RpcHostAndPort hostAndPort);
 	
 	private Map<String,List<String>> serviceServerCache = new HashMap<String,List<String>>();
+
+	private Map<String,RpcHostAndPort> serverHostCache = new HashMap<>();
 	
 	private Map<String,AbstractRpcConnector> serverConnectorCache = new HashMap<String,AbstractRpcConnector>();
 	
@@ -113,6 +115,8 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		connector.addRpcCallListener(this);
 		connector.addRpcNetListener(this);
 		connector.startService();
+
+		serverHostCache.put(hostAndPort.toString(),hostAndPort);
 		serverConnectorCache.put(hostAndPort.toString(), connector);
 		return true;
 	}
@@ -140,6 +144,7 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 			connector.stopService();
 		}
 		serverConnectorCache.remove(server);
+		serverHostCache.remove(server);
 		Collection<List<String>> values = serviceServerCache.values();
 		for(List<String> servers:values){
 			if(servers!=null){
@@ -169,12 +174,19 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 			throw new RpcException("can't find server for:"+call);
 		}
 		AbstractRpcConnector connector = null;
+		RpcHostAndPort hostAndPort = null;
 		while(connector==null&&servers.size()>0){
 			String server = this.hash(servers);
 			connector = serverConnectorCache.get(server);
+			hostAndPort = serverHostCache.get(server);
 		}
 		if(connector==null){
 			throw new RpcException("can't find connector for:"+call);
+		}
+
+		//加入token
+		if(hostAndPort!=null){
+			call.getAttachment().put("RpcToken",hostAndPort.getToken());
 		}
 		return connector;
 	} 

@@ -2,6 +2,7 @@ package com.linda.framework.rpc;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -36,7 +37,7 @@ public class RemoteCall implements Serializable{
 	/**
 	 * 上下文，用户传递相关参数，使用案例如分布式环境下log跟踪，同一个客户端请求，经过的所有服务器处理flag一致，方便搜索与跟踪
 	 */
-	private Map<String,Object> attachment;
+	private Map<String,Object> attachment = new HashMap<>();
 
 	public RemoteCall(){
 
