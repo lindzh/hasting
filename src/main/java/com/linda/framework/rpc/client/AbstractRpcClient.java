@@ -19,11 +19,6 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 	
 	private int executorThreadCount = 2;//默认2
 
-	/**
-	 * 当前应用
-	 */
-	private String application;
-
 	public abstract AbstractClientRemoteExecutor getRemoteExecutor();
 	
 	public Class<? extends AbstractRpcConnector> getConnectorClass() {
@@ -69,10 +64,10 @@ public abstract class AbstractRpcClient extends AbstractRpcNetworkBase{
 	}
 
 	public String getApplication() {
-		return application;
+		return proxy.getApplication();
 	}
 
 	public void setApplication(String application) {
-		this.application = application;
+		proxy.setApplication(application);
 	}
 }

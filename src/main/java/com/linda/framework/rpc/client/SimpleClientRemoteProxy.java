@@ -17,6 +17,11 @@ public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 	private RemoteExecutor remoteExecutor;
 	
 	private ConcurrentHashMap<Class,String> versionCache = new ConcurrentHashMap<Class,String>();
+
+	/**
+	 * 应用
+	 */
+	private String application;
 	
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
@@ -36,7 +41,10 @@ public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 		//加入上下文附件传送支持
 		Map<String, Object> attachment = RpcContext.getContext().getAttachment();
 		call.setAttachment(attachment);
-		
+
+		//客户点应用加入附件中
+		call.getAttachment().put("Application",application);
+
 		if(method.getReturnType()==void.class){
 			remoteExecutor.oneway(call);
 			return null;
@@ -73,5 +81,13 @@ public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 	@Override
 	public void stopService() {
 		remoteExecutor.stopService();
+	}
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
 	}
 }

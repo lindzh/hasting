@@ -26,10 +26,16 @@ public class RpcServiceBean implements Serializable {
 	 */
 	private Object bean;
 
-	public RpcServiceBean(Class interf, Object bean, String version) {
+	/**
+	 * 所属应用
+	 */
+	private String application;
+
+	public RpcServiceBean(Class interf, Object bean, String version,String application) {
 		this.interf = interf;
 		this.bean = bean;
 		this.version = version;
+		this.application = application;
 	}
 
 	public Class getInterf() {
@@ -54,5 +60,13 @@ public class RpcServiceBean implements Serializable {
 
 	public void setBean(Object bean) {
 		this.bean = bean;
+	}
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
 	}
 }

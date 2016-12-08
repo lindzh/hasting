@@ -28,6 +28,11 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 	 * 业务方法执行异常处理器
 	 */
 	private RpcExceptionHandler exceptionHandler;
+
+	/**
+	 * 当前应用
+	 */
+	private String application;
 	
 	public SimpleServerRemoteExecutor(){
 		exceptionHandler = new SimpleRpcExceptionHandler();
@@ -75,7 +80,7 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 		if(version==null){
 			version=RpcUtils.DEFAULT_VERSION;
 		}
-		exeCache.put(this.genExeKey(clazz.getName(), version), new RpcServiceBean(clazz,ifaceImpl,version));
+		exeCache.put(this.genExeKey(clazz.getName(), version), new RpcServiceBean(clazz,ifaceImpl,version,application));
 	}
 	
 	private String genExeKey(String service,String version){
@@ -124,5 +129,13 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 		ArrayList<RpcServiceBean> list = new ArrayList<RpcServiceBean>();
 		list.addAll(exeCache.values());
 		return list;
+	}
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
 	}
 }
