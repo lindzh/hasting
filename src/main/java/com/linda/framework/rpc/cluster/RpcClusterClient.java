@@ -9,12 +9,14 @@ import com.linda.framework.rpc.client.SimpleClientRemoteProxy;
 import com.linda.framework.rpc.net.AbstractRpcConnector;
 import com.linda.framework.rpc.utils.RpcUtils;
 
+import static javafx.scene.input.KeyCode.T;
+
 /**
  * 集群模式client
  * @author lindezhi
  * 2016年6月13日 下午4:20:23
  */
-public class RpcClusterClient extends AbstractRpcClient{
+public abstract class RpcClusterClient extends AbstractRpcClient{
 	
 	private SimpleClientRemoteProxy proxy;
 	
@@ -24,6 +26,12 @@ public class RpcClusterClient extends AbstractRpcClient{
 		this.executor = executor;
 	}
 
+	/**
+	 * 注册生成proxy实例
+	 * @param iface
+	 * @param <T>
+     * @return
+     */
 	@Override
 	public <T> T register(Class<T> iface) {
 		return this.register(iface, RpcUtils.DEFAULT_VERSION);
@@ -45,8 +53,22 @@ public class RpcClusterClient extends AbstractRpcClient{
 			group=RpcUtils.DEFAULT_GROUP;
 		}
 
-		return proxy.registerRemote(iface, version,group);
+		T result = proxy.registerRemote(iface, version, group);
+
+		//通知
+		this.doRegisterRemote(iface,version,group);
+
+		return result;
 	}
+
+	/**
+	 * 方便client提交依赖到注册中心
+	 * @param iface
+	 * @param version
+	 * @param group
+     * @param <T>
+     */
+	public abstract <T> void doRegisterRemote(Class<T> iface, String version, String group);
 
 	@Override
 	public AbstractClientRemoteExecutor getRemoteExecutor() {
