@@ -35,6 +35,13 @@ public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNet
 	}
 
 	public void register(Class<?> clazz, Object ifaceImpl, String version,String group) {
+		if(version == null){
+			version=RpcUtils.DEFAULT_VERSION;
+		}
+
+		if(group == null){
+			group=RpcUtils.DEFAULT_GROUP;
+		}
 		super.register(clazz, ifaceImpl, version,group);
 		this.doRegister(clazz, ifaceImpl, version,group);
 	}
@@ -53,7 +60,7 @@ public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNet
 		//添加token验证器
 		if(this.validateToken){
 			if(token==null){
-				token = this.getToken();
+				token = this.genToken();
 			}
 			this.addRpcFilter(new TokenFilter(this.getTimeout(),this.getToken(),this.isValidateToken()));
 		}
