@@ -16,7 +16,7 @@ import static javafx.scene.input.KeyCode.T;
  * @author lindezhi
  * 2016年6月13日 下午4:20:23
  */
-public abstract class RpcClusterClient extends AbstractRpcClient{
+public class RpcClusterClient extends AbstractRpcClient{
 	
 	private SimpleClientRemoteProxy proxy;
 	
@@ -68,7 +68,9 @@ public abstract class RpcClusterClient extends AbstractRpcClient{
 	 * @param group
      * @param <T>
      */
-	public abstract <T> void doRegisterRemote(Class<T> iface, String version, String group);
+	public <T> void doRegisterRemote(Class<T> iface, String version, String group){
+		this.executor.doRegisterRemote(iface,version,group);
+	}
 
 	@Override
 	public AbstractClientRemoteExecutor getRemoteExecutor() {

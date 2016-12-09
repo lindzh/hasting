@@ -33,6 +33,15 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	public abstract void startRpcCluster();
 	
 	public abstract void stopRpcCluster();
+
+	/**
+	 * 提供给子类使用,方便提供依赖上报
+	 * @param iface
+	 * @param version
+	 * @param group
+     * @param <T>
+     */
+	public abstract <T> void doRegisterRemote(Class<T> iface, String version, String group);
 	
 	public abstract String hash(List<String> servers);
 	

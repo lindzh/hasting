@@ -16,7 +16,11 @@ public class SimpleClusterExecutor extends AbstractRpcClusterClientExecutor{
 		return list;
 	}
 
-	
+	@Override
+	public <T> void doRegisterRemote(Class<T> iface, String version, String group) {
+
+	}
+
 	@Override
 	public List<RpcService> getServerService(RpcHostAndPort hostAndPort) {
 		List<RpcService> services = new ArrayList<RpcService>();

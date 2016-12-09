@@ -9,12 +9,7 @@ import com.linda.framework.rpc.utils.RpcUtils;
 public class SimpleClientTest {
 	
 	public static void main(String[] args) {
-		RpcClusterClient client = new RpcClusterClient(){
-            @Override
-            public <T> void doRegisterRemote(Class<T> iface, String version, String group) {
-
-            }
-        };
+		RpcClusterClient client = new RpcClusterClient();
 		client.setRemoteExecutor(new SimpleClusterExecutor());
 		client.startService();
 		HelloRpcService service = client.register(HelloRpcService.class);
