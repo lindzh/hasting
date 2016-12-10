@@ -69,7 +69,7 @@ public class RpcClusterClient extends AbstractRpcClient{
      * @param <T>
      */
 	public <T> void doRegisterRemote(Class<T> iface, String version, String group){
-		this.executor.doRegisterRemote(iface,version,group);
+		this.executor.doRegisterRemote(this.getApplication(),iface,version,group);
 	}
 
 	@Override

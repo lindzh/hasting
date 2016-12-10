@@ -35,13 +35,18 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	public abstract void stopRpcCluster();
 
 	/**
+	 * 本机ip
+	 */
+	private String selfIp;
+
+	/**
 	 * 提供给子类使用,方便提供依赖上报
 	 * @param iface
 	 * @param version
 	 * @param group
      * @param <T>
      */
-	public abstract <T> void doRegisterRemote(Class<T> iface, String version, String group);
+	public abstract <T> void doRegisterRemote(String application,Class<T> iface, String version, String group);
 	
 	public abstract String hash(List<String> servers);
 	
@@ -205,5 +210,34 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 			call.getAttachment().put("RpcToken",hostAndPort.getToken());
 		}
 		return connector;
-	} 
+	}
+
+	public String getSelfIp() {
+		if(selfIp==null){
+			selfIp = RpcUtils.chooseIP(RpcUtils.getLocalV4IPs());
+		}
+		return selfIp;
+	}
+
+	public void setSelfIp(String selfIp) {
+		this.selfIp = selfIp;
+	}
+
+	/**
+	 * 消费者应用列表
+	 * @param group
+	 * @param service
+	 * @param version
+     * @return
+     */
+	public abstract List<String> getConsumeApplications(String group,String service,String version);
+
+	/**
+	 * 获取消费者机器列表
+	 * @param group
+	 * @param service
+	 * @param version
+     * @return
+     */
+	public abstract List<ConsumeRpcObject> getConsumeObjects(String group,String service,String version);
 }
