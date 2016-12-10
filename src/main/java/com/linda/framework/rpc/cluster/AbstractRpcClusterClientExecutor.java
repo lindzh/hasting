@@ -1,11 +1,6 @@
 package com.linda.framework.rpc.cluster;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -48,11 +43,13 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
      */
 	public abstract <T> void doRegisterRemote(String application,Class<T> iface, String version, String group);
 	
-	public abstract String hash(List<String> servers);
+	public abstract String hash(List<RpcHostAndPort> servers);
 	
 	public abstract void onClose(RpcHostAndPort hostAndPort);
 	
-	private Map<String,List<String>> serviceServerCache = new HashMap<String,List<String>>();
+	private Map<String,List<RpcHostAndPort>> serviceServerCache = new HashMap<String,List<RpcHostAndPort>>();
+
+	private Map<String,RpcService> serviceCache = new HashMap<String,RpcService>();
 
 	private Map<String,RpcHostAndPort> serverHostCache = new HashMap<>();
 	
@@ -88,12 +85,14 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 				if(serverServices!=null){
 					for(RpcService serverService:serverServices){
 						String key = this.genserviceServersKey(serverService.getGroup(),serverService.getName(),serverService.getVersion());
-						List<String> servers = serviceServerCache.get(key);
+						//加入,方便权重使用
+						serviceCache.put(key,serverService);
+						List<RpcHostAndPort> servers = serviceServerCache.get(key);
 						if(servers==null){
-							servers = new ArrayList<String>();
+							servers = new ArrayList<RpcHostAndPort>();
 							serviceServerCache.put(key, servers);
 						}
-						servers.add(hostAndPort.toString());
+						servers.add(hostAndPort);
 					}
 				}
 			}
@@ -163,11 +162,17 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		}
 		serverConnectorCache.remove(server);
 		serverHostCache.remove(server);
-		Collection<List<String>> values = serviceServerCache.values();
-		for(List<String> servers:values){
-			if(servers!=null){
-				servers.remove(server);
+		Set<String> keys = serviceServerCache.keySet();
+		for(String key:keys){
+			List<RpcHostAndPort> servers = serviceServerCache.get(key);
+
+			ArrayList<RpcHostAndPort> hostAndPorts = new ArrayList<>();
+			for(RpcHostAndPort ss:servers){
+				if(!server.equals(ss.toString())){
+					hostAndPorts.add(ss);
+				}
 			}
+			serviceServerCache.put(key,hostAndPorts);
 		}
 	}
 	
@@ -179,24 +184,39 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 
 	@Override
 	public AbstractRpcConnector getRpcConnector(RemoteCall call) {
-		List<String> servers = Collections.emptyList();
+		List<RpcHostAndPort> servers = Collections.emptyList();
+		String application = null;
 		//泛型每台服务器都会有，所以需要转换server，做过滤处理
 		if(call.getService().equals(GenericService.class.getCanonicalName())){
 			String group = (String)call.getArgs()[0];
 			String service = (String)call.getArgs()[1];
 			String version = (String)call.getArgs()[2];
 			String key = this.genserviceServersKey(group,service,version);
-			servers = serviceServerCache.get(key);
+			RpcService rpcService = serviceCache.get(key);
+			if(rpcService!=null){
+				application = rpcService.getApplication();
+				servers = serviceServerCache.get(key);
+			}
 		}else{
 			String key = this.genserviceServersKey(call.getGroup(),call.getService(),call.getVersion());
-			servers = serviceServerCache.get(key);
+			RpcService rpcService = serviceCache.get(key);
+			if(rpcService!=null){
+				application = rpcService.getApplication();
+				servers = serviceServerCache.get(key);
+			}
 		}
-		if(servers==null||servers.size()<1){
+		if(application==null||servers==null||servers.size()<1){
 			throw new RpcException("can't find server for:"+call);
 		}
 		AbstractRpcConnector connector = null;
 		RpcHostAndPort hostAndPort = null;
+
 		while(connector==null&&servers.size()>0){
+
+			//获得权重值
+			List<HostWeight> weights = this.getWeights(application);
+			this.setWeight(weights,servers);
+
 			String server = this.hash(servers);
 			connector = serverConnectorCache.get(server);
 			hostAndPort = serverHostCache.get(server);
@@ -210,6 +230,20 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 			call.getAttachment().put("RpcToken",hostAndPort.getToken());
 		}
 		return connector;
+	}
+
+	private void setWeight(List<HostWeight> weights,List<RpcHostAndPort> hosts){
+		Map<String,HostWeight> weightMap = new HashMap<>();
+		for(HostWeight ww:weights){
+			weightMap.put(ww.getKey(),ww);
+		}
+
+		for(RpcHostAndPort host:hosts){
+			HostWeight weight = weightMap.get(host.toString());
+			if(weight!=null){
+				host.setWeight(weight.getWeight());
+			}
+		}
 	}
 
 	public String getSelfIp() {
@@ -240,4 +274,18 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
      * @return
      */
 	public abstract List<ConsumeRpcObject> getConsumeObjects(String group,String service,String version);
+
+	/**
+	 * 获取权重列表
+	 * @param application
+	 * @return
+     */
+	public abstract List<HostWeight> getWeights(String application);
+
+	/**
+	 * 设置权重列表
+	 * @param application
+	 * @param weight
+     */
+	public abstract void setWeight(String application,HostWeight weight);
 }

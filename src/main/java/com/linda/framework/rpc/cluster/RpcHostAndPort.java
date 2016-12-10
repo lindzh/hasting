@@ -55,11 +55,6 @@ public class RpcHostAndPort {
 		this.port = port;
 	}
 
-	@Override
-	public String toString() {
-		return host + ":" + port;
-	}
-
 	public long getTime() {
 		return time;
 	}
@@ -93,17 +88,18 @@ public class RpcHostAndPort {
 		RpcHostAndPort that = (RpcHostAndPort) o;
 
 		if (port != that.port) return false;
-		if (weight != that.weight) return false;
-		if (host != null ? !host.equals(that.host) : that.host != null) return false;
-		return token != null ? token.equals(that.token) : that.token == null;
+		return host != null ? host.equals(that.host) : that.host == null;
 	}
 
 	@Override
 	public int hashCode() {
 		int result = host != null ? host.hashCode() : 0;
 		result = 31 * result + port;
-		result = 31 * result + (token != null ? token.hashCode() : 0);
-		result = 31 * result + weight;
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return host+":"+port;
 	}
 }
