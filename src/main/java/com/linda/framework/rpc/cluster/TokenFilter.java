@@ -38,7 +38,7 @@ public class TokenFilter implements RpcFilter{
         if(this.validateToken){
             Map<String, Object> attachment = call.getAttachment();
             if(attachment==null){
-                this.sendTokenInvalid(rpc,call,sender,"attachment RpcToken is null");
+                this.sendTokenInvalid(rpc,call,sender,"attachment RpcToken container attachment null");
                 return ;
             }
             String token = (String)attachment.get("RpcToken");

@@ -140,6 +140,7 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 
 	public void remoteConnector(RpcHostAndPort hostAndPort){
 		serverConnectorCache.remove(hostAndPort.toString());
+		serverHostCache.remove(hostAndPort.toString());
 	}
 	
 	/**
@@ -229,6 +230,7 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 		if(hostAndPort!=null){
 			call.getAttachment().put("RpcToken",hostAndPort.getToken());
 		}
+
 		return connector;
 	}
 

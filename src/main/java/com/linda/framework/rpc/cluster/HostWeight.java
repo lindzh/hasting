@@ -38,4 +38,8 @@ public class HostWeight {
     public void setWeight(int weight) {
         this.weight = weight;
     }
+
+    public void setKey(String key){
+        //do nothing
+    }
 }

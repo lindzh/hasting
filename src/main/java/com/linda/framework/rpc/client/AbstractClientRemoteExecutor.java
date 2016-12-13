@@ -37,10 +37,11 @@ public abstract class AbstractClientRemoteExecutor implements RemoteExecutor,Rpc
 	
 	@Override
 	public void oneway(RemoteCall call) {
+		AbstractRpcConnector connector = getRpcConnector(call);
 		byte[] buffer = serializer.serialize(call);
 		int length = buffer.length;
 		RpcObject rpc = new RpcObject(ONEWAY,this.genIndex(),length,buffer);
-		getRpcConnector(call).sendRpcObject(rpc, timeout);
+		connector.sendRpcObject(rpc, timeout);
 	}
 	
 	private String genRpcCallCacheKey(long threadId,int index){
@@ -49,12 +50,13 @@ public abstract class AbstractClientRemoteExecutor implements RemoteExecutor,Rpc
 
 	@Override
 	public Object invoke(RemoteCall call) {
+		AbstractRpcConnector connector = getRpcConnector(call);
 		byte[] buffer = serializer.serialize(call);
 		int length = buffer.length;
 		RpcObject request = new RpcObject(INVOKE,this.genIndex(),length,buffer);
 		RpcCallSync sync = new RpcCallSync(request.getIndex(),request);
 		rpcCache.put(this.genRpcCallCacheKey(request.getThreadId(), request.getIndex()), sync);
-		getRpcConnector(call).sendRpcObject(request, timeout);
+		connector.sendRpcObject(request, timeout);
 		clientRpcSync.waitForResult(timeout, sync);
 		rpcCache.remove(sync.getIndex());
 		RpcObject response = sync.getResponse();
