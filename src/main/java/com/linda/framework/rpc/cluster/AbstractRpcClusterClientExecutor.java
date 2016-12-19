@@ -149,7 +149,20 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	@Override
 	public void stopService() {
 		this.stopRpcCluster();
-		this.startConnectors();
+		this.stopConnectors();
+	}
+
+	/**
+	 * 停止服务
+	 */
+	private void stopConnectors(){
+		Set<Map.Entry<String, AbstractRpcConnector>> entries = serverConnectorCache.entrySet();
+		for(Map.Entry<String, AbstractRpcConnector> entry:entries){
+			AbstractRpcConnector connector = entry.getValue();
+			if(connector!=null){
+				connector.stopService();
+			}
+		}
 	}
 	
 	/**
