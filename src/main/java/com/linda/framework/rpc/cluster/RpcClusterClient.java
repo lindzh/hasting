@@ -112,4 +112,15 @@ public class RpcClusterClient extends AbstractRpcClient{
 	public List<RpcService> getServerService(RpcHostAndPort hostAndPort) {
 		return getClusterClientExecutor().getServerService(hostAndPort);
 	}
+
+	@Override
+	public String getApplication() {
+		return super.getApplication();
+	}
+
+	@Override
+	public void setApplication(String application) {
+		super.setApplication(application);
+		((AbstractRpcClusterClientExecutor)this.getRemoteExecutor()).setApplication(application);
+	}
 }

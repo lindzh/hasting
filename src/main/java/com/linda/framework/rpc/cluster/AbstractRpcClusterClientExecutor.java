@@ -29,6 +29,8 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	
 	public abstract void stopRpcCluster();
 
+	private String application;
+
 	/**
 	 * 本机ip
 	 */
@@ -78,6 +80,11 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	}
 
 	protected boolean startConnector(RpcHostAndPort hostAndPort){
+		//消费者上传不加入
+		if(hostAndPort.getPort()<1000){
+			return false;
+		}
+		//消费者
 		try{
 			boolean initAndStartConnector = this.initAndStartConnector(hostAndPort);
 			if(initAndStartConnector){
@@ -303,4 +310,12 @@ public abstract class AbstractRpcClusterClientExecutor extends AbstractClientRem
 	 * @param weight
      */
 	public abstract void setWeight(String application,HostWeight weight);
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
+	}
 }

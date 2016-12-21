@@ -6,6 +6,8 @@ package com.linda.framework.rpc.cluster;
  * 2015年6月13日 下午2:59:18
  */
 public class RpcHostAndPort {
+
+	private String application;
 	
 	/**
 	 * provider host
@@ -78,6 +80,14 @@ public class RpcHostAndPort {
 
 	public void setWeight(int weight) {
 		this.weight = weight;
+	}
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
 	}
 
 	@Override
