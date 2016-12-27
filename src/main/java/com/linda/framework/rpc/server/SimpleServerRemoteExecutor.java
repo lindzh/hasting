@@ -11,6 +11,7 @@ import com.linda.framework.rpc.exception.RpcException;
 import com.linda.framework.rpc.exception.RpcExceptionHandler;
 import com.linda.framework.rpc.exception.SimpleRpcExceptionHandler;
 import com.linda.framework.rpc.utils.RpcUtils;
+import com.linda.framework.rpc.utils.XAliasUtils;
 
 /**
  * provider业务代码执行
@@ -86,6 +87,9 @@ public class SimpleServerRemoteExecutor implements RemoteExecutor,RpcServicesHol
 		if(group==null){
 			group = RpcUtils.DEFAULT_GROUP;
 		}
+		//添加类型映射
+		XAliasUtils.addServiceRefType(clazz);
+
 		exeCache.put(this.genExeKey(clazz.getName(), version,group), new RpcServiceBean(clazz,ifaceImpl,version,application,group));
 	}
 	

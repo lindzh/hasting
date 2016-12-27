@@ -11,6 +11,7 @@ import com.linda.framework.rpc.RemoteExecutor;
 import com.linda.framework.rpc.RpcContext;
 import com.linda.framework.rpc.Service;
 import com.linda.framework.rpc.utils.RpcUtils;
+import com.linda.framework.rpc.utils.XAliasUtils;
 
 public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 
@@ -86,6 +87,9 @@ public class SimpleClientRemoteProxy implements InvocationHandler,Service{
 		if(group==null){
 			group = RpcUtils.DEFAULT_GROUP;
 		}
+
+		XAliasUtils.addServiceRefType(remote);
+
 		groupCache.put(remote,group);
 		return result;
 	}

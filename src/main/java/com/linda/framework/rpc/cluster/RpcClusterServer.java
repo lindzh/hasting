@@ -6,6 +6,7 @@ import com.linda.framework.rpc.net.RpcNetBase;
 import com.linda.framework.rpc.net.RpcNetListener;
 import com.linda.framework.rpc.server.SimpleRpcServer;
 import com.linda.framework.rpc.utils.RpcUtils;
+import com.linda.framework.rpc.utils.XAliasUtils;
 
 import java.util.Random;
 import java.util.UUID;
@@ -67,10 +68,6 @@ public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNet
 
 		super.startService();
 	}
-
-	protected abstract void doRegister(Class<?> clazz, Object ifaceImpl);
-	
-	protected abstract void doRegister(Class<?> clazz, Object ifaceImpl, String version);
 
 	protected abstract void doRegister(Class<?> clazz, Object ifaceImpl, String version,String group);
 
