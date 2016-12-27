@@ -1,5 +1,8 @@
 package com.linda.framework.rpc;
 
+import com.linda.framework.rpc.utils.XName;
+import com.linda.framework.rpc.utils.XNamespace;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +13,7 @@ import java.util.Map;
  * @author linda
  *
  */
+@XNamespace("system")
 public class RemoteCall implements Serializable{
 
 	private static final long serialVersionUID = 2769999854843571360L;
@@ -17,31 +21,37 @@ public class RemoteCall implements Serializable{
 	/**
 	 * 分组
 	 */
+	@XName("group")
 	private String group;
 	
 	/**
 	 * 服务名称 classname
 	 */
+	@XName("service")
 	private String service;
 	
 	/**
 	 * 服务版本
 	 */
+	@XName("version")
 	private String version;
 	
 	/**
 	 * 方法
 	 */
+	@XName("method")
 	private String method;
 	
 	/**
 	 * 方法参数
 	 */
+	@XName("args")
 	private Object[] args;
 	
 	/**
 	 * 上下文，用户传递相关参数，使用案例如分布式环境下log跟踪，同一个客户端请求，经过的所有服务器处理flag一致，方便搜索与跟踪
 	 */
+	@XName("attachment")
 	private Map<String,Object> attachment = new HashMap<>();
 
 	public RemoteCall(){
