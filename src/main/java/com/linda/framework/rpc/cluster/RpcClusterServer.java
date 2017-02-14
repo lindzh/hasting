@@ -24,6 +24,8 @@ public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNet
 	protected boolean validateToken = true;
 
 	protected String token;
+
+	protected boolean stop = false;
 	
 	@Override
 	public void register(Class<?> clazz, Object ifaceImpl) {
@@ -67,9 +69,16 @@ public abstract class RpcClusterServer extends SimpleRpcServer implements RpcNet
 		}
 
 		super.startService();
+		stop = false;
 	}
 
-	protected abstract void doRegister(Class<?> clazz, Object ifaceImpl, String version,String group);
+	@Override
+	public void stopService() {
+		super.stopService();
+		this.stop = true;
+	}
+
+	protected abstract void doRegister(Class<?> clazz, Object ifaceImpl, String version, String group);
 
 	@Override
 	public void setAcceptor(AbstractRpcAcceptor acceptor) {
