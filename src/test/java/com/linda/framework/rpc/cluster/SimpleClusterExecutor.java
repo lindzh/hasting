@@ -17,11 +17,6 @@ public class SimpleClusterExecutor extends AbstractRpcClusterClientExecutor{
 	}
 
 	@Override
-	public <T> void doRegisterRemote(Class<T> iface, String version, String group) {
-
-	}
-
-	@Override
 	public List<RpcService> getServerService(RpcHostAndPort hostAndPort) {
 		List<RpcService> services = new ArrayList<RpcService>();
 		services.add(new RpcService("com.linda.framework.rpc.HelloRpcService",RpcUtils.DEFAULT_VERSION));
@@ -40,10 +35,29 @@ public class SimpleClusterExecutor extends AbstractRpcClusterClientExecutor{
 	}
 
 	@Override
-	public String hash(List<String> servers) {
-		return servers.get(0);
+	public <T> void doRegisterRemote(String application, Class<T> iface, String version, String group) {
+
 	}
 
+	@Override
+	public List<String> getConsumeApplications(String group, String service, String version) {
+		return null;
+	}
+
+	@Override
+	public List<ConsumeRpcObject> getConsumeObjects(String group, String service, String version) {
+		return null;
+	}
+
+	@Override
+	public List<HostWeight> getWeights(String application) {
+		return null;
+	}
+
+	@Override
+	public void setWeight(String application, HostWeight weight) {
+
+	}
 
 	@Override
 	public void onClose(RpcHostAndPort hostAndPort) {
@@ -54,5 +68,10 @@ public class SimpleClusterExecutor extends AbstractRpcClusterClientExecutor{
 	@Override
 	public void onStart(RpcNetBase network) {
 		System.out.println("start:"+network.getHost()+":"+network.getPort());
+	}
+
+	@Override
+	public String hash(List<RpcHostAndPort> servers) {
+		return null;
 	}
 }

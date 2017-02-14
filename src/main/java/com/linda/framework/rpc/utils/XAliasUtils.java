@@ -49,6 +49,10 @@ public class XAliasUtils {
 
     }
 
+    public static boolean isInnerType(Class clazz){
+        return aliasClassCache.get(clazz.getName())!=null;
+    }
+
     public static void addAlias(Class clazz){
         if(clazz==Object.class){
             return ;
@@ -62,6 +66,7 @@ public class XAliasUtils {
         }
         if(clazz.isArray()){
             addAlias(clazz.getComponentType());
+            return;
         }
 
         if(List.class.isAssignableFrom(clazz)){
@@ -72,6 +77,7 @@ public class XAliasUtils {
             ParameterizedType pt = (ParameterizedType)genType;
             Type[] actualTypeArguments = pt.getActualTypeArguments();
             addAlias((Class)actualTypeArguments[0]);
+            return;
         }
 
         if(Set.class.isAssignableFrom(clazz)){
@@ -82,6 +88,7 @@ public class XAliasUtils {
             ParameterizedType pt = (ParameterizedType)genType;
             Type[] actualTypeArguments = pt.getActualTypeArguments();
             addAlias((Class)actualTypeArguments[0]);
+            return;
         }
 
         if(Map.class.isAssignableFrom(clazz)){
@@ -93,6 +100,11 @@ public class XAliasUtils {
             Type[] actualTypeArguments = pt.getActualTypeArguments();
             addAlias((Class)actualTypeArguments[0]);
             addAlias((Class)actualTypeArguments[1]);
+            return;
+        }
+
+        if(isInnerType(clazz)){
+            return;
         }
 
         if(clazz.getCanonicalName().startsWith("java.")||clazz.getCanonicalName().startsWith("javax.")){
