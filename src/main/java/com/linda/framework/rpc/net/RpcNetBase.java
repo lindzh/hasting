@@ -117,9 +117,12 @@ public abstract class RpcNetBase extends AbstractRpcNetworkBase implements RpcNe
 		}
 	}
 
+	/**
+	 * executorSharable为true的才可以关闭
+	 */
 	@Override
 	public void stopService() {
-		if(!this.isExecutorSharable()&&executorService!=null){
+		if(this.isExecutorSharable()&&executorService!=null){
 			executorService.shutdown();
 		}
 	}
