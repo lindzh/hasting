@@ -1,0 +1,42 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<web-app>
+	<display-name>Archetype Created Web Application</display-name>
+	
+	<filter>
+		<filter-name>EncodingFilter</filter-name>
+		<filter-class>com.lindzh.hasting.webui.servlet.EncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>EncodingFilter</filter-name>
+		<servlet-name>WebuiServlet</servlet-name>
+	</filter-mapping>
+	
+	<servlet>
+		<servlet-name>WebuiServlet</servlet-name>
+		<description>rpc webui</description>
+		<servlet-class>com.lindzh.hasting.webui.servlet.WebuiServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+		<init-param>
+			<param-name>rpcConfig</param-name>
+			<param-value>webui.json</param-value>
+		</init-param>
+		<init-param>
+			<param-name>templateLocation</param-name>
+			<param-value>/WEB-INF/template</param-value>
+		</init-param>
+		<init-param>
+			<param-name>templateSuffix</param-name>
+			<param-value>ftl</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WebuiServlet</servlet-name>
+		<url-pattern>/webui/*</url-pattern>
+	</servlet-mapping>
+</web-app>

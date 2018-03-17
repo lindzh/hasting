@@ -1,0 +1,14 @@
+[
+    {
+        "namespace": "default",
+        "protocol": "redis",
+        "etcdUrl": null,
+        "redisHost": "192.168.139.129",
+        "redisPort": 7770,
+        "sentinelMaster": null,
+        "sentinels": null,
+        "providerHost": null,
+        "providerPort": 0,
+        "zkConnectionString": null
+    }
+]

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <mvc:default-servlet-handler />
+
+    <aop:aspectj-autoproxy/>
+
+    <context:component-scan base-package="com.lindzh.hasting.webui.controller"/>
+
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+            <bean class="org.springframework.http.converter.FormHttpMessageConverter" />
+            <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+        <property name="serializationInclusion">
+            <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+        </property>
+    </bean>
+    <bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+        <property name="autodetectAnnotations" value="true" />
+        <property name="streamDriver">
+            <bean class="com.thoughtworks.xstream.io.xml.DomDriver" />
+        </property>
+    </bean>
+    <bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
+    <bean id="freemarkerConfig"
+          class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPath" value="WEB-INF/template"></property>
+        <property name="freemarkerSettings">
+            <props>
+                <!-- 10 minutes -->
+                <prop key="template_update_delay">0</prop>
+                <prop key="default_encoding">UTF-8</prop>
+                <prop key="locale">zh_cn</prop>
+                <prop key="number_format">0.##########</prop>
+                <prop key="url_escaping_charset">UTF-8</prop>
+            </props>
+        </property>
+        <property name="freemarkerVariables">
+            <map>
+                <entry key="xml_escape" value-ref="fmXmlEscape" />
+            </map>
+        </property>
+    </bean>
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="defaultContentType" value="application/json" />
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html;charset=UTF-8" />
+                <entry key="json" value="application/json;charset=UTF-8" />
+                <entry key="xml" value="application/xml;charset=UTF-8" />
+            </map>
+        </property>
+        <property name="viewResolvers">
+            <list>
+                <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+                    <property name="cache" value="false" />
+                    <property name="prefix" value=""/>
+                    <property name="suffix" value=".ftl" />
+                    <property name="exposeSpringMacroHelpers" value="true" />
+                    <property name="exposeRequestAttributes" value="true" />
+                    <property name="exposeSessionAttributes" value="true" />
+                    <property name="contentType" value="text/html;charset=UTF-8" />
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+                    <property name="objectMapper" ref="objectMapper" />
+                    <property name="contentType" value="application/json;charset=UTF-8" />
+                    <property name="modelKeys">
+                        <set>
+                            <value>data</value>
+                            <value>code</value>
+                            <value>message</value>
+                        </set>
+                    </property>
+                </bean>
+
+                <bean id="marshallingView" class="org.springframework.web.servlet.view.xml.MarshallingView">
+                    <property name="marshaller" ref="xstreamMarshaller"></property>
+                    <property name="modelKey" value="data"></property>
+                    <property name="contentType" value="application/xml" />
+                </bean>
+
+            </list>
+        </property>
+    </bean>
+    <bean id="handlerMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="41943040" />
+    </bean>
+</beans>
