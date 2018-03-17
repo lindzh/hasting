@@ -1,0 +1,62 @@
+.kop-login-form{
+	width: 300px;
+	margin: 200px auto;
+}
+
+.kop-list-select{
+	display: online;
+}
+
+.kop-list-select-left{
+	float:left;
+	width:700px;
+	display: online;
+}
+
+.kop-list-select-right{
+	float:right;
+	display: online;
+}
+
+.kop-no-display{
+	display: none;
+}
+
+.kop-display{
+	display: block;
+}
+
+.error{
+	font-weight:normal;
+	font-style:normal;
+	font-size:12px;
+	color:red;
+}
+
+.modal-dialog{
+	width:1000px;
+}
+
+.pannel-magin0{
+	margin-bottom:0px;
+}
+
+.searchIpt{
+	width:300px;
+}
+
+.rightSpan{
+	float:right;
+}
+
+.limit-service{
+    width:200;
+}
+
+.limit-method{
+    width:50;
+}
+
+.limit-num{
+    width:20;
+}

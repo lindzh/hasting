@@ -2,17 +2,23 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.linda</groupId>
-	<artifactId>framework-rpc</artifactId>
+	<groupId>com.lindzh</groupId>
+	<artifactId>hasting-all</artifactId>
 	<version>0.1.2-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
-	<name>framework.rpc</name>
+	<name>hasting-all</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
+	<modules>
+        <module>hasting-rpc</module>
+		<module>hasting-cluster</module>
+		<module>hasting-webui</module>
+	</modules>
 
 	<repositories>
 		<repository>
@@ -22,6 +28,7 @@
 		</repository>
 	</repositories>
 
+	<dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -34,7 +41,23 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
 		</dependency>
+		<dependency>
+			<groupId>com.lindzh</groupId>
+			<artifactId>hasting-rpc</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lindzh</groupId>
+			<artifactId>hasting-cluster</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lindzh</groupId>
+			<artifactId>hasting-webui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
+	</dependencyManagement>
 	
 	<build>
 		<plugins>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <!--
+    <bean id="adminService" class="SimpleRpcAdminService" init-method="startService" destroy-method="stopService">
+        <property name="namespace" value="default"></property>
+        <property name="host" value=""></property>
+        <property name="port" value=""></property>
+    </bean>
+    -->
+
+    <!--
+    <bean id="adminService" class="EtcdRpcAdminService" init-method="startService" destroy-method="stopService">
+        <property name="namespace" value="${rpc.namespace}"></property>
+        <property name="etcdUrl" value="${rpc.etcdurl}"></property>
+    </bean>
+    -->
+
+    <!--
+        <bean id="adminService" class="RedisRpcAdminService"  destroy-method="stopService">
+            <property name="namespace" value="default"></property>
+            <property name="redisHost" value="127.0.0.1"></property>
+            <property name="redisPort" value="6379"></property>
+
+            <property name="redisMasterName" value=""></property>
+            <property name="redisSentinels" value=""></property>
+    </bean>
+    -->
+
+    <bean id="adminService" class="com.lindzh.hasting.cluster.zk.ZkRpcAdminService" init-method="startService" destroy-method="stopService">
+        <property name="namespace" value="${rpc.namespace}"></property>
+        <property name="connectString" value="${rpc.zkurl}"></property>
+    </bean>
+
+
+    <context:component-scan base-package="com.linda.rpc.webui.manager"></context:component-scan>
+
+    <context:component-scan base-package="com.linda.rpc.webui.biz"></context:component-scan>
+
+    <bean id="contextSchedule" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="updateServersTrigger"/>
+                <ref bean="fetchHostInfoTrigger"/>
+                <ref bean="syncConsumersTrigger"/>
+                <ref bean="updateServiceCountAndStatusTrigger"/>
+                <ref bean="weightTaskTrigger"/>
+                <ref bean="limitTaskTrigger"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="updateServersTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="updateServersJobDetail" />
+        <property name="cronExpression" value="0/30 * * * * ?" />
+    </bean>
+
+    <bean id="updateServersJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="managerService" />
+        <property name="targetMethod" value="doUpdateServers" />
+    </bean>
+
+    <bean id="fetchHostInfoTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="fetchHostInfoJobDetail" />
+        <property name="cronExpression" value="10/30 * * * * ?" />
+    </bean>
+
+    <bean id="fetchHostInfoJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="managerService" />
+        <property name="targetMethod" value="doFetchHostInfoTask" />
+    </bean>
+
+
+    <bean id="syncConsumersTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="syncConsumersJobDetail" />
+        <property name="cronExpression" value="20/30 * * * * ?" />
+    </bean>
+
+    <bean id="syncConsumersJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="managerService" />
+        <property name="targetMethod" value="doSyncConsumers" />
+    </bean>
+
+
+    <bean id="updateServiceCountAndStatusTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="updateServiceCountAndStatusJobDetail" />
+        <property name="cronExpression" value="5/10 * * * * ?" />
+    </bean>
+
+    <bean id="updateServiceCountAndStatusJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="managerService" />
+        <property name="targetMethod" value="doUpdateServiceCountAndStatus" />
+    </bean>
+
+    <bean id="weightTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="weightTaskJobDetail" />
+        <property name="cronExpression" value="7/30 * * * * ?" />
+    </bean>
+
+    <bean id="weightTaskJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="managerService" />
+        <property name="targetMethod" value="doWeightTask" />
+    </bean>
+
+
+    <bean id="limitTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="limitTaskJobDetail" />
+        <property name="cronExpression" value="2/30 * * * * ?" />
+    </bean>
+
+    <bean id="limitTaskJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="managerService" />
+        <property name="targetMethod" value="syncLimits" />
+    </bean>
+
+
+</beans>
