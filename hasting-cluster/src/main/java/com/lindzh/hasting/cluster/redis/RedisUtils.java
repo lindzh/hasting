@@ -1,6 +1,5 @@
 package com.lindzh.hasting.cluster.redis;
 
-import com.linda.framework.rpc.cluster.*;
 import com.lindzh.hasting.rpc.cluster1.RpcHostAndPort;
 import com.lindzh.hasting.cluster.JSONUtils;
 import com.lindzh.hasting.cluster.MD5Utils;

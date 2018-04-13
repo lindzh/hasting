@@ -3,7 +3,6 @@ package com.lindzh.hasting.cluster.etcd;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.linda.framework.rpc.cluster.*;
 import com.lindzh.hasting.cluster.hash.Hashing;
 import com.lindzh.hasting.cluster.hash.RoundRobinHashing;
 import com.lindzh.hasting.cluster.limit.LimitDefine;
@@ -19,11 +18,11 @@ import org.apache.log4j.Logger;
 
 import com.lindzh.hasting.rpc.RpcService;
 import com.lindzh.hasting.rpc.net.RpcNetBase;
-import com.linda.jetcd.EtcdChangeResult;
-import com.linda.jetcd.EtcdClient;
-import com.linda.jetcd.EtcdNode;
-import com.linda.jetcd.EtcdResult;
-import com.linda.jetcd.EtcdWatchCallback;
+import com.lindzh.jetcd.EtcdChangeResult;
+import com.lindzh.jetcd.EtcdClient;
+import com.lindzh.jetcd.EtcdNode;
+import com.lindzh.jetcd.EtcdResult;
+import com.lindzh.jetcd.EtcdWatchCallback;
 
 public class EtcdRpcClientExecutor extends AbstractRpcClusterClientExecutor {
 

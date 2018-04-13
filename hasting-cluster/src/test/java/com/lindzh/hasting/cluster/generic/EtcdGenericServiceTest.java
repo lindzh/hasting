@@ -2,10 +2,10 @@ package com.lindzh.hasting.cluster.generic;
 
 import java.util.HashMap;
 
+import com.lindzh.hasting.cluster.JSONUtils;
 import com.lindzh.hasting.cluster.etcd.EtcdRpcClient;
 import com.lindzh.hasting.rpc.generic.GenericService;
 import com.lindzh.hasting.rpc.utils.RpcUtils;
-import com.linda.jetcd.JSONUtils;
 
 public class EtcdGenericServiceTest {
 	

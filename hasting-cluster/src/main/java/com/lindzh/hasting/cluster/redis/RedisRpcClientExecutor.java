@@ -3,7 +3,6 @@ package com.lindzh.hasting.cluster.redis;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.linda.framework.rpc.cluster.*;
 import com.lindzh.hasting.cluster.hash.RoundRobinHashing;
 import com.lindzh.hasting.rpc.cluster1.AbstractRpcClusterClientExecutor;
 import com.lindzh.hasting.rpc.cluster1.ConsumeRpcObject;

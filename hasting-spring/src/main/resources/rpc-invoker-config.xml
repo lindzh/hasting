@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans  
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+					       http://www.springframework.org/schema/context
+						   http://www.springframework.org/schema/context/spring-context.xsd">
+		
+		
+	<bean id="simpleRpcClient" class="com.lindzh.hasting.rpc.client.SimpleRpcClient">
+		<property name="host" value="127.0.0.1"></property>
+		<property name="port" value="5432"></property>
+	</bean>	
+	
+	<bean id="rpcPackages" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<value>com.lindzh.hasting.spring.test</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="rpcInvokerAnnotationConfigurer" class="com.lindzh.hasting.spring.invoker.RpcInvokerAnnotationConfigurer" destroy-method="stopRpcService">
+		<property name="packages" ref="rpcPackages"/>
+	</bean>
+	
+	<context:component-scan base-package="com.lindzh.hasting.spring.test"></context:component-scan>
+	
+</beans>

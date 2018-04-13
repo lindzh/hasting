@@ -3,7 +3,7 @@ package com.lindzh.hasting.cluster.etcd;
 import com.lindzh.hasting.cluster.JSONUtils;
 import com.lindzh.hasting.cluster.limit.LimitConst;
 import com.lindzh.hasting.cluster.limit.LimitDefine;
-import com.linda.jetcd.EtcdClient;
+import com.lindzh.jetcd.EtcdClient;
 
 import java.util.ArrayList;
 

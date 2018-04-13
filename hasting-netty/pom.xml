@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.lindzh</groupId>
+		<artifactId>hasting-all</artifactId>
+		<version>0.1.2-SNAPSHOT</version>
+	</parent>
+	<artifactId>hasting-netty</artifactId>
+	<packaging>jar</packaging>
+
+	<name>hasting-netty-${project.version}</name>
+	<url>http://maven.apache.org</url>
+
+<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.lindzh</groupId>
+			<artifactId>hasting-rpc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>compile</phase>
+                        <goals><goal>jar-no-fork</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>deploy</id>
+                        <phase>deploy</phase>
+                        <goals><goal>deploy</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>   
+			     <artifactId>maven-assembly-plugin</artifactId>   
+			     <version>2.2-beta-5</version>   
+			     <configuration>   
+			          <archive>  
+			               <manifest>  
+			                    <mainClass>com.wolf.Process</mainClass>  
+			               </manifest>  
+			          </archive>  
+			          <descriptorRefs>   
+			               <descriptorRef>jar-with-dependencies</descriptorRef>   
+			          </descriptorRefs>   
+			     </configuration>   
+			</plugin> 
+		</plugins>
+	</build>
+</project>

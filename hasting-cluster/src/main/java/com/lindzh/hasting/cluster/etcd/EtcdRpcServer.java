@@ -8,16 +8,16 @@ import com.lindzh.hasting.rpc.cluster1.RpcHostAndPort;
 import com.lindzh.hasting.cluster.limit.LimitCache;
 import com.lindzh.hasting.cluster.limit.LimitFilter;
 import com.lindzh.hasting.cluster.limit.LimitDefine;
-import com.linda.jetcd.EtcdChangeResult;
-import com.linda.jetcd.EtcdResult;
-import com.linda.jetcd.EtcdWatchCallback;
+import com.lindzh.jetcd.EtcdChangeResult;
+import com.lindzh.jetcd.EtcdResult;
+import com.lindzh.jetcd.EtcdWatchCallback;
 import com.lindzh.hasting.cluster.JSONUtils;
 import org.apache.log4j.Logger;
 
 import com.lindzh.hasting.rpc.RpcService;
 import com.lindzh.hasting.cluster.MD5Utils;
 import com.lindzh.hasting.rpc.net.RpcNetBase;
-import com.linda.jetcd.EtcdClient;
+import com.lindzh.jetcd.EtcdClient;
 
 /**
  * 
