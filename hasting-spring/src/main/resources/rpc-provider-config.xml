@@ -16,7 +16,7 @@
 		<property name="port" value="5432"></property>
 	</bean>
 	
-	<bean id="rpcServerFilter" class="RpcTestFilter"/>
+	<bean id="rpcServerFilter" class="com.lindzh.hasting.spring.filter.RpcTestFilter"/>
 
 	<bean class="com.lindzh.hasting.spring.provider.RpcProviderProcessor" destroy-method="stopRpcService"/>
 	

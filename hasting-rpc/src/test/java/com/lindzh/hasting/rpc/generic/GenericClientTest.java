@@ -16,7 +16,7 @@ public class GenericClientTest {
 		GenericService service = client.register(GenericService.class);
 
 		String[] getBeanTypes = new String[] {
-				"TestBean", "int" };
+				"com.lindzh.hasting.rpc.TestBean", "int" };
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("limit", 111);
 		map.put("offset", 322);
@@ -24,7 +24,7 @@ public class GenericClientTest {
 		map.put("message", "this is a test");
 		Object[] getBeanArgs = new Object[] { map, 543543 };
 		RpcContext.getContext().setAttachment("myhaha", "myattachment value");
-		Object hh = service.invoke("aapp","HelloRpcService",
+		Object hh = service.invoke("aapp","com.lindzh.hasting.rpc.HelloRpcService",
 				RpcUtils.DEFAULT_VERSION, "getBean", getBeanTypes, getBeanArgs);
 		RpcContext.getContext().clear();
 		System.out.println("getBean result:" + hh);
@@ -33,7 +33,7 @@ public class GenericClientTest {
 		Object[] args = new Object[] { "hello,this is linda", 543543 };
 		RpcContext.getContext().setAttachment("myattachment", "myhaha value");
 		Object invoke = service.invoke("aapp",
-				"HelloRpcService",
+				"com.lindzh.hasting.rpc.HelloRpcService",
 				RpcUtils.DEFAULT_VERSION, "sayHello", argTypes, args);
 		RpcContext.getContext().clear();
 		System.out.println("sayHello result:" + invoke);

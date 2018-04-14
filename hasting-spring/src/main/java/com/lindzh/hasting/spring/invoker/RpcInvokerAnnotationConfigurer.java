@@ -14,62 +14,62 @@ import org.springframework.context.ApplicationContextAware;
 
 
 public class RpcInvokerAnnotationConfigurer implements
-		BeanDefinitionRegistryPostProcessor,ApplicationContextAware {
+        BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
-	private List<String> packages;
+    private List<String> packages;
 
-	private Map<String, AbstractRpcClient> rpcClients;
-	
-	private ApplicationContext apc;
+    private Map<String, AbstractRpcClient> rpcClients;
 
-	public List<String> getPackages() {
-		return packages;
-	}
+    private ApplicationContext apc;
 
-	public void setPackages(List<String> packages) {
-		this.packages = packages;
-	}
+    public List<String> getPackages() {
+        return packages;
+    }
 
-	public Map<String, AbstractRpcClient> getRpcClients() {
-		return rpcClients;
-	}
+    public void setPackages(List<String> packages) {
+        this.packages = packages;
+    }
 
-	public void setRpcClients(Map<String, AbstractRpcClient> rpcClients) {
-		this.rpcClients = rpcClients;
-	}
+    public Map<String, AbstractRpcClient> getRpcClients() {
+        return rpcClients;
+    }
 
-	@Override
-	public void postProcessBeanFactory(
-			ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void setRpcClients(Map<String, AbstractRpcClient> rpcClients) {
+        this.rpcClients = rpcClients;
+    }
 
-	}
+    @Override
+    public void postProcessBeanFactory(
+            ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
-	@Override
-	public void postProcessBeanDefinitionRegistry(
-			BeanDefinitionRegistry registry) throws BeansException {
-		RpcInvokerAnnotationScanner scanner = new RpcInvokerAnnotationScanner(registry, rpcClients);
-		scanner.scan(packages.toArray(new String[0]));
-	}
+    }
 
-	private void startRpcs(){
-		Collection<AbstractRpcClient> clients = rpcClients.values();
-		for (AbstractRpcClient client : clients) {
-			client.startService();
-		}
-	}
-	
-	public void stopRpcService() {
-		Collection<AbstractRpcClient> clients = rpcClients.values();
-		for (AbstractRpcClient client : clients) {
-			client.stopService();
-		}
-	}
+    @Override
+    public void postProcessBeanDefinitionRegistry(
+            BeanDefinitionRegistry registry) throws BeansException {
+        RpcInvokerAnnotationScanner scanner = new RpcInvokerAnnotationScanner(registry, rpcClients);
+        scanner.scan(packages.toArray(new String[0]));
+    }
 
-	public void setApplicationContext(ApplicationContext apc)
-			throws BeansException {
-		this.apc = apc;
-		this.rpcClients = this.apc.getBeansOfType(AbstractRpcClient.class);
-		this.startRpcs();
-	}
+    private void startRpcs() {
+        Collection<AbstractRpcClient> clients = rpcClients.values();
+        for (AbstractRpcClient client : clients) {
+            client.startService();
+        }
+    }
+
+    public void stopRpcService() {
+        Collection<AbstractRpcClient> clients = rpcClients.values();
+        for (AbstractRpcClient client : clients) {
+            client.stopService();
+        }
+    }
+
+    public void setApplicationContext(ApplicationContext apc)
+            throws BeansException {
+        this.apc = apc;
+        this.rpcClients = this.apc.getBeansOfType(AbstractRpcClient.class);
+        this.startRpcs();
+    }
 
 }

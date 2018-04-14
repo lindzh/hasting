@@ -24,5 +24,9 @@ public class CallService {
 	public void callHelloTestIndex(int index,String key){
 		helloRpcTestService.index(index, key);
 	}
+
+	public TestRemoteBean getBean(TestBean bean,int id){
+		return helloService.getBean(bean, id);
+	}
 	
 }

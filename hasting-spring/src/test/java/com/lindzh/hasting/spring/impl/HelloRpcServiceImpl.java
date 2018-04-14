@@ -9,7 +9,7 @@ import com.lindzh.hasting.spring.test.HelloRpcService;
 import com.lindzh.hasting.spring.test.TestBean;
 
 @Service
-@RpcProviderService(rpcServer="simpleRpcServer",version="1.1")
+@RpcProviderService(rpcServer="simpleRpcServer",version="1.0")
 public class HelloRpcServiceImpl implements HelloRpcService{
 
 	private Logger logger = Logger.getLogger(HelloRpcServiceImpl.class);
