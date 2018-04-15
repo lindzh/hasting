@@ -40,7 +40,7 @@
 	</dependency>
 
       <dependency>
-          <groupId>com.linda.common</groupId>
+          <groupId>com.lindzh</groupId>
           <artifactId>mybatis-generator</artifactId>
           <version>1.0.3</version>
       </dependency>

@@ -1,7 +1,7 @@
 package com.lindzh.hasting.webui;
 
-import com.linda.common.mybatis.generator.bean.MybatisPojo;
-import com.linda.common.mybatis.generator.processor.DefaultMybatisGenerator;
+import com.lindzh.mybatis.generator.bean.MybatisPojo;
+import com.lindzh.mybatis.generator.processor.DefaultMybatisGenerator;
 import com.lindzh.hasting.webui.pojo.LimitInfo;
 
 /**

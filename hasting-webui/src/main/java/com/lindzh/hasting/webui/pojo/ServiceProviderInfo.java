@@ -1,8 +1,8 @@
 package com.lindzh.hasting.webui.pojo;
 
-import com.linda.common.mybatis.generator.annotation.Column;
-import com.linda.common.mybatis.generator.annotation.PrimaryKey;
-import com.linda.common.mybatis.generator.annotation.Table;
+import com.lindzh.mybatis.generator.annotation.Column;
+import com.lindzh.mybatis.generator.annotation.PrimaryKey;
+import com.lindzh.mybatis.generator.annotation.Table;
 import lombok.Data;
 
 /**
