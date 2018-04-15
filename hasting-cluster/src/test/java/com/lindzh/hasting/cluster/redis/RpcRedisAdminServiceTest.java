@@ -18,7 +18,9 @@ public class RpcRedisAdminServiceTest {
 		adminService.setRedisPort(6379);
 		adminService.startService();
 		List<RpcHostAndPort> rpcServers = adminService.getRpcServers();
+		System.out.println("servers start");
 		System.out.println(JSONUtils.toJSON(rpcServers));
+		System.out.println("servers end");
 		for(RpcHostAndPort hap:rpcServers){
 			List<RpcService> services = adminService.getRpcServices(hap);
 			System.out.println(JSONUtils.toJSON(services));
