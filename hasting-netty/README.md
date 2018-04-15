@@ -1,4 +1,4 @@
-#### Rpc netty支持
+#### Hasting netty支持组件
 
 >加入rpc对netty的支持，网络层。和rpc框架实现的nio，oio完全兼容，通信协议一样
 
